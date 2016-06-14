@@ -1,0 +1,9 @@
+target/
+*.class
+*.ipr
+*.iws
+*.iml
+*.log.*
+*.log
+tspm.properties
+logs/
