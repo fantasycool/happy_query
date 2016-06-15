@@ -1,5 +1,7 @@
 package com.happy_query.parser.definition;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,21 +15,15 @@ public class DataDefinition {
      */
     private String name;
     /**
-     * select, input, checkbox,multiselect
-     */
-    private DataDefinitionType type;
-    /**
      * 字段数据类型
      */
     private DataDefinitionDataType dataType;
+
+    private DefinitionType definitionType;
     /**
      * 是否为标签类型
      */
     private boolean isTag;
-    /**
-     * 标签类型选项
-     */
-    private List<String> tagOptions;
     /**
      * 字段描述
      */
@@ -50,6 +46,15 @@ public class DataDefinition {
      */
     private Boolean isUseTemplate;
 
+    /**
+     * 字典类型
+     */
+    private String type;
+
+    private Date gmtCreate;
+
+    private Date gmtModified;
+
     public long getId() {
         return id;
     }
@@ -58,11 +63,11 @@ public class DataDefinition {
         this.id = id;
     }
 
-    public DataDefinitionType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(DataDefinitionType type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -98,14 +103,6 @@ public class DataDefinition {
         isTag = tag;
     }
 
-    public List<String> getTagOptions() {
-        return tagOptions;
-    }
-
-    public void setTagOptions(List<String> tagOptions) {
-        this.tagOptions = tagOptions;
-    }
-
     public String getDesc() {
         return desc;
     }
@@ -138,11 +135,61 @@ public class DataDefinition {
         this.template = template;
     }
 
-    public int hashCode(){
+    public Date getGmtCreate() {
+        return gmtCreate;
+    }
+
+    public void setGmtCreate(Date gmtCreate) {
+        this.gmtCreate = gmtCreate;
+    }
+
+    public Date getGmtModified() {
+        return gmtModified;
+    }
+
+    public void setGmtModified(Date gmtModified) {
+        this.gmtModified = gmtModified;
+    }
+
+    public DefinitionType getDefinitionType() {
+        return definitionType;
+    }
+
+    public void setDefinitionType(DefinitionType definitionType) {
+        this.definitionType = definitionType;
+    }
+
+    public int hashCode() {
         return Integer.valueOf(String.valueOf(id));
     }
 
-    public static DataDefinition createFromMapData(Map<String, Object> data){
+    public static DataDefinition createFromMapData(Map<String, Object> data) {
+        DataDefinition dataDefinition = new DataDefinition();
+        dataDefinition.setDataOptions(analysisDataOptions(data.get("data_options")));
+        dataDefinition.setDataType(analysisDataDefinitionDataType(data.getOrDefault("data_type", "").toString()));
+        dataDefinition.setDesc(data.getOrDefault("description", "").toString());
+        dataDefinition.setDefinitionType(DefinitionType.getByValue(data.getOrDefault("definition_type", "").toString()));
+        dataDefinition.setTag(data.getOrDefault("is_tag", "0").toString().equals("1") ? true : false);
+        dataDefinition.setRule(data.getOrDefault("rule", "").toString());
+        dataDefinition.setDataOptions(Arrays.asList(data.getOrDefault("data_options", "").toString().split(",")));
+        dataDefinition.setTemplate(data.getOrDefault("template", "").toString());
+        dataDefinition.setUseTemplate(data.getOrDefault("is_use_template", "0").toString().equals("1") ? true : false);
+        dataDefinition.setType(data.getOrDefault("type", "0").toString());
+        dataDefinition.setGmtCreate((Date) data.get("gmt_create"));
+        dataDefinition.setGmtModified((Date) data.get("gmt_modified"));
+        dataDefinition.setId((Long) data.get("id"));
+        return dataDefinition;
+    }
+
+    private static List<String> analysisDataOptions(Object data_options) {
+        if (data_options != null) {
+            String[] options = data_options.toString().split(",");
+            return Arrays.asList(options);
+        }
         return null;
+    }
+
+    public static DataDefinitionDataType analysisDataDefinitionDataType(String ddt) {
+        return DataDefinitionDataType.getByValue(ddt);
     }
 }
