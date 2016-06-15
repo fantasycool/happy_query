@@ -20,7 +20,6 @@ public class JsonParseDataParam {
 
     private List<String> leftColumns;
 
-    private List<String> rightColumns;
 
     /**
      * limit n1, n2: n1
@@ -39,7 +38,6 @@ public class JsonParseDataParam {
         this.rightTableName = rightTableName;
         this.contextParameters = contextParams;
         this.leftColumns = leftColumns;
-        this.rightColumns = rightColumns;
     }
 
     public String getJsonOperation() {
@@ -90,11 +88,11 @@ public class JsonParseDataParam {
         this.size = size;
     }
 
-    public List<String> getRightColumns() {
-        return rightColumns;
+    public List<String> getLeftColumns() {
+        return leftColumns;
     }
 
-    public void setRightColumns(List<String> rightColumns) {
-        this.rightColumns = rightColumns;
+    public void setLeftColumns(List<String> leftColumns) {
+        this.leftColumns = leftColumns;
     }
 }
