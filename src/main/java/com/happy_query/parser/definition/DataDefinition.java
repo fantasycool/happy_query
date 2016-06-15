@@ -163,6 +163,13 @@ public class DataDefinition {
         return Integer.valueOf(String.valueOf(id));
     }
 
+    public boolean equals(Object obj) {
+        if (obj instanceof DataDefinition){
+           return ((DataDefinition) obj).getId() == this.getId();
+        }
+        return false;
+    }
+
     public static DataDefinition createFromMapData(Map<String, Object> data) {
         DataDefinition dataDefinition = new DataDefinition();
         dataDefinition.setDataOptions(analysisDataOptions(data.get("data_options")));
@@ -179,6 +186,12 @@ public class DataDefinition {
         dataDefinition.setGmtModified((Date) data.get("gmt_modified"));
         dataDefinition.setId((Long) data.get("id"));
         return dataDefinition;
+    }
+
+    public static DataDefinition createDataDefinitionById(Long id){
+        DataDefinition d = new DataDefinition();
+        d.setId(id);
+        return d;
     }
 
     private static List<String> analysisDataOptions(Object data_options) {
