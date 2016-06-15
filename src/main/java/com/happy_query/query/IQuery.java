@@ -1,10 +1,7 @@
 package com.happy_query.query;
 
 import com.happy_query.parser.domain.JsonParseDataParam;
-import com.happy_query.query.domain.Row;
-
-import javax.sql.DataSource;
-import java.util.List;
+import com.happy_query.query.domain.HappyQueryResult;
 
 /**
  * Query Runner to get query Result
@@ -14,8 +11,7 @@ public interface IQuery {
     /**
      * Query By JsonParseDataParam
      * @param jsonParseDataParam
-     * @param dataSource
      * @return
      */
-    List<Row> queryByJsonLogic(JsonParseDataParam jsonParseDataParam, DataSource dataSource);
+    HappyQueryResult queryByJsonLogic(JsonParseDataParam jsonParseDataParam);
 }

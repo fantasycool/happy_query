@@ -7,10 +7,17 @@ import javax.sql.DataSource;
 import java.util.List;
 
 /**
+ * Query to get result
  * Created by frio on 16/6/15.
  */
 public class Query implements IQuery {
-    public List<Row> queryByJsonLogic(JsonParseDataParam jsonParseDataParam, DataSource dataSource) {
+    private DataSource dataSource;
+
+    public Query(DataSource dataSource){
+        this.dataSource = dataSource;
+    }
+
+    public List<Row> queryByJsonLogic(JsonParseDataParam jsonParseDataParam) {
         return null;
     }
 }
