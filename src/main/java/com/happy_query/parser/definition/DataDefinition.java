@@ -49,15 +49,6 @@ public class DataDefinition {
      */
     private Boolean isUseTemplate;
 
-    //TODO
-    /**
-     * 读取template脚本,进行渲染
-     * @return
-     */
-    public String getViewValue(){
-        return "";
-    }
-
     public long getId() {
         return id;
     }
@@ -144,5 +135,9 @@ public class DataDefinition {
 
     public void setTemplate(String template) {
         this.template = template;
+    }
+
+    public int hashCode(){
+        return Integer.valueOf(String.valueOf(id));
     }
 }

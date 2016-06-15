@@ -1,25 +1,45 @@
 package com.happy_query.query.domain;
 
-import com.happy_query.parser.definition.DataDefinition;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.happy_query.parser.domain.JsonParseDataParam;
 
 /**
  * Created by frio on 16/6/15.
  */
 public class QueryResult {
-    private Map<DataDefinition, Value> data = new HashMap<DataDefinition, Value>();
+    private Row row;
+    private Integer count;
+    private JsonParseDataParam jsonParseDataParam;
+    private String querySql;
 
-    public Map<DataDefinition, Value> getData() {
-        return data;
+    public Row getRow() {
+        return row;
     }
 
-    public void setData(Map<DataDefinition, Value> data) {
-        this.data = data;
+    public void setRow(Row row) {
+        this.row = row;
     }
 
-    static class Value {
+    public Integer getCount() {
+        return count;
+    }
 
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
+    public JsonParseDataParam getJsonParseDataParam() {
+        return jsonParseDataParam;
+    }
+
+    public void setJsonParseDataParam(JsonParseDataParam jsonParseDataParam) {
+        this.jsonParseDataParam = jsonParseDataParam;
+    }
+
+    public String getQuerySql() {
+        return querySql;
+    }
+
+    public void setQuerySql(String querySql) {
+        this.querySql = querySql;
     }
 }

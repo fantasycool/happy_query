@@ -37,6 +37,7 @@ public class JsonParserTest {
                 "                  }\n" +
                 "          ]\n" +
                 "  ]";
+        System.out.println(j);
         System.out.println(jsonLogicParser.convertJsonToLogicExpression(j, null, null));
     }
 }
