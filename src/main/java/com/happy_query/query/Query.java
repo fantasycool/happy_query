@@ -1,6 +1,7 @@
 package com.happy_query.query;
 
 import com.happy_query.parser.domain.JsonParseDataParam;
+import com.happy_query.query.domain.HappyQueryResult;
 import com.happy_query.query.domain.Row;
 
 import javax.sql.DataSource;
@@ -17,7 +18,7 @@ public class Query implements IQuery {
         this.dataSource = dataSource;
     }
 
-    public List<Row> queryByJsonLogic(JsonParseDataParam jsonParseDataParam) {
+    public HappyQueryResult queryByJsonLogic(JsonParseDataParam jsonParseDataParam) {
         return null;
     }
 }
