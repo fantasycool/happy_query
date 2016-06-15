@@ -1,4 +1,4 @@
-package com.frio.parser.json.logic;
+package com.happy_query.parser;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

@@ -1,4 +1,4 @@
-package com.frio.parser.json.logic;
+package com.happy_query.parser;
 
 /**
  * Created by frio on 16/6/14.

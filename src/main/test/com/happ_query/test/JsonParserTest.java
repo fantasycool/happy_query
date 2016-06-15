@@ -1,13 +1,13 @@
-package com.frio.test.parser.json.logic;
+package com.happ_query.test;
 
-import com.frio.parser.json.logic.IJsonLogicParser;
-import com.frio.parser.json.logic.JsonLogicParser;
+import com.happy_query.parser.IJsonLogicParser;
+import com.happy_query.parser.JsonLogicParser;
 import org.junit.Test;
 
 /**
- * Created by frio on 16/6/14.
+ * Created by frio on 16/6/15.
  */
-public class TestJsonLogicParser {
+public class JsonParserTest {
     @Test
     public void testMethod() {
         IJsonLogicParser jsonLogicParser = new JsonLogicParser();

@@ -1,4 +1,4 @@
-package com.frio.parser.json.logic;
+package com.happy_query.parser;
 
 import java.util.Map;
 
