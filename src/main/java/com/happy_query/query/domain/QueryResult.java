@@ -2,21 +2,27 @@ package com.happy_query.query.domain;
 
 import com.happy_query.parser.domain.JsonParseDataParam;
 
+import java.util.List;
+
 /**
  * Created by frio on 16/6/15.
  */
 public class QueryResult {
-    private Row row;
+    private List<Row> rows;
     private Integer count;
     private JsonParseDataParam jsonParseDataParam;
     private String querySql;
 
-    public Row getRow() {
-        return row;
+    public static List<Row> getRowsFromOrinalData(){
+        return null;
     }
 
-    public void setRow(Row row) {
-        this.row = row;
+    public List<Row> getRows() {
+        return rows;
+    }
+
+    public void setRows(List<Row> rows) {
+        this.rows = rows;
     }
 
     public Integer getCount() {
@@ -42,4 +48,5 @@ public class QueryResult {
     public void setQuerySql(String querySql) {
         this.querySql = querySql;
     }
+
 }
