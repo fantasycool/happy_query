@@ -28,10 +28,6 @@ public class DataDefinition {
      */
     private List<String> tagOptions;
     /**
-     * value
-     */
-    private Object value;
-    /**
      * 字段描述
      */
     private String desc;
@@ -116,14 +112,6 @@ public class DataDefinition {
 
     public void setTagOptions(List<String> tagOptions) {
         this.tagOptions = tagOptions;
-    }
-
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
     }
 
     public String getDesc() {
