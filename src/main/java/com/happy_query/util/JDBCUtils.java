@@ -22,6 +22,7 @@ public abstract class JDBCUtils {
      * execute query, return list result
      * @param dataSource
      * @param sql
+     * @param parameters query parameters to be set
      * @return
      */
     public static List<Map<String, Object>> executeQuery(DataSource dataSource, String sql, List<Object> parameters)throws SQLException{

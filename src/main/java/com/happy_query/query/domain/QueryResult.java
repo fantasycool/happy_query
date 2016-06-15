@@ -3,6 +3,7 @@ package com.happy_query.query.domain;
 import com.happy_query.parser.domain.JsonParseDataParam;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by frio on 16/6/15.
@@ -13,7 +14,8 @@ public class QueryResult {
     private JsonParseDataParam jsonParseDataParam;
     private String querySql;
 
-    public static List<Row> getRowsFromOrinalData(){
+    public static QueryResult createFromOrinalData(JsonParseDataParam jsonParseDataParam, List<Map<String, Object>> originalQueryResult, List<Map<String, Object>> countQueryResult){
+
         return null;
     }
 

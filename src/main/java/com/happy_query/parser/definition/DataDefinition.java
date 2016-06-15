@@ -1,6 +1,7 @@
 package com.happy_query.parser.definition;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by frio on 16/6/14.
@@ -139,5 +140,9 @@ public class DataDefinition {
 
     public int hashCode(){
         return Integer.valueOf(String.valueOf(id));
+    }
+
+    public static DataDefinition createFromMapData(Map<String, Object> data){
+        return null;
     }
 }

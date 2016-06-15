@@ -5,6 +5,6 @@ package com.happy_query.util;
  */
 public class QueryException extends RuntimeException {
     public QueryException(String s, Exception e) {
-
+        super(s, e);
     }
 }

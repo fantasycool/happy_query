@@ -1,7 +1,7 @@
 package com.happy_query.query;
 
 import com.happy_query.parser.domain.JsonParseDataParam;
-import com.happy_query.query.domain.HappyQueryResult;
+import com.happy_query.query.domain.QueryResult;
 
 /**
  * Query Runner to get query Result
@@ -13,5 +13,5 @@ public interface IQuery {
      * @param jsonParseDataParam
      * @return
      */
-    HappyQueryResult queryByJsonLogic(JsonParseDataParam jsonParseDataParam);
+    QueryResult queryByJsonLogic(JsonParseDataParam jsonParseDataParam);
 }
