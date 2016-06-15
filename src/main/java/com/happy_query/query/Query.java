@@ -2,10 +2,8 @@ package com.happy_query.query;
 
 import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.domain.HappyQueryResult;
-import com.happy_query.query.domain.Row;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 /**
  * Query to get result
