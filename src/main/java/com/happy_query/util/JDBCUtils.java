@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import static java.lang.System.out;
+
 /**
- * JDBC tools to execute sql
+ * JDBC tools to execute sql.
+ * please refer to druid jdbcutil
+ * https://github.com/alibaba/druid/blob/master/src/main/java/com/alibaba/druid/util/JdbcUtils.java
  * Created by frio on 16/6/15.
  */
 public abstract class JDBCUtils {

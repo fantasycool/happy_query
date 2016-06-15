@@ -40,6 +40,15 @@ public class JsonParseDataParam {
         this.leftColumns = leftColumns;
     }
 
+    /**
+     * TODO
+     * do validate
+     * @return
+     */
+    public boolean check(){
+        return true;
+    }
+
     public String getJsonOperation() {
         return jsonOperation;
     }

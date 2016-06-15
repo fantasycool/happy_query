@@ -11,5 +11,12 @@ public interface IJsonSqlParser {
      * @param jsonParseDataParam
      * @return
      */
-    String convertJsonLogicToSql(JsonParseDataParam jsonParseDataParam);
+    String convertJsonLogicToQuerySql(JsonParseDataParam jsonParseDataParam);
+
+    /**
+     * Get count sql from json parse data
+     * @param jsonParseDataParam
+     * @return
+     */
+    String convertJsonLogicToCountSql(JsonParseDataParam jsonParseDataParam);
 }
