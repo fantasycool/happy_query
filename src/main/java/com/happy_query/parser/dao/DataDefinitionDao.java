@@ -23,6 +23,9 @@ public class DataDefinitionDao {
     static Logger LOG = LoggerFactory.getLogger(DataDefinitionDao.class);
 
     public static DataDefinition getDataDefinition(DataSource dataSource, Long id) {
+        if(id == null){
+            return null;
+        }
         List<Object> list = Arrays.asList((Object) id);
         try {
             List<Map<String, Object>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where id=? order by gmt_create desc limit 1", list);
