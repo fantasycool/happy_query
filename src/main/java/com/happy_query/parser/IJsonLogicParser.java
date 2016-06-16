@@ -27,7 +27,7 @@ public interface IJsonLogicParser {
      * {
      * "attr":"c",
      * "operator":"in",
-     * "value":"(1,2,3,4)"
+     * "value":[1,2,3,4]
      * },
      * {
      * "attr":"d",
