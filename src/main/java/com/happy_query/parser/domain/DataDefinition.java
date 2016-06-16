@@ -1,9 +1,8 @@
 package com.happy_query.parser.domain;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Joiner;
+
+import java.util.*;
 
 /**
  * Created by frio on 16/6/14.
@@ -23,11 +22,11 @@ public class DataDefinition {
     /**
      * 是否为标签类型
      */
-    private boolean isTag;
+    private Boolean isTag;
     /**
      * 字段描述
      */
-    private String desc;
+    private String description;
     /**
      * 规则
      */
@@ -102,20 +101,20 @@ public class DataDefinition {
         this.dataType = dataType;
     }
 
-    public boolean isTag() {
+    public Boolean getTag() {
         return isTag;
     }
 
-    public void setTag(boolean tag) {
+    public void setTag(Boolean tag) {
         isTag = tag;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getRule() {
@@ -181,11 +180,10 @@ public class DataDefinition {
         DataDefinition dataDefinition = new DataDefinition();
         dataDefinition.setDataOptions(analysisDataOptions(data.get("data_options")));
         dataDefinition.setDataType(analysisDataDefinitionDataType(data.getOrDefault("data_type", "").toString()));
-        dataDefinition.setDesc(data.getOrDefault("description", "").toString());
+        dataDefinition.setDescription(data.getOrDefault("description", "").toString());
         dataDefinition.setDefinitionType(DefinitionType.getByValue(data.getOrDefault("definition_type", "").toString()));
         dataDefinition.setTag(data.getOrDefault("is_tag", "0").toString().equals("1") ? true : false);
         dataDefinition.setRule(data.getOrDefault("rule", "").toString());
-        dataDefinition.setDataOptions(Arrays.asList(data.getOrDefault("data_options", "").toString().split(",")));
         dataDefinition.setTemplate(data.getOrDefault("template", "").toString());
         dataDefinition.setUseTemplate(data.getOrDefault("is_use_template", "0").toString().equals("1") ? true : false);
         dataDefinition.setType(data.getOrDefault("type", "0").toString());
@@ -203,12 +201,39 @@ public class DataDefinition {
         return d;
     }
 
+    /**
+     * don't use reflect for performance
+     * @return map arguments
+     */
+    public Map<String, Object> inverseDataDefinition(){
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        if(dataOptions != null)
+            parameters.put("data_options", inverseDataOptions(dataOptions));
+        parameters.put("data_type", dataType);
+        parameters.put("description", description);
+        parameters.put("definition_type", definitionType);
+        if(isTag != null)
+            parameters.put("is_tag", isTag?1:0);
+        parameters.put("rule", rule);
+        if(isUseTemplate != null)
+            parameters.put("is_use_template", isUseTemplate?1:0);
+        parameters.put("type",type);
+        parameters.put("id", id);
+        parameters.put("status", status);
+        parameters.put("sub_type", subType);
+        return parameters;
+    }
+
     private static List<String> analysisDataOptions(Object data_options) {
         if (data_options != null) {
             String[] options = data_options.toString().split(",");
             return Arrays.asList(options);
         }
         return null;
+    }
+
+    private static String inverseDataOptions(List<String> options){
+        return Joiner.on(",").join(options);
     }
 
     public static DataDefinitionDataType analysisDataDefinitionDataType(String ddt) {
