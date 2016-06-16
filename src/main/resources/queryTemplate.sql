@@ -1,10 +1,10 @@
 select
-	a.*,
+	${left_table}.*,
   b.int_strs,
   b.varchar_strs,
   b.double_strs
 from
-	$left_table
+	${left_table}
 right join
 (
 	select
@@ -13,16 +13,16 @@ right join
         group_concat(concat(dd_ref_id, ':::', str_value) separator '|||') as vachar_strs,
         group_concat(concat(dd_ref_id, ':::', double_value) separator '|||') as double_strs
 	from
-		$right_table
+		${right_table}
 	where
-		$operation_str
+		${operation_str}
 	group BY
 	  left_id
-	limit $start_index, $size
+	limit ${start_index}, ${size}
 )b
 on
-	$left_table.$primary_id=b.left_id
-<#if $left_operation_str != null>
+	${left_table}.${primary_id}=b.left_id
+<#if left_operation_str ??>
 where
 	$left_operation_str
 </#if>

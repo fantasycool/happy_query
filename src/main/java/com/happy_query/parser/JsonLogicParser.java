@@ -61,12 +61,12 @@ public class JsonLogicParser implements IJsonLogicParser {
                     if(dataDefinition.getDataType() == DataDefinitionDataType.INT
                             ||dataDefinition.getDataType() == DataDefinitionDataType.BOOLEAN
                             ||dataDefinition.getDataType() == DataDefinitionDataType.DATETIME){
-                        sb.append("int_value").append(getOperator(o.getString("operator"))).append(o.getString("value"));
+                        sb.append("int_value").append(getOperator(o.getString("operator"))).append(getStringValue(o, "int"));
                     }else if(dataDefinition.getDataType() == DataDefinitionDataType.DOUBLE
                             ||dataDefinition.getDataType()==DataDefinitionDataType.FLOAT){
-                        sb.append("double_value").append(getOperator(o.getString("operator"))).append(o.getString("value"));
+                        sb.append("double_value").append(getOperator(o.getString("operator"))).append(getStringValue(o, "double"));
                     }else{
-                        sb.append("str_value").append(getOperator(o.getString("operator"))).append("\"" + o.getString("value" + "\""));
+                        sb.append("str_value").append(getOperator(o.getString("operator"))).append(getStringValue(o, "str"));
                     }
                     sb.append(")").append(BLANK);
                     if (i < jsonArray.size() - 1) {
@@ -77,6 +77,31 @@ public class JsonLogicParser implements IJsonLogicParser {
             return sb.toString();
         } else {
             throw new JsonLogicParseException(String.format("invalid json logic format:%s", jsonArray.toJSONString()));
+        }
+    }
+
+    private String getStringValue(JSONObject o, String type) {
+        if(o.get("value") instanceof JSONArray){
+            StringBuilder sb = new StringBuilder();
+            sb.append("(");
+            for(int i=0; i < ((JSONArray) o.get("value")).size(); i ++){
+                if(type.equals("str")){
+                    sb.append("\"").append(((JSONArray) o.get("value")).get(i)).append("\"");
+                }else{
+                    sb.append(((JSONArray) o.get("value")).get(i));
+                }
+                if(i < ((JSONArray) o.get("value")).size()-1){
+                    sb.append(",");
+                }
+            }
+            sb.append(")");
+            return sb.toString();
+        }else{
+            if(type.equals("str")){
+                return "\"" + o.getString("value") + "\"";
+            }else{
+                return o.getString("value");
+            }
         }
     }
 

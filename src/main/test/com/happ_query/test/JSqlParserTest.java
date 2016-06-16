@@ -52,7 +52,7 @@ public class JSqlParserTest {
                 "                  {\n" +
                 "                      \"attr\":\"3\",\n" +
                 "                      \"operator\":\"in\",\n" +
-                "                      \"value\":\"(1,2,3,4)\"\n" +
+                "                      \"value\":[1,2,3,4]\n" +
                 "                  },\n" +
                 "                  {\n" +
                 "                      \"attr\":\"4\",\n" +
