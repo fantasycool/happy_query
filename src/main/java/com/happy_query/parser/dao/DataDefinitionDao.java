@@ -1,6 +1,6 @@
 package com.happy_query.parser.dao;
 
-import com.happy_query.parser.definition.DataDefinition;
+import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.query.domain.Row;
 import com.happy_query.util.JDBCUtils;
 import org.slf4j.Logger;

@@ -1,6 +1,6 @@
 package com.happy_query.parser.viewer;
 
-import com.happy_query.parser.definition.DataDefinition;
+import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.query.domain.Row;
 
 /**

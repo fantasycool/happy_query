@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.happy_query.cache.CacheManager;
-import com.happy_query.parser.definition.DataDefinition;
-import com.happy_query.parser.definition.DataDefinitionDataType;
+import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.parser.domain.DataDefinitionDataType;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;

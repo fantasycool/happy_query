@@ -1,6 +1,6 @@
 package com.happy_query.query.domain;
 
-import com.happy_query.parser.definition.DataDefinition;
+import com.happy_query.parser.domain.DataDefinition;
 
 import java.util.HashMap;
 import java.util.Map;

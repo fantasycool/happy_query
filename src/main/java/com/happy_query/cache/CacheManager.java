@@ -4,7 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.happy_query.parser.dao.DataDefinitionDao;
-import com.happy_query.parser.definition.DataDefinition;
+import com.happy_query.parser.domain.DataDefinition;
 
 import javax.sql.DataSource;
 import java.util.concurrent.ExecutionException;

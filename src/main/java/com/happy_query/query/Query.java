@@ -5,7 +5,6 @@ import com.happy_query.parser.IJsonLogicParser;
 import com.happy_query.parser.IJsonSqlParser;
 import com.happy_query.parser.JsonLogicParser;
 import com.happy_query.parser.JsqlSqlParser;
-import com.happy_query.parser.definition.DataDefinition;
 import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.domain.QueryResult;
 import com.happy_query.query.domain.Row;

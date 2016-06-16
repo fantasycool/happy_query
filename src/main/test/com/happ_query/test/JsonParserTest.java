@@ -3,8 +3,8 @@ package com.happ_query.test;
 import com.happy_query.cache.CacheManager;
 import com.happy_query.parser.IJsonLogicParser;
 import com.happy_query.parser.JsonLogicParser;
-import com.happy_query.parser.definition.DataDefinition;
-import com.happy_query.parser.definition.DataDefinitionDataType;
+import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.parser.domain.DataDefinitionDataType;
 import org.junit.Test;
 
 import java.util.concurrent.ExecutionException;

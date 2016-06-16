@@ -1,7 +1,7 @@
 package com.happy_query.query.domain;
 
 import com.happy_query.cache.CacheManager;
-import com.happy_query.parser.definition.DataDefinition;
+import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.QueryResultConstant;
 import org.slf4j.Logger;
