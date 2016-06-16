@@ -61,12 +61,12 @@ public class JsonLogicParser implements IJsonLogicParser {
                     if(dataDefinition.getDataType() == DataDefinitionDataType.INT
                             ||dataDefinition.getDataType() == DataDefinitionDataType.BOOLEAN
                             ||dataDefinition.getDataType() == DataDefinitionDataType.DATETIME){
-                        sb.append("int_value").append(o.getString("operator")).append(o.getString("value"));
+                        sb.append("int_value").append(getOperator(o.getString("operator"))).append(o.getString("value"));
                     }else if(dataDefinition.getDataType() == DataDefinitionDataType.DOUBLE
                             ||dataDefinition.getDataType()==DataDefinitionDataType.FLOAT){
-                        sb.append("double_value").append(o.getString("operator")).append(o.getString("value"));
+                        sb.append("double_value").append(getOperator(o.getString("operator"))).append(o.getString("value"));
                     }else{
-                        sb.append("str_value").append(o.getString("operator")).append(o.getString("value"));
+                        sb.append("str_value").append(getOperator(o.getString("operator"))).append("\"" + o.getString("value" + "\""));
                     }
                     sb.append(")").append(BLANK);
                     if (i < jsonArray.size() - 1) {
@@ -77,6 +77,14 @@ public class JsonLogicParser implements IJsonLogicParser {
             return sb.toString();
         } else {
             throw new JsonLogicParseException(String.format("invalid json logic format:%s", jsonArray.toJSONString()));
+        }
+    }
+
+    public String getOperator(String operator){
+        if(operator.equals("in")){
+            return BLANK + operator + BLANK;
+        }else{
+            return operator;
         }
     }
 }

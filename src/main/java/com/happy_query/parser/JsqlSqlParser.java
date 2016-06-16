@@ -23,6 +23,7 @@ public class JsqlSqlParser implements IJsonSqlParser {
     private Template queryTemplate;
     private Template countTemplate;
     private static Logger LOG = LoggerFactory.getLogger(JsqlSqlParser.class);
+
     public JsqlSqlParser(IJsonLogicParser jsonLogicParser) {
         this.jsonLogicParser = jsonLogicParser;
         Configuration configuration = new Configuration();

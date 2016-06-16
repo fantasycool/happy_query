@@ -22,7 +22,7 @@ public class JsonParseDataParam {
 
     private List<String> leftColumns;
 
-    private Long leftPrimaryId;
+    private String leftPrimaryId;
 
     /**
      * limit n1, n2: n1
@@ -39,8 +39,8 @@ public class JsonParseDataParam {
     private String leftOperationStr;
 
     public JsonParseDataParam(String jsonOperation, String leftTableName, String rightTableName
-            , Map<String, String> contextParams, List<String> leftColumns, List<String> rightColumns,
-                              String prefix, Long leftPrimaryId, String leftOperationStr) {
+            , Map<String, String> contextParams, List<String> leftColumns,
+                              String prefix, String leftPrimaryId, String leftOperationStr) {
         this.jsonOperation = jsonOperation;
         this.leftTableName = leftTableName;
         this.rightTableName = rightTableName;
@@ -49,6 +49,10 @@ public class JsonParseDataParam {
         this.prefix = prefix;
         this.leftPrimaryId = leftPrimaryId;
         this.leftOperationStr = leftOperationStr;
+    }
+
+    public JsonParseDataParam(){
+
     }
 
     /**
@@ -124,11 +128,11 @@ public class JsonParseDataParam {
         this.prefix = prefix;
     }
 
-    public Long getLeftPrimaryId() {
+    public String getLeftPrimaryId() {
         return leftPrimaryId;
     }
 
-    public void setLeftPrimaryId(Long leftPrimaryId) {
+    public void setLeftPrimaryId(String leftPrimaryId) {
         this.leftPrimaryId = leftPrimaryId;
     }
 

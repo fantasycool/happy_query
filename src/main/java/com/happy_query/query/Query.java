@@ -1,6 +1,9 @@
 package com.happy_query.query;
 
+import com.happy_query.cache.CacheManager;
+import com.happy_query.parser.IJsonLogicParser;
 import com.happy_query.parser.IJsonSqlParser;
+import com.happy_query.parser.JsonLogicParser;
 import com.happy_query.parser.JsqlSqlParser;
 import com.happy_query.parser.definition.DataDefinition;
 import com.happy_query.parser.domain.JsonParseDataParam;
@@ -24,7 +27,9 @@ public class Query implements IQuery {
 
     public Query(DataSource dataSource){
         this.dataSource = dataSource;
-        this.jsonSqlParser = new JsqlSqlParser();
+        CacheManager cacheManager = new CacheManager(dataSource);
+        IJsonLogicParser jsonLogicParser = new JsonLogicParser(cacheManager);
+        this.jsonSqlParser = new JsqlSqlParser(jsonLogicParser);
     }
 
     public void init(){
