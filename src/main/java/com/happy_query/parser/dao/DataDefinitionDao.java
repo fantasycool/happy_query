@@ -48,4 +48,8 @@ public class DataDefinitionDao {
         return m;
     }
 
+    public static List<Long> insertDataDefinition(DataSource dataSource, DataDefinition dataDefinition){
+        return null;
+    }
+
 }
