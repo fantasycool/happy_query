@@ -4,7 +4,6 @@ import com.happy_query.cache.CacheManager;
 import com.happy_query.parser.definition.DataDefinition;
 import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.QueryResultConstant;
-import com.sun.tools.javac.code.Attribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.happy_query.util.NullChecker.*;
+import static com.happy_query.util.NullChecker.checkNull;
 
 /**
  * Created by frio on 16/6/15.
