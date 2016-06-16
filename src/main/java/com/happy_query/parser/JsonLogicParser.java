@@ -17,10 +17,8 @@ import java.util.concurrent.ExecutionException;
 public class JsonLogicParser implements IJsonLogicParser {
     private String BLANK = " ";
     private String AND = "and";
-    private CacheManager cacheManager;
 
-    public JsonLogicParser(CacheManager cacheManager){
-        this.cacheManager = cacheManager;
+    public JsonLogicParser(){
     }
 
     public String convertJsonToLogicExpression(String json, String prefix, Map<String, String> attributesMap) {
@@ -54,7 +52,7 @@ public class JsonLogicParser implements IJsonLogicParser {
                     sb.append("dd_ref_id=").append(dd_ref_id).append(BLANK).append(AND).append(BLANK);
                     DataDefinition dataDefinition = null;
                     try {
-                        dataDefinition = (DataDefinition) cacheManager.getValue(DataDefinition.createDataDefinitionById(dd_ref_id));
+                        dataDefinition = (DataDefinition) CacheManager.getValue(DataDefinition.createDataDefinitionById(dd_ref_id));
                     } catch (ExecutionException e) {
                         throw new JsonLogicParseException(String.format("cache get failed!dd_ref_id %d", dd_ref_id), e);
                     }

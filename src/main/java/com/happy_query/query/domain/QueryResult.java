@@ -27,8 +27,7 @@ public class QueryResult {
 
     public static QueryResult createFromOrinalData(JsonParseDataParam jsonParseDataParam,
                                                    List<Map<String, Row.Value>> originalQueryResult,
-                                                   List<Map<String, Row.Value>> countQueryResult,
-                                                   CacheManager cacheManager) {
+                                                   List<Map<String, Row.Value>> countQueryResult) {
         checkNull(jsonParseDataParam);
         checkNull(originalQueryResult);
         checkNull(countQueryResult);
@@ -60,7 +59,7 @@ public class QueryResult {
                     String dataDefinitionId = idValue[0]; //definition id
                     String value = idValue[1]; //definition value
                     try {
-                        Object o = cacheManager.getValue(DataDefinition.createDataDefinitionById(Long.valueOf(dataDefinitionId)));
+                        Object o = CacheManager.getValue(DataDefinition.createDataDefinitionById(Long.valueOf(dataDefinitionId)));
                         if (o != null) {
                             DataDefinition dataDefinition = (DataDefinition) o;
                             Row.Value rv = Row.Value.createValue(dataDefinition, value);

@@ -5,8 +5,14 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.happy_query.parser.dao.DataDefinitionDao;
 import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.util.DataDefinitionTemplate;
+import com.happy_query.util.TemplateUtil;
+import freemarker.template.Template;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+import java.io.StringReader;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -18,13 +24,11 @@ import java.util.concurrent.TimeUnit;
  * Created by frio on 16/6/15.
  */
 public class CacheManager {
-    private DataSource dataSource;
+    public static DataSource dataSource;
+    static Logger LOG = LoggerFactory.getLogger(CacheManager.class);
 
-    public CacheManager(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
-    private LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
+    private static LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
             .maximumSize(2000)
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .build(
@@ -34,21 +38,31 @@ public class CacheManager {
                         }
                     });
 
-    public Object getValue(Object k) throws ExecutionException {
+
+    public static Object getValue(Object k) throws ExecutionException {
         return cache.get(k);
     }
 
-    public void putValue(Object k, Object v) throws ExecutionException {
+    public static void putValue(Object k, Object v) throws ExecutionException {
         cache.put(k, v);
     }
 
-    public Object createValue(Object key) {
+    public static Object createValue(Object key) {
         if (key instanceof DataDefinition) {
             if (key != null && ((DataDefinition) key).getId() > 0) {
                 DataDefinitionDao.getDataDefinition(dataSource, ((DataDefinition) key).getId());
             }
+        }else if(key instanceof String){
+            if(((String) key).startsWith("template_")){
+                try {
+                    Template t = new Template("templateName",
+                            new StringReader(((String) key).replace(TemplateUtil.TEMPLATE_PREFIX, "")), TemplateUtil.configuration);
+                    return t;
+                }catch(Exception e){
+                    LOG.error("init template failed!", e);
+                }
+            }
         }
         return null;
     }
-
 }
