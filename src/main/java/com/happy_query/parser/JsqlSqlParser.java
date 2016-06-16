@@ -5,6 +5,7 @@ import com.happy_query.util.QueryException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,11 +51,17 @@ public class JsqlSqlParser implements IJsonSqlParser {
         Map root = new HashMap();
         root.put("left_table", jsonParseDataParam.getLeftTableName());
         root.put("right_table", jsonParseDataParam.getRightTableName());
+        //control operationStr
+        if(StringUtils.isBlank(operationStr)){
+            operationStr = "1=1"; //set default operation;
+        }
         root.put("operation_str", operationStr);
         root.put("primary_id", jsonParseDataParam.getLeftPrimaryId());
         root.put("start_index", jsonParseDataParam.getLimitStart());
         root.put("size", jsonParseDataParam.getSize());
         root.put("left_operation_str", jsonParseDataParam.getLeftOperationStr());
+        //control left or right join
+        root.put("connect_type", jsonParseDataParam.getConnectType() != null ? jsonParseDataParam.getConnectType() : "right");
         StringWriter sw = new StringWriter();
         try {
             if(type.equals("query")){

@@ -1,8 +1,18 @@
-select
-	count(b.left_id) as count_num
+SELECT
+  count(*)
 from
-	${left_table}
-right join
+(
+  SELECT
+    *
+  FROM
+    ${left_table}
+  <#if left_operation_str ??>
+  where
+    $left_operation_str
+  </#if>
+
+) a
+${connect_type} join
 (
 	select
 	      left_id,
@@ -15,10 +25,7 @@ right join
 		${operation_str}
 	group BY
 	  left_id
+	limit ${start_index}, ${size}
 )b
 on
-	${left_table}.${primary_id}=b.left_id
-<#if left_operation_str ??>
-where
-	${left_operation_str}
-</#if>
+	a.${primary_id}=b.left_id

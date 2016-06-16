@@ -1,11 +1,21 @@
-select
-	${left_table}.*,
+SELECT
+  a.*,
   b.int_strs,
   b.varchar_strs,
   b.double_strs
 from
-	${left_table}
-right join
+(
+  SELECT
+    *
+  FROM
+    ${left_table}
+  <#if left_operation_str ??>
+  where
+    $left_operation_str
+  </#if>
+
+) a
+${connect_type} join
 (
 	select
 	      left_id,
@@ -21,8 +31,4 @@ right join
 	limit ${start_index}, ${size}
 )b
 on
-	${left_table}.${primary_id}=b.left_id
-<#if left_operation_str ??>
-where
-	$left_operation_str
-</#if>
+	a.${primary_id}=b.left_id

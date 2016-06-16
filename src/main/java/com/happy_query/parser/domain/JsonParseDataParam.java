@@ -38,18 +38,7 @@ public class JsonParseDataParam {
 
     private String leftOperationStr;
 
-    public JsonParseDataParam(String jsonOperation, String leftTableName, String rightTableName
-            , Map<String, String> contextParams, List<String> leftColumns,
-                              String prefix, String leftPrimaryId, String leftOperationStr) {
-        this.jsonOperation = jsonOperation;
-        this.leftTableName = leftTableName;
-        this.rightTableName = rightTableName;
-        this.contextParameters = contextParams;
-        this.leftColumns = leftColumns;
-        this.prefix = prefix;
-        this.leftPrimaryId = leftPrimaryId;
-        this.leftOperationStr = leftOperationStr;
-    }
+    private String connectType;
 
     public JsonParseDataParam(){
 
@@ -146,5 +135,13 @@ public class JsonParseDataParam {
 
     public String toString(){
         return ReflectionToStringBuilder.toString(this);
+    }
+
+    public String getConnectType() {
+        return connectType;
+    }
+
+    public void setConnectType(String connectType) {
+        this.connectType = connectType;
     }
 }

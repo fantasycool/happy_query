@@ -23,17 +23,12 @@ import java.util.Map;
 public class Query implements IQuery {
     private DataSource dataSource;
     private IJsonSqlParser jsonSqlParser;
-    private List<DataDefinition> dataDefinitions;
 
     public Query(DataSource dataSource){
         this.dataSource = dataSource;
         CacheManager cacheManager = new CacheManager(dataSource);
         IJsonLogicParser jsonLogicParser = new JsonLogicParser(cacheManager);
         this.jsonSqlParser = new JsqlSqlParser(jsonLogicParser);
-    }
-
-    public void init(){
-
     }
 
     public QueryResult queryByJsonLogic(JsonParseDataParam jsonParseDataParam) {
