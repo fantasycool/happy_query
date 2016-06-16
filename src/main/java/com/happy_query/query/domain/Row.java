@@ -35,10 +35,46 @@ public class Row {
     }
 
     public static class Value {
+        /**
+         * right table use
+         * when is left table datadefinitions, should be null
+         */
         DataDefinition dataDefinition;
         private String viewValue;
         private String columnName;
-        //TODO
+        private int columnType; //refer to java.sql.Types
+        /**
+         * value object
+         */
+        Object value;
+
+        public Value(Object value, int columnType, DataDefinition dataDefinition){
+            this.dataDefinition = dataDefinition;
+            this.value = value;
+            this.columnType = columnType;
+        }
+
+        public Value(Object value, int columnType){
+            this.value = value;
+            this.columnType = columnType;
+        }
+
+        /**
+         * when creating value
+         * generate view value with datadefinition template
+         * @param dataDefinition
+         * @param value
+         * @return
+         */
+        public static Value createValue(DataDefinition dataDefinition, String value){
+            Value v= new Value();
+            return v;
+        }
+
+        public Value(){
+
+        }
+
         /**
          * 读取template脚本,进行渲染
          * @return
@@ -55,6 +91,13 @@ public class Row {
             this.dataDefinition = dataDefinition;
         }
 
+        public int getColumnType() {
+            return columnType;
+        }
+
+        public void setColumnType(int columnType) {
+            this.columnType = columnType;
+        }
 
         public String getColumnName() {
             return columnName;
@@ -62,6 +105,16 @@ public class Row {
 
         public void setColumnName(String columnName) {
             this.columnName = columnName;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+
+
+        public void setValue(Object value) {
+            this.value = value;
         }
     }
 }

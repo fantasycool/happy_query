@@ -1,5 +1,6 @@
 package com.happy_query.util;
 
+import com.happy_query.query.domain.Row;
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 
 import javax.sql.DataSource;
@@ -25,9 +26,9 @@ public abstract class JDBCUtils {
      * @param parameters query parameters to be set
      * @return
      */
-    public static List<Map<String, Object>> executeQuery(DataSource dataSource, String sql, List<Object> parameters)throws SQLException{
+    public static List<Map<String, Row.Value>> executeQuery(DataSource dataSource, String sql, List<Object> parameters)throws SQLException{
         Connection connection = null;
-        List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
+        List<Map<String, Row.Value>> rows = new ArrayList<Map<String, Row.Value>>();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try{
@@ -39,11 +40,12 @@ public abstract class JDBCUtils {
             }
             ResultSetMetaData rsMeta = rs.getMetaData();
             while(rs.next()){
-                Map<String, Object> row = new LinkedHashMap<String, Object>();
+                Map<String, Row.Value> row = new LinkedHashMap<String, Row.Value>();
                 for (int i = 0, size = rsMeta.getColumnCount(); i < size; ++i){
                     String columnName = rsMeta.getColumnLabel(i + 1);
                     Object value = rs.getObject(i + 1);
-                    row.put(columnName, value);
+                    Row.Value v = new Row.Value(value, rsMeta.getColumnType(i+1));
+                    row.put(columnName, v);
                 }
                 rows.add(row);
             }

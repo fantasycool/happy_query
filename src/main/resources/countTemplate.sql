@@ -1,5 +1,5 @@
 SELECT
-  count(*)
+  count(*) as count_num
 from
 (
   SELECT

@@ -8,6 +8,7 @@ import com.happy_query.parser.JsqlSqlParser;
 import com.happy_query.parser.definition.DataDefinition;
 import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.domain.QueryResult;
+import com.happy_query.query.domain.Row;
 import com.happy_query.util.JDBCUtils;
 import com.happy_query.util.QueryException;
 
@@ -39,8 +40,8 @@ public class Query implements IQuery {
         String querySql = jsonSqlParser.convertJsonLogicToQuerySql(jsonParseDataParam);
         String countSql = jsonSqlParser.convertJsonLogicToCountSql(jsonParseDataParam);
         try {
-            List<Map<String, Object>> originalQueryResult = JDBCUtils.executeQuery(dataSource, querySql, null);
-            List<Map<String, Object>> countQueryResult = JDBCUtils.executeQuery(dataSource, countSql, null);
+            List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(dataSource, querySql, null);
+            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(dataSource, countSql, null);
             QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);
             return queryResult;
         } catch (SQLException e) {
