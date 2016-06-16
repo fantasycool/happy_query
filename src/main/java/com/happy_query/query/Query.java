@@ -9,7 +9,7 @@ import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.domain.QueryResult;
 import com.happy_query.query.domain.Row;
 import com.happy_query.util.JDBCUtils;
-import com.happy_query.util.QueryException;
+import com.happy_query.util.HappyQueryException;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -44,7 +44,7 @@ public class Query implements IQuery {
             QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);
             return queryResult;
         } catch (SQLException e) {
-            throw new QueryException("query sql exception", e);
+            throw new HappyQueryException("query sql exception", e);
         }
     }
 }

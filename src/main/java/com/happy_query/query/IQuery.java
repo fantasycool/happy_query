@@ -10,6 +10,9 @@ import com.happy_query.query.domain.QueryResult;
 public interface IQuery {
     /**
      * Query By JsonParseDataParam
+     * columns result from data_definition_value table
+     * cannot set 'order by [dynamic_column]' expression.
+     *
      * @param jsonParseDataParam
      * @return
      */

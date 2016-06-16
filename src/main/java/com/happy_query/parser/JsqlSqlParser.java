@@ -1,7 +1,7 @@
 package com.happy_query.parser;
 
 import com.happy_query.parser.domain.JsonParseDataParam;
-import com.happy_query.util.QueryException;
+import com.happy_query.util.HappyQueryException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -71,10 +71,10 @@ public class JsqlSqlParser implements IJsonSqlParser {
             }
         } catch (TemplateException e) {
             LOG.error("sql template render failed!param= [{}]", jsonParseDataParam.toString());
-            throw new QueryException(e);
+            throw new HappyQueryException(e);
         } catch (IOException e) {
             LOG.error("template file read io failed!param=[{}]", jsonParseDataParam.toString());
-            throw new QueryException(e);
+            throw new HappyQueryException(e);
         }
         return sw.toString();
     }

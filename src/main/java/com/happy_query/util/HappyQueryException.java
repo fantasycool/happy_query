@@ -5,12 +5,12 @@ import freemarker.template.TemplateException;
 /**
  * Created by frio on 16/6/15.
  */
-public class QueryException extends RuntimeException {
-    public QueryException(String s, Exception e) {
+public class HappyQueryException extends RuntimeException {
+    public HappyQueryException(String s, Exception e) {
         super(s, e);
     }
 
-    public QueryException(Exception e) {
+    public HappyQueryException(Exception e) {
         super(e);
     }
 }

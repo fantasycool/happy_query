@@ -197,7 +197,7 @@ public abstract class JDBCUtils {
         try {
             x.close();
         } catch (Exception e) {
-            throw new QueryException("close sql connection failed!", e);
+            throw new HappyQueryException("close sql connection failed!", e);
         }
     }
 
@@ -208,7 +208,7 @@ public abstract class JDBCUtils {
         try {
             x.close();
         } catch (Exception e) {
-            throw new QueryException("close sql statement exception failed", e);
+            throw new HappyQueryException("close sql statement exception failed", e);
         }
     }
 
@@ -219,7 +219,7 @@ public abstract class JDBCUtils {
         try {
             x.close();
         } catch (Exception e) {
-            throw new QueryException("close result set failed", e);
+            throw new HappyQueryException("close result set failed", e);
         }
     }
 
