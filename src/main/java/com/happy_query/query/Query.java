@@ -47,8 +47,4 @@ public class Query implements IQuery {
             throw new QueryException("query sql exception", e);
         }
     }
-
-    private void cacheDataDefinitions(){
-
-    }
 }
