@@ -51,6 +51,13 @@ public class DataDefinition {
      */
     private String type;
 
+    /**
+     * 字段状态
+     */
+    private int status;
+
+    private String subType;
+
     private Date gmtCreate;
 
     private Date gmtModified;
@@ -185,6 +192,8 @@ public class DataDefinition {
         dataDefinition.setGmtCreate((Date) data.get("gmt_create"));
         dataDefinition.setGmtModified((Date) data.get("gmt_modified"));
         dataDefinition.setId((Long) data.get("id"));
+        dataDefinition.setStatus(0);
+        dataDefinition.setSubType(data.getOrDefault("sub_type", "").toString());
         return dataDefinition;
     }
 
@@ -204,5 +213,21 @@ public class DataDefinition {
 
     public static DataDefinitionDataType analysisDataDefinitionDataType(String ddt) {
         return DataDefinitionDataType.getByValue(ddt);
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getSubType() {
+        return subType;
+    }
+
+    public void setSubType(String subType) {
+        this.subType = subType;
     }
 }
