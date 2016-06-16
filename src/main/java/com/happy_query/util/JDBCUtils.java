@@ -6,10 +6,8 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import javax.sql.DataSource;
 import java.io.PrintStream;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Date;
+import java.util.*;
 
 /**
  * JDBC tools to execute sql.
@@ -21,40 +19,168 @@ public abstract class JDBCUtils {
 
     /**
      * execute query, return list result
+     *
      * @param dataSource
      * @param sql
      * @param parameters query parameters to be set
      * @return
      */
-    public static List<Map<String, Row.Value>> executeQuery(DataSource dataSource, String sql, List<Object> parameters)throws SQLException{
+    public static List<Map<String, Row.Value>> executeQuery(DataSource dataSource, String sql, List<Object> parameters) throws SQLException {
         Connection connection = null;
         List<Map<String, Row.Value>> rows = new ArrayList<Map<String, Row.Value>>();
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        try{
+        try {
             connection = dataSource.getConnection();
             stmt = connection.prepareStatement(sql);
             setParameters(stmt, parameters);
-            if(null != parameters){
+            if (null != parameters) {
                 rs = stmt.executeQuery();
             }
             ResultSetMetaData rsMeta = rs.getMetaData();
-            while(rs.next()){
+            while (rs.next()) {
                 Map<String, Row.Value> row = new LinkedHashMap<String, Row.Value>();
-                for (int i = 0, size = rsMeta.getColumnCount(); i < size; ++i){
+                for (int i = 0, size = rsMeta.getColumnCount(); i < size; ++i) {
                     String columnName = rsMeta.getColumnLabel(i + 1);
                     Object value = rs.getObject(i + 1);
-                    Row.Value v = new Row.Value(value, rsMeta.getColumnType(i+1));
+                    Row.Value v = new Row.Value(value, rsMeta.getColumnType(i + 1));
                     row.put(columnName, v);
                 }
                 rows.add(row);
             }
-        }finally {
+        } finally {
             close(rs);
             close(stmt);
             close(connection);
         }
         return rows;
+    }
+
+    /**
+     * execute update return take effect number
+     *
+     * @param dataSource
+     * @param tableName
+     * @param parameters
+     * @return
+     * @throws SQLException
+     */
+    public static int executeUpdateById(DataSource dataSource, String tableName, Map<String, Object> parameters, String idName, long id) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("update ").append(tableName).append(" ").append("set ");
+        List<Object> args = new ArrayList<Object>();
+        for (int i = 0; i < parameters.keySet().size(); i++) {
+            Object v = parameters.get(parameters.keySet().toArray()[i]);
+            if (v != null) {
+                sb.append(parameters.keySet().toArray()[i]).append("=").append("?");
+                args.add(v);
+                if (i < parameters.keySet().size()) {
+                    sb.append(",");
+                }
+            }
+        }
+        sb.append(" where ").append(idName).append("=").append(id);
+        return executeUpdate(dataSource, sb.toString(), args);
+    }
+
+
+    /**
+     * execute update with parameters and sql
+     *
+     * @param dataSource
+     * @param sql
+     * @param parameters
+     * @return
+     * @throws SQLException
+     */
+    public static int executeUpdate(DataSource dataSource, String sql, List<Object> parameters) throws SQLException {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            return executeUpdate(conn, sql, parameters);
+        } finally {
+            close(conn);
+        }
+    }
+
+    /**
+     * execute insert with map data
+     * @param dataSource
+     * @param tableName
+     * @param data
+     * @throws SQLException
+     */
+    public static void insertToTable(DataSource dataSource, String tableName, Map<String, Object> data)
+            throws SQLException {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            insertToTable(conn, tableName, data);
+        } finally {
+            close(conn);
+        }
+    }
+
+    public static void insertToTable(Connection conn, String tableName, Map<String, Object> data) throws SQLException {
+        String sql = makeInsertToTableSql(tableName, data.keySet());
+        List<Object> parameters = new ArrayList<Object>(data.values());
+        execute(conn, sql, parameters);
+    }
+
+    public static String makeInsertToTableSql(String tableName, Collection<String> names) {
+        StringBuilder sql = new StringBuilder() //
+                .append("insert into ") //
+                .append(tableName) //
+                .append("("); //
+
+        int nameCount = 0;
+        for (String name : names) {
+            if (nameCount > 0) {
+                sql.append(",");
+            }
+            sql.append(name);
+            nameCount++;
+        }
+        sql.append(") values (");
+        for (int i = 0; i < nameCount; ++i) {
+            if (i != 0) {
+                sql.append(",");
+            }
+            sql.append("?");
+        }
+        sql.append(")");
+
+        return sql.toString();
+    }
+
+    public static void execute(Connection conn, String sql, List<Object> parameters) throws SQLException {
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = conn.prepareStatement(sql);
+
+            setParameters(stmt, parameters);
+
+            stmt.executeUpdate();
+        } finally {
+            close(stmt);
+        }
+    }
+
+    public static int executeUpdate(Connection conn, String sql, List<Object> parameters) throws SQLException {
+        PreparedStatement stmt = null;
+
+        int updateCount;
+        try {
+            stmt = conn.prepareStatement(sql);
+
+            setParameters(stmt, parameters);
+
+            updateCount = stmt.executeUpdate();
+        } finally {
+            close(stmt);
+        }
+        return updateCount;
     }
 
     private static void setParameters(PreparedStatement stmt, List<Object> parameters) throws SQLException {

@@ -1,6 +1,7 @@
 package com.happy_query.query.domain;
 
 import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.util.TemplateUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +69,9 @@ public class Row {
          */
         public static Value createValue(DataDefinition dataDefinition, String value){
             Value v= new Value();
-
+            Map<String, Object> context = new HashMap<String, Object>();
+            context.put(dataDefinition.getTemplate(), value);
+            String viewValue = TemplateUtil.getViewValueByTemplateStr(dataDefinition.getTemplate(), context);
             return v;
         }
 

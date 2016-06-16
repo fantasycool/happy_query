@@ -23,7 +23,7 @@ public class TemplateUtil {
     public static String TEMPLATE_PREFIX = "template_";
 
     public static String getViewValueByTemplateStr(String templateStr,
-                                                   Map<String, Object> contextParameters, CacheManager cacheManager) {
+                                                   Map<String, Object> contextParameters) {
         try {
             Template t = (Template) cacheManager.getValue(TEMPLATE_PREFIX + templateStr);
             StringWriter out = new StringWriter();
