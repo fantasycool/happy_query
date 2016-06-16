@@ -17,20 +17,22 @@ import java.util.Map;
 public class TemplateUtil {
     public static Configuration configuration = new Configuration();
     static Logger LOG = LoggerFactory.getLogger(TemplateUtil.class);
-    static{
+
+    static {
         configuration.setObjectWrapper(new DefaultObjectWrapper());
     }
+
     public static String TEMPLATE_PREFIX = "template_";
 
     public static String getViewValueByTemplateStr(String templateStr,
                                                    Map<String, Object> contextParameters) {
         try {
-            Template t = (Template) cacheManager.getValue(TEMPLATE_PREFIX + templateStr);
+            Template t = (Template) CacheManager.getValue(TEMPLATE_PREFIX + templateStr);
             StringWriter out = new StringWriter();
             t.process(contextParameters, out);
             return out.toString();
-        }catch(Exception e){
-            LOG.error("getViewValueFailed, templateStr:[{}] t:[{}]",templateStr, e);
+        } catch (Exception e) {
+            LOG.error("getViewValueFailed, templateStr:[{}] t:[{}]", templateStr, e);
             return null;
         }
     }
