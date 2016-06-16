@@ -24,10 +24,11 @@ import java.util.Map;
 public class Query implements IQuery {
     private DataSource dataSource;
     private IJsonSqlParser jsonSqlParser;
+    private CacheManager cacheManager;
 
     public Query(DataSource dataSource){
         this.dataSource = dataSource;
-        CacheManager cacheManager = new CacheManager(dataSource);
+        cacheManager = new CacheManager(dataSource);
         IJsonLogicParser jsonLogicParser = new JsonLogicParser(cacheManager);
         this.jsonSqlParser = new JsqlSqlParser(jsonLogicParser);
     }
@@ -42,7 +43,7 @@ public class Query implements IQuery {
         try {
             List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(dataSource, querySql, null);
             List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(dataSource, countSql, null);
-            QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);
+            QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult, cacheManager);
             return queryResult;
         } catch (SQLException e) {
             throw new QueryException("query sql exception", e);
