@@ -1,5 +1,7 @@
 package com.happy_query.parser.domain;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,7 @@ public class JsonParseDataParam {
 
     private List<String> leftColumns;
 
+    private Long leftPrimaryId;
 
     /**
      * limit n1, n2: n1
@@ -31,13 +34,21 @@ public class JsonParseDataParam {
      */
     private int size;
 
+    private String prefix;
+
+    private String leftOperationStr;
+
     public JsonParseDataParam(String jsonOperation, String leftTableName, String rightTableName
-            , Map<String, String> contextParams, List<String> leftColumns, List<String> rightColumns) {
+            , Map<String, String> contextParams, List<String> leftColumns, List<String> rightColumns,
+                              String prefix, Long leftPrimaryId, String leftOperationStr) {
         this.jsonOperation = jsonOperation;
         this.leftTableName = leftTableName;
         this.rightTableName = rightTableName;
         this.contextParameters = contextParams;
         this.leftColumns = leftColumns;
+        this.prefix = prefix;
+        this.leftPrimaryId = leftPrimaryId;
+        this.leftOperationStr = leftOperationStr;
     }
 
     /**
@@ -103,5 +114,33 @@ public class JsonParseDataParam {
 
     public void setLeftColumns(List<String> leftColumns) {
         this.leftColumns = leftColumns;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public Long getLeftPrimaryId() {
+        return leftPrimaryId;
+    }
+
+    public void setLeftPrimaryId(Long leftPrimaryId) {
+        this.leftPrimaryId = leftPrimaryId;
+    }
+
+    public String getLeftOperationStr() {
+        return leftOperationStr;
+    }
+
+    public void setLeftOperationStr(String leftOperationStr) {
+        this.leftOperationStr = leftOperationStr;
+    }
+
+    public String toString(){
+        return ReflectionToStringBuilder.toString(this);
     }
 }
