@@ -5,7 +5,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.happy_query.parser.dao.DataDefinitionDao;
 import com.happy_query.parser.domain.DataDefinition;
-import com.happy_query.util.DataDefinitionTemplate;
 import com.happy_query.util.TemplateUtil;
 import freemarker.template.Template;
 import org.slf4j.Logger;
