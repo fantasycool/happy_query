@@ -1,6 +1,6 @@
 package com.happy_query.writer.domain;
 
-import java.io.File;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +12,7 @@ public class ImportParam {
     private String leftTableName;
     private String leftPrimaryId;
     private String rightTableName;
-    private File importFile;
+    private Reader reader;
     private List<Map<Long, Object>> datas;
     private int group;
 
@@ -22,13 +22,13 @@ public class ImportParam {
      * @param leftTableName
      * @param leftPrimaryId
      * @param rightTableName
-     * @param importFile
+     * @param reader
      */
-    public ImportParam(String leftTableName, String leftPrimaryId, String rightTableName, File importFile, int group){
+    public ImportParam(String leftTableName, String leftPrimaryId, String rightTableName, Reader reader, int group){
         this.leftTableName = leftTableName;
         this.leftPrimaryId = leftPrimaryId;
         this.rightTableName = rightTableName;
-        this.importFile = importFile;
+        this.reader = reader;
         this.group = group;
     }
 
@@ -36,11 +36,11 @@ public class ImportParam {
      * if we don't have left table,we import data use global sequence table to get sequence id as data_defintion_value
      * table's left_id column value
      * @param rightTableName
-     * @param importFile
+     * @param reader
      */
-    public ImportParam(String rightTableName, File importFile, int group){
+    public ImportParam(String rightTableName, Reader reader, int group){
         this.rightTableName = rightTableName;
-        this.importFile = importFile;
+        this.reader = reader;
         this.group = group;
     }
 
@@ -96,12 +96,12 @@ public class ImportParam {
         this.rightTableName = rightTableName;
     }
 
-    public File getImportFile() {
-        return importFile;
+    public Reader getReader() {
+        return reader;
     }
 
-    public void setImportFile(File importFile) {
-        this.importFile = importFile;
+    public void setReader(Reader reader) {
+        this.reader = reader;
     }
 
     public List<Map<Long, Object>> getDatas() {

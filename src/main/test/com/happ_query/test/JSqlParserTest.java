@@ -10,6 +10,7 @@ import com.happy_query.parser.domain.DataDefinitionDataType;
 import com.happy_query.parser.domain.JsonParseDataParam;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -69,6 +70,13 @@ public class JSqlParserTest {
         jsonParseDataParam.setSize(30);
         jsonParseDataParam.setRightTableName("data_definition_value");
         System.out.println(jsqlSqlParser.convertJsonLogicToCountSql(jsonParseDataParam));
+    }
+
+    /**
+     *
+     */
+    public void mockDataDefinitions(){
+
     }
 
     @Test

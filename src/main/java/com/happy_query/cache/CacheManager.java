@@ -49,7 +49,7 @@ public class CacheManager {
     public static Object createValue(Object key) {
         if (key instanceof DataDefinition) {
             if (key != null && ((DataDefinition) key).getId() > 0) {
-                DataDefinitionDao.getDataDefinition(dataSource, ((DataDefinition) key).getId());
+                return DataDefinitionDao.getDataDefinition(dataSource, ((DataDefinition) key).getId());
             }
         }else if(key instanceof String){
             if(((String) key).startsWith("template_")){

@@ -39,6 +39,7 @@ public class Query implements IQuery {
         String querySql = jsonSqlParser.convertJsonLogicToQuerySql(jsonParseDataParam);
         String countSql = jsonSqlParser.convertJsonLogicToCountSql(jsonParseDataParam);
         try {
+            //remember to set "SET SESSION group_concat_max_len = 1000000";
             List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(dataSource, querySql, null);
             List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(dataSource, countSql, null);
             QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);

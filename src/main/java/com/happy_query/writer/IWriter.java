@@ -1,6 +1,7 @@
 package com.happy_query.writer;
 
 import com.happy_query.writer.domain.ImportParam;
+import com.happy_query.writer.domain.Record;
 
 /**
  * Created by frio on 16/6/16.
@@ -25,4 +26,9 @@ public interface IWriter {
      * @param importParam
      */
     void batchUpdateData(ImportParam importParam);
+
+    /**
+     * @param record
+     */
+    void writeRecord(Record record);
 }

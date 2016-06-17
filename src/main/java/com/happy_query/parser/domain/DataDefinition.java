@@ -57,6 +57,8 @@ public class DataDefinition {
 
     private String subType;
 
+    private Boolean isEditable;
+
     private Date gmtCreate;
 
     private Date gmtModified;
@@ -169,6 +171,14 @@ public class DataDefinition {
         return Integer.valueOf(String.valueOf(id));
     }
 
+    public Boolean getEditable() {
+        return isEditable;
+    }
+
+    public void setEditable(Boolean editable) {
+        isEditable = editable;
+    }
+
     public boolean equals(Object obj) {
         if (obj instanceof DataDefinition){
            return ((DataDefinition) obj).getId() == this.getId();
@@ -192,6 +202,7 @@ public class DataDefinition {
         dataDefinition.setId((Long) data.get("id"));
         dataDefinition.setStatus(0);
         dataDefinition.setSubType(data.getOrDefault("sub_type", "").toString());
+        dataDefinition.setEditable(data.getOrDefault("is_editable", "0").toString().equals("1") ? true : false);
         return dataDefinition;
     }
 
@@ -217,6 +228,8 @@ public class DataDefinition {
         parameters.put("rule", rule);
         if(isUseTemplate != null)
             parameters.put("is_use_template", isUseTemplate?1:0);
+        if(isEditable != null)
+            parameters.put("is_editable", isUseTemplate?1:0);
         parameters.put("type",type);
         parameters.put("id", id);
         parameters.put("status", status);

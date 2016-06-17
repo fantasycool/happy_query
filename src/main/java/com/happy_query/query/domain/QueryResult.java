@@ -63,6 +63,7 @@ public class QueryResult {
                         if (o != null) {
                             DataDefinition dataDefinition = (DataDefinition) o;
                             Row.Value rv = Row.Value.createValue(dataDefinition, value);
+
                             lr.put(dataDefinition, rv);
                         }
                     } catch (ExecutionException e) {
@@ -71,6 +72,7 @@ public class QueryResult {
                     }
                 }
             }
+            row.setLeftId(Long.valueOf(originalQueryResult.get(i).get("left_id").toString()));
             row.setData(lr);
             rows.add(row);
         }

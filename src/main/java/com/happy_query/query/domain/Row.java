@@ -19,6 +19,11 @@ public class Row {
      */
     private Map<String, Value> leftTableData = new HashMap<String, Value>();
 
+    /**
+     * left table id value
+     */
+    private Long leftId;
+
     public Map<DataDefinition, Value> getData() {
         return data;
     }
@@ -123,5 +128,13 @@ public class Row {
         public void setViewValue(String viewValue) {
             this.viewValue = viewValue;
         }
+    }
+
+    public Long getLeftId() {
+        return leftId;
+    }
+
+    public void setLeftId(Long leftId) {
+        this.leftId = leftId;
     }
 }
