@@ -72,6 +72,7 @@ public class Row {
             Map<String, Object> context = new HashMap<String, Object>();
             context.put(dataDefinition.getTemplate(), value);
             String viewValue = TemplateUtil.getViewValueByTemplateStr(dataDefinition.getTemplate(), context);
+            v.setViewValue(viewValue);
             return v;
         }
 
@@ -117,6 +118,10 @@ public class Row {
 
         public void setValue(Object value) {
             this.value = value;
+        }
+
+        public void setViewValue(String viewValue) {
+            this.viewValue = viewValue;
         }
     }
 }
