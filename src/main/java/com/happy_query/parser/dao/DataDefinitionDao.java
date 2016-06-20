@@ -38,6 +38,20 @@ public class DataDefinitionDao {
         return null;
     }
 
+    public static DataDefinition getDataDefinitionByName(DataSource dataSource, String name){
+        NullChecker.checkNull(name);
+        List<Object> list = Arrays.asList((Object)name);
+        try {
+            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where name=? order by gmt_create desc limit 1", list);
+            Map<String, Object> m = convertFromValueMap(data);
+            return DataDefinition.createFromMapData(m);
+        } catch (SQLException e) {
+            LOG.error("getDataDefinitionByName failed!", e);
+            LOG.error("param name is [{}]", name);
+        }
+        return null;
+    }
+
     private static Map<String, Object> convertFromValueMap(List<Map<String, Row.Value>> data) {
         NullChecker.checkNull(data);
         Map<String, Object> m = new HashMap<String, Object>();

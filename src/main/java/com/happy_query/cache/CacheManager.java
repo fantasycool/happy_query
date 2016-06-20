@@ -60,6 +60,8 @@ public class CacheManager {
                 }catch(Exception e){
                     LOG.error("init template failed!", e);
                 }
+            }else if(((String) key).startsWith("definition_name_")){
+
             }
         }
         return null;

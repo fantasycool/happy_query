@@ -1,6 +1,8 @@
 package com.happy_query.parser.domain;
 
 import com.google.common.base.Joiner;
+import com.happy_query.parser.JsonLogicParseException;
+import com.happy_query.query.domain.Row;
 
 import java.util.*;
 
@@ -180,8 +182,8 @@ public class DataDefinition {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof DataDefinition){
-           return ((DataDefinition) obj).getId() == this.getId();
+        if (obj instanceof DataDefinition) {
+            return ((DataDefinition) obj).getId() == this.getId();
         }
         return false;
     }
@@ -206,7 +208,7 @@ public class DataDefinition {
         return dataDefinition;
     }
 
-    public static DataDefinition createDataDefinitionById(Long id){
+    public static DataDefinition createDataDefinitionById(Long id) {
         DataDefinition d = new DataDefinition();
         d.setId(id);
         return d;
@@ -214,23 +216,24 @@ public class DataDefinition {
 
     /**
      * don't use reflect for performance
+     *
      * @return map arguments
      */
-    public Map<String, Object> inverseDataDefinition(){
+    public Map<String, Object> inverseDataDefinition() {
         Map<String, Object> parameters = new HashMap<String, Object>();
-        if(dataOptions != null)
+        if (dataOptions != null)
             parameters.put("data_options", inverseDataOptions(dataOptions));
         parameters.put("data_type", dataType);
         parameters.put("description", description);
         parameters.put("definition_type", definitionType);
-        if(isTag != null)
-            parameters.put("is_tag", isTag?1:0);
+        if (isTag != null)
+            parameters.put("is_tag", isTag ? 1 : 0);
         parameters.put("rule", rule);
-        if(isUseTemplate != null)
-            parameters.put("is_use_template", isUseTemplate?1:0);
-        if(isEditable != null)
-            parameters.put("is_editable", isUseTemplate?1:0);
-        parameters.put("type",type);
+        if (isUseTemplate != null)
+            parameters.put("is_use_template", isUseTemplate ? 1 : 0);
+        if (isEditable != null)
+            parameters.put("is_editable", isUseTemplate ? 1 : 0);
+        parameters.put("type", type);
         parameters.put("id", id);
         parameters.put("status", status);
         parameters.put("sub_type", subType);
@@ -245,7 +248,7 @@ public class DataDefinition {
         return null;
     }
 
-    private static String inverseDataOptions(List<String> options){
+    private static String inverseDataOptions(List<String> options) {
         return Joiner.on(",").join(options);
     }
 
@@ -268,4 +271,43 @@ public class DataDefinition {
     public void setSubType(String subType) {
         this.subType = subType;
     }
+
+    /**
+     * format string value to Row.Value
+     * @return
+     */
+    public Row.Value formatStringValue(String value) {
+        Row.Value rv = new Row.Value();
+        switch (dataType){
+            case BOOLEAN:
+                if(value.equals("是") || value.equals("1")){
+                    rv.setValue(Integer.valueOf("1"));
+                }else{
+                    rv.setValue(Integer.valueOf("0"));
+                }
+                break;
+            case INT:
+                rv.setValue(Long.valueOf(value));
+                break;
+            case STRING:
+                rv.setValue(value);
+                break;
+            case DATETIME:
+                rv.setValue(Long.valueOf(value));
+                break;
+            case FLOAT:
+                rv.setValue(Float.valueOf(value));
+                break;
+            case DOUBLE:
+                rv.setValue(Double.valueOf(value));
+                break;
+            default:
+                break;
+        }
+        if(rv.getValue() != null){
+            return rv;
+        }
+        throw new JsonLogicParseException("data definition is not valid!");
+    }
+
 }
