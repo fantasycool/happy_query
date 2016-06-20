@@ -40,6 +40,18 @@ public class Row {
         this.leftTableData = leftTableData;
     }
 
+    /**
+     * 返回id->value的result
+     * @return
+     */
+    public Map<Long, Value> getFlatMapData(){
+        Map<Long, Value> result = new HashMap<Long, Value>();
+        for(Map.Entry<DataDefinition, Value> e: data.entrySet()){
+            result.put(e.getKey().getId(), e.getValue());
+        }
+        return result;
+    }
+
     public static class Value {
         /**
          * right table use

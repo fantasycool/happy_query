@@ -7,3 +7,4 @@ target/
 *.log
 tspm.properties
 logs/
+.idea/

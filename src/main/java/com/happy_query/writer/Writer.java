@@ -7,6 +7,7 @@ import com.happy_query.writer.domain.Record;
  * Created by frio on 16/6/17.
  */
 public class Writer implements IWriter {
+
     public void importDataByExcel(ImportParam importParam) {
 
     }

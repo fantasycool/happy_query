@@ -23,8 +23,6 @@ public class OpenCSVUtil {
      */
     public static List<Row> readAll(Reader reader, int skipNum, char quoted, char seperator){
         CSVReader csvReader = new CSVReader(reader,seperator, quoted, skipNum);
-
-
         return null;
     }
 
