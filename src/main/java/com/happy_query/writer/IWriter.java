@@ -1,6 +1,7 @@
 package com.happy_query.writer;
 
 import com.happy_query.writer.domain.ImportParam;
+import com.happy_query.writer.domain.InsertResult;
 import com.happy_query.writer.domain.Record;
 
 /**
@@ -8,27 +9,17 @@ import com.happy_query.writer.domain.Record;
  */
 public interface IWriter {
     /**
-     * import data to happy_query data_definition_value_[xxx] from csv file
+     * import data to happy_query from csv file
      *
      * @param importParam
      */
     void importDataByExcel(ImportParam importParam);
 
     /**
-     * import data to happy_query data_definition_value_[xxx] from List datas
-     * @param importParam
+     * write data to happy_query
+     * @param insertResult
      */
-    void batchInsertData(ImportParam importParam);
+    void writeRecord(InsertResult insertResult);
 
-
-    /**
-     * batch update data_definition_value
-     * @param importParam
-     */
-    void batchUpdateData(ImportParam importParam);
-
-    /**
-     * @param record
-     */
-    void writeRecord(Record record);
+    void updateRecord(InsertResult insertResult);
 }

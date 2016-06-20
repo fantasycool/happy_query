@@ -3,7 +3,9 @@ package com.happy_query.query.domain;
 import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.util.TemplateUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,6 +20,8 @@ public class Row {
      * left table 对应的固有列的值
      */
     private Map<String, Value> leftTableData = new HashMap<String, Value>();
+
+    private List<String> leftTableDefinitionNames = new ArrayList<String>();
 
     /**
      * left table id value
@@ -50,6 +54,14 @@ public class Row {
             result.put(e.getKey().getId(), e.getValue());
         }
         return result;
+    }
+
+    public List<String> getLeftTableDefinitionNames() {
+        return leftTableDefinitionNames;
+    }
+
+    public void setLeftTableDefinitionNames(List<String> leftTableDefinitionNames) {
+        this.leftTableDefinitionNames = leftTableDefinitionNames;
     }
 
     public static class Value {

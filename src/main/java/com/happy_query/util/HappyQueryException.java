@@ -13,4 +13,8 @@ public class HappyQueryException extends RuntimeException {
     public HappyQueryException(Exception e) {
         super(e);
     }
+
+    public HappyQueryException(String s) {
+        super(s);
+    }
 }

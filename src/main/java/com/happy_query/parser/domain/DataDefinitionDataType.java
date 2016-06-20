@@ -12,7 +12,8 @@ public enum DataDefinitionDataType {
     BOOLEAN,
     DATETIME,
     DOUBLE,
-    FLOAT;
+    FLOAT,
+    TEXT;
 
     private static BiMap<String, DataDefinitionDataType> biMap = HashBiMap.create();
     static{
@@ -22,6 +23,7 @@ public enum DataDefinitionDataType {
         biMap.put("datetime", DATETIME);
         biMap.put("double", DOUBLE);
         biMap.put("float", FLOAT);
+        biMap.put("text", TEXT);
     }
 
     public static DataDefinitionDataType getByValue(String v){

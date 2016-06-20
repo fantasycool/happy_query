@@ -22,20 +22,7 @@ public class OpenCSVUtil {
     private static Logger LOG = LoggerFactory.getLogger(OpenCSVUtil.class);
 
     /**
-     * Read all from csv file
-     * format key and value
-     * -> data_definition_value Row
-     *
-     * @param reader
-     * @return
-     */
-    public static List<Row> readAll(Reader reader, int skipNum, char quoted, char seperator) {
-        CSVReader csvReader = new CSVReader(reader, seperator, quoted, skipNum);
-        return null;
-    }
-
-    /**
-     * use default config to read from import file
+     * get import insert result from csv file and mysql datasource
      *
      * @param dataSource
      * @param reader
@@ -49,6 +36,8 @@ public class OpenCSVUtil {
             Map<Integer, DataDefinition> definitions = new LinkedHashMap<Integer, DataDefinition>();
             List<String[]> rows = csvReader.readAll();
             List<Row> resultRows = new ArrayList<Row>();
+            List<String> definitionNames = new ArrayList<String>();
+            Map<String, Row.Value> leftDatas = new LinkedHashMap<String, Row.Value>();
             for (int i = 0; i < rows.size(); i++) {
                 if (i > 0) {
                     if (i > 1 && rows.get(i).length <= 1) {
@@ -70,7 +59,11 @@ public class OpenCSVUtil {
                         String[] headers = rows.get(i);
                         for (int j = 0; j < headers.length; j++) {
                             if (j > 0) {
-                                definitions.put(j, DataDefinitionDao.getDataDefinitionByName(dataSource, getDefinitionName(headers[j])));
+                                DataDefinition dd = DataDefinitionDao.getDataDefinitionByName(dataSource, getDefinitionName(headers[j]));
+                                definitions.put(j, dd);
+                                if(dd.getLeftData()){
+                                    definitionNames.add(dd.getLefColName());
+                                }
                             }
                         }
                         continue;
@@ -80,16 +73,21 @@ public class OpenCSVUtil {
                      */
                     String[] flatRow = rows.get(i);
                     Row row = new Row();
-                    Long leftId = Long.valueOf(flatRow[0].trim());
-                    Map<DataDefinition, Row.Value> dataMap = new LinkedHashMap<DataDefinition,  Row.Value>();
+                    Long leftId = flatRow[0].trim().equals("") ? null : Long.valueOf(flatRow[0].trim());
+                    Map<DataDefinition, Row.Value> dataMap = new LinkedHashMap<DataDefinition, Row.Value>();
                     for (int y = 0; y < flatRow.length; y++) {
-                        if(y > 0){
+                        if (y > 0) {
                             DataDefinition dataDefinition = definitions.get(y);
                             Row.Value rv = dataDefinition.formatStringValue(flatRow[y]);
-                            dataMap.put(dataDefinition, rv);
+                            if(dataDefinition.getLeftData()){
+                                leftDatas.put(dataDefinition.getLefColName(), rv);
+                            }else{
+                                dataMap.put(dataDefinition, rv);
+                            }
                         }
                     }
                     row.setData(dataMap);
+                    row.setLeftTableDefinitionNames(definitionNames);
                     row.setLeftId(leftId);
                     resultRows.add(row);
                 }

@@ -83,6 +83,24 @@ public abstract class JDBCUtils {
         return executeUpdate(dataSource, sb.toString(), args);
     }
 
+    public static int executeUpdateById(Connection conn, String tableName, Map<String, Object> parameters, String idName, long id) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        sb.append("update ").append(tableName).append(" ").append("set ");
+        List<Object> args = new ArrayList<Object>();
+        for (int i = 0; i < parameters.keySet().size(); i++) {
+            Object v = parameters.get(parameters.keySet().toArray()[i]);
+            if (v != null) {
+                sb.append(parameters.keySet().toArray()[i]).append("=").append("?");
+                args.add(v);
+                if (i < parameters.keySet().size()) {
+                    sb.append(",");
+                }
+            }
+        }
+        sb.append(" where ").append(idName).append("=").append(id);
+        return executeUpdate(conn, sb.toString(), args);
+    }
+
 
     /**
      * execute update with parameters and sql
@@ -104,13 +122,96 @@ public abstract class JDBCUtils {
     }
 
     /**
+     * batch execute update with parameters and sql
+     *
+     * @param dataSource
+     * @param sql
+     * @param parameters
+     * @return
+     * @throws SQLException
+     */
+    public static void batchExecuteUpdate(DataSource dataSource, String sql, List<List<Object>> parameters) throws SQLException {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            PreparedStatement stmt = null;
+            int count = 0;
+            executeBatchUpdate(sql, parameters, conn, stmt, count);
+        } finally {
+            close(conn);
+        }
+    }
+
+    private static void executeBatchUpdate(String sql, List<List<Object>> parameters, Connection conn, PreparedStatement stmt, int count) throws SQLException {
+        for (List<Object> l : parameters) {
+            try {
+                stmt = conn.prepareStatement(sql);
+                setParameters(stmt, l);
+                stmt.addBatch();
+                if (++count % 100 == 0) {
+                    stmt.executeBatch();
+                }
+            } finally {
+                stmt.executeBatch();
+                close(stmt);
+            }
+        }
+    }
+
+    public static void batchExecuteUpdate(Connection connection, String sql, List<List<Object>> parameters) throws SQLException {
+        PreparedStatement stmt = null;
+        int count = 0;
+        executeBatchUpdate(sql, parameters, connection, stmt, count);
+    }
+
+    /**
      * execute insert with map data
+     *
      * @param dataSource
      * @param tableName
      * @param data
      * @throws SQLException
      */
-    public static void insertToTable(DataSource dataSource, String tableName, Map<String, Object> data)
+    public static long insertToTable(DataSource dataSource, String tableName, Map<String, Object> data)
+            throws SQLException {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            return insertToTable(conn, tableName, data);
+        } finally {
+            close(conn);
+        }
+    }
+
+    /**
+     * execute insert with map data
+     *
+     * @param dataSource
+     * @param tableName
+     * @param data
+     * @throws SQLException
+     */
+    public static Long insertToTableGetId(DataSource dataSource, String tableName, Map<String, Object> data)
+            throws SQLException {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            insertToTable(conn, tableName, data);
+        } finally {
+            close(conn);
+        }
+        return null;
+    }
+
+    /**
+     * execute batch insert with map data
+     *
+     * @param dataSource
+     * @param tableName
+     * @param data
+     * @throws SQLException
+     */
+    public static void insertToTable(DataSource dataSource, String tableName, List<Map<String, Object>> data)
             throws SQLException {
         Connection conn = null;
         try {
@@ -121,10 +222,40 @@ public abstract class JDBCUtils {
         }
     }
 
-    public static void insertToTable(Connection conn, String tableName, Map<String, Object> data) throws SQLException {
+    public static void batchInsertToTable(DataSource dataSource, String tableName, List<Map<String, Object>> data) throws SQLException {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+            insertToTable(conn, tableName, data);
+        } finally {
+            close(conn);
+        }
+    }
+
+    public static long insertToTable(Connection conn, String tableName, Map<String, Object> data) throws SQLException {
         String sql = makeInsertToTableSql(tableName, data.keySet());
         List<Object> parameters = new ArrayList<Object>(data.values());
-        execute(conn, sql, parameters);
+        return executeGetLastId(conn, sql, parameters);
+    }
+
+    public static void insertToTable(Connection conn, String tableName, List<Map<String, Object>> data) throws SQLException {
+        String sql = makeInsertToTableSql(tableName, data.get(0).keySet());
+        int count = 0;
+        PreparedStatement stmt = null;
+        try {
+            for (Map<String, Object> m : data) {
+                stmt = conn.prepareStatement(sql);
+                setParameters(stmt, new ArrayList<Object>(m.values()));
+                stmt.addBatch();
+                if (++count % 100 == 0) {
+                    stmt.executeBatch();
+                }
+
+            }
+            stmt.executeBatch();
+        } finally {
+            close(stmt);
+        }
     }
 
     public static String makeInsertToTableSql(String tableName, Collection<String> names) {
@@ -162,6 +293,25 @@ public abstract class JDBCUtils {
             setParameters(stmt, parameters);
 
             stmt.executeUpdate();
+        } finally {
+            close(stmt);
+        }
+    }
+
+    public static long executeGetLastId(Connection conn, String sql, List<Object> parameters) throws SQLException {
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            setParameters(stmt, parameters);
+
+            stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+            return 0;
         } finally {
             close(stmt);
         }

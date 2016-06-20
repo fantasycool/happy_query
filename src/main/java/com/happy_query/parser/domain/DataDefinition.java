@@ -61,9 +61,29 @@ public class DataDefinition {
 
     private Boolean isEditable;
 
+    private Boolean isLeftData;
+
+    private String lefColName;
+
     private Date gmtCreate;
 
     private Date gmtModified;
+
+    public Boolean getLeftData() {
+        return isLeftData;
+    }
+
+    public void setLeftData(Boolean leftData) {
+        isLeftData = leftData;
+    }
+
+    public String getLefColName() {
+        return lefColName;
+    }
+
+    public void setLefColName(String lefColName) {
+        this.lefColName = lefColName;
+    }
 
     public long getId() {
         return id;
@@ -205,6 +225,8 @@ public class DataDefinition {
         dataDefinition.setStatus(0);
         dataDefinition.setSubType(data.getOrDefault("sub_type", "").toString());
         dataDefinition.setEditable(data.getOrDefault("is_editable", "0").toString().equals("1") ? true : false);
+        dataDefinition.setLeftData(data.getOrDefault("is_left_data", "0").toString().equals("1") ? true : false);
+        dataDefinition.setLefColName(data.getOrDefault("left_col_name", "").toString());
         return dataDefinition;
     }
 
@@ -233,6 +255,9 @@ public class DataDefinition {
             parameters.put("is_use_template", isUseTemplate ? 1 : 0);
         if (isEditable != null)
             parameters.put("is_editable", isUseTemplate ? 1 : 0);
+        if (isLeftData != null)
+            parameters.put("is_left_data", isLeftData ? 1 : 0);
+        parameters.put("left_col_name", lefColName);
         parameters.put("type", type);
         parameters.put("id", id);
         parameters.put("status", status);
@@ -274,15 +299,16 @@ public class DataDefinition {
 
     /**
      * format string value to Row.Value
+     *
      * @return
      */
     public Row.Value formatStringValue(String value) {
         Row.Value rv = new Row.Value();
-        switch (dataType){
+        switch (dataType) {
             case BOOLEAN:
-                if(value.equals("是") || value.equals("1")){
+                if (value.equals("是") || value.equals("1")) {
                     rv.setValue(Integer.valueOf("1"));
-                }else{
+                } else {
                     rv.setValue(Integer.valueOf("0"));
                 }
                 break;
@@ -304,7 +330,7 @@ public class DataDefinition {
             default:
                 break;
         }
-        if(rv.getValue() != null){
+        if (rv.getValue() != null) {
             return rv;
         }
         throw new JsonLogicParseException("data definition is not valid!");
