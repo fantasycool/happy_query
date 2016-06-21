@@ -13,6 +13,7 @@ import com.happy_query.util.JDBCUtils;
 import com.happy_query.util.HappyQueryException;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,14 +41,18 @@ public class Query implements IQuery {
 
         String querySql = jsonSqlParser.convertJsonLogicToQuerySql(jsonParseDataParam);
         String countSql = jsonSqlParser.convertJsonLogicToCountSql(jsonParseDataParam);
+        Connection connection = null;
         try {
-            //remember to set "SET SESSION group_concat_max_len = 1000000";
-            List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(dataSource, querySql, new ArrayList());
-            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(dataSource, countSql,  new ArrayList());
+            connection = dataSource.getConnection();
+            JDBCUtils.execute(connection, "SET SESSION group_concat_max_len = 1000000", new ArrayList<Object>());
+            List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList());
+            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(connection, countSql,  new ArrayList());
             QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);
             return queryResult;
         } catch (SQLException e) {
             throw new HappyQueryException("query sql exception", e);
+        } finally {
+            JDBCUtils.close(connection);
         }
     }
 
@@ -67,13 +72,16 @@ public class Query implements IQuery {
 
         String querySql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "left_id=" + leftId, "query");
         String countSql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "left_id=" + leftId, "count");
-
+        Connection connection = null;
         try {
-            List<Map<String, Row.Value>> queryResult = JDBCUtils.executeQuery(dataSource, querySql, new ArrayList());
-            List<Map<String, Row.Value>> countResult = JDBCUtils.executeQuery(dataSource, countSql, new ArrayList());
+            connection = dataSource.getConnection();
+            List<Map<String, Row.Value>> queryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList());
+            List<Map<String, Row.Value>> countResult = JDBCUtils.executeQuery(connection, countSql, new ArrayList());
             return QueryResult.createFromOrinalData(jsonParseDataParam, queryResult, countResult);
         } catch (SQLException e) {
             throw new HappyQueryException("query by leftId:" + leftId + "failed", e);
+        }finally {
+            JDBCUtils.close(connection);
         }
     }
 }

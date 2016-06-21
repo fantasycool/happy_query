@@ -56,6 +56,35 @@ public abstract class JDBCUtils {
         return rows;
     }
 
+
+    public static List<Map<String, Row.Value>> executeQuery(Connection connection, String sql, List<Object> parameters) throws SQLException {
+        List<Map<String, Row.Value>> rows = new ArrayList<Map<String, Row.Value>>();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            stmt = connection.prepareStatement(sql);
+            setParameters(stmt, parameters);
+            if (null != parameters) {
+                rs = stmt.executeQuery();
+            }
+            ResultSetMetaData rsMeta = rs.getMetaData();
+            while (rs.next()) {
+                Map<String, Row.Value> row = new LinkedHashMap<String, Row.Value>();
+                for (int i = 0, size = rsMeta.getColumnCount(); i < size; ++i) {
+                    String columnName = rsMeta.getColumnLabel(i + 1);
+                    Object value = rs.getObject(i + 1);
+                    Row.Value v = new Row.Value(value, rsMeta.getColumnType(i + 1));
+                    row.put(columnName, v);
+                }
+                rows.add(row);
+            }
+        } finally {
+            close(rs);
+            close(stmt);
+        }
+        return rows;
+    }
+
     /**
      * execute update return take effect number
      *
