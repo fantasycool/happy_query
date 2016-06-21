@@ -80,7 +80,7 @@ public class Writer implements IWriter {
                  */
                 Map<DataDefinition, Row.Value> m = r.getData();
                 for (DataDefinition d : m.keySet()) {
-                    JDBCUtils.
+
                 }
             } catch (Exception e) {
                 connection.rollback();
