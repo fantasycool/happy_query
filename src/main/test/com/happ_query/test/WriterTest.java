@@ -43,4 +43,10 @@ public class WriterTest {
         ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
         writer.importDataByCSV(importParam);
     }
+
+    @Test
+    public void testImportDataWithId() throws IOException {
+
+    }
+
 }

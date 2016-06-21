@@ -126,7 +126,6 @@ public class Writer implements IWriter {
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
             try {
-
                 /**
                  * 1: we insert left table first
                  */
@@ -188,9 +187,9 @@ public class Writer implements IWriter {
             insertSql
                     = "insert into " + rightTable + "(left_id, dd_ref_id,str_value,sub_key) " +
                     "values(?,?,?," + subKey + ")";
-        } else {
+        }  else {
             insertSql
-                    = "insert into" + rightTable + "(left_id, dd_ref_id,text,sub_key) " +
+                    = "insert into " + rightTable + "(left_id, dd_ref_id,feature,sub_key) " +
                     "values(?,?,?," + subKey + ")";
         }
         return insertSql;

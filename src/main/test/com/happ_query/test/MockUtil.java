@@ -14,7 +14,7 @@ public class MockUtil {
     public static List<DataDefinition> getMockDataDefinitions(){
         List<DataDefinition> resultList = new ArrayList<DataDefinition>();
         DataDefinition d1 = DataDefinition.createDataDefinitionById(1l);
-        d1.setDataOptions(Arrays.asList("1:dataoption1;2:dataoption2;3:dataoption3;4:dataoption4".split(";")));
+        d1.setDataOptions("");
         d1.setName("指标1");
         d1.setDataType(DataDefinitionDataType.STRING);
         d1.setDefinitionType(DefinitionType.SELECT);

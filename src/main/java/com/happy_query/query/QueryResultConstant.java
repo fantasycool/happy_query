@@ -8,6 +8,7 @@ public interface QueryResultConstant {
     String INT_GROUP_COLUMN_NAME = "int_strs";
     String DOUBLE_GROUP_COLUMN_NAME = "double_strs";
     String VARCHAR_GROUP_COLUMN_NAME = "varchar_strs";
+    String FEATURE_GROUP_COLUMN_NAME = "feature_strs";
     String DEFINITION_SPLIT = "|||";
     String KEY_VALUE_SPIT = ":::";
 

@@ -1,5 +1,6 @@
 package com.happy_query.parser.domain;
 
+import com.alibaba.fastjson.JSON;
 import com.google.common.base.Joiner;
 import com.happy_query.parser.JsonLogicParseException;
 import com.happy_query.query.domain.Row;
@@ -36,7 +37,7 @@ public class DataDefinition {
     /**
      * 字段选项
      */
-    private List<String> dataOptions;
+    private String dataOptions;
     /**
      * 模板,控制展示,freemarker脚本
      */
@@ -149,11 +150,11 @@ public class DataDefinition {
         this.rule = rule;
     }
 
-    public List<String> getDataOptions() {
+    public String getDataOptions() {
         return dataOptions;
     }
 
-    public void setDataOptions(List<String> dataOptions) {
+    public void setDataOptions(String dataOptions) {
         this.dataOptions = dataOptions;
     }
 
@@ -244,7 +245,7 @@ public class DataDefinition {
     public Map<String, Object> inverseDataDefinition() {
         Map<String, Object> parameters = new HashMap<String, Object>();
         if (dataOptions != null)
-            parameters.put("data_options", inverseDataOptions(dataOptions));
+            parameters.put("data_options", dataOptions);
         parameters.put("data_type", dataType);
         parameters.put("description", description);
         parameters.put("definition_type", definitionType);
@@ -265,10 +266,9 @@ public class DataDefinition {
         return parameters;
     }
 
-    private static List<String> analysisDataOptions(Object data_options) {
+    private static String analysisDataOptions(Object data_options) {
         if (data_options != null) {
-            String[] options = data_options.toString().split(",");
-            return Arrays.asList(options);
+            return data_options.toString();
         }
         return null;
     }
@@ -326,6 +326,9 @@ public class DataDefinition {
                 break;
             case DOUBLE:
                 rv.setValue(Double.valueOf(value));
+                break;
+            case TEXT:
+                rv.setValue(String.valueOf(value));
                 break;
             default:
                 break;
