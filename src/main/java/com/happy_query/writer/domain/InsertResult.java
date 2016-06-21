@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class InsertResult {
     private List<Row> rows;
-    private String categoryType;
+    private String categoryType; //user,fuwu
 
     public String getCategoryType() {
         return categoryType;

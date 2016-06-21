@@ -280,6 +280,9 @@ public abstract class JDBCUtils {
     }
 
     public static String makeInsertToTableSql(String tableName, Collection<String> names) {
+        if(names.size() == 0){
+            return "insert into " + tableName + "(id) values (null)";
+        }
         StringBuilder sql = new StringBuilder() //
                 .append("insert into ") //
                 .append(tableName) //

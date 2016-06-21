@@ -23,20 +23,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * writer
+ * writer to import data
  * Created by frio on 16/6/17.
  */
 public class Writer implements IWriter {
     private static Logger LOG = LoggerFactory.getLogger(Writer.class);
     private DataSource dataSource;
 
-    public void importDataByExcel(ImportParam importParam) {
+    public void importDataByCSV(ImportParam importParam) {
         InsertResult insertResult
                 = OpenCSVUtil.readAllDefaultTemplate(importParam.getReader(), dataSource);
         try {
             insertRows(insertResult);
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new HappyWriterException("import failed!", e);
         }
 
     }
@@ -132,7 +132,7 @@ public class Writer implements IWriter {
                  */
                 Map<String, Object> insertDatas = getLeftInsertDatas(leftIdColumn, r);
                 leftBatchInsertValues.add(insertDatas);
-                if (r.getLeftId() != null) {
+                if (r.getLeftId() == null) {
                     Long leftPrimaryId = JDBCUtils.insertToTable(connection, leftTable, insertDatas);
                     r.setLeftId(leftPrimaryId);
                 }
@@ -147,7 +147,6 @@ public class Writer implements IWriter {
                     rightParameters.add(r.getLeftId());
                     rightParameters.add(d.getId());
                     rightParameters.add(m.get(d).getValue());
-                    rightParameters.add(subKey);
                     if (cachPr.get(insertSql) != null) {
                         cachPr.get(insertSql).add(rightParameters);
                     } else {
@@ -176,18 +175,18 @@ public class Writer implements IWriter {
         if (dataType == DataDefinitionDataType.BOOLEAN
                 || dataType == DataDefinitionDataType.DATETIME
                 || dataType == DataDefinitionDataType.INT) {
-            insertSql = "insert into" + rightTable + "(left_id, dd_ref_id,int_value,sub_key) " +
+            insertSql = "insert into " + rightTable + "(left_id, dd_ref_id,int_value,sub_key) " +
                     "values(?,?,?," + subKey + ")";
 
         } else if (dataType == DataDefinitionDataType.FLOAT
                 || dataType == DataDefinitionDataType.DOUBLE) {
             insertSql
-                    = "insert into" + rightTable + "(left_id, dd_ref_id,double_value,sub_key) " +
+                    = "insert into " + rightTable + "(left_id, dd_ref_id,double_value,sub_key) " +
                     "values(?,?,?," + subKey + ")";
 
         } else if (dataType == DataDefinitionDataType.STRING) {
             insertSql
-                    = "insert into" + rightTable + "(left_id, dd_ref_id,str_value,sub_key) " +
+                    = "insert into " + rightTable + "(left_id, dd_ref_id,str_value,sub_key) " +
                     "values(?,?,?," + subKey + ")";
         } else {
             insertSql
@@ -242,10 +241,6 @@ public class Writer implements IWriter {
         } finally {
             JDBCUtils.close(connection);
         }
-    }
-
-    public DataSource getDataSource() {
-        return dataSource;
     }
 
     public void setDataSource(DataSource dataSource) {

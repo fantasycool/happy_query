@@ -60,6 +60,9 @@ public class OpenCSVUtil {
                         for (int j = 0; j < headers.length; j++) {
                             if (j > 0) {
                                 DataDefinition dd = DataDefinitionDao.getDataDefinitionByName(dataSource, getDefinitionName(headers[j]));
+                                if(dd == null){
+                                    throw new HappyWriterException("can't find definition " +  getDefinitionName(headers[j]));
+                                }
                                 definitions.put(j, dd);
                                 if(dd.getLeftData()){
                                     definitionNames.add(dd.getLefColName());

@@ -13,7 +13,7 @@ public interface IWriter {
      *
      * @param importParam
      */
-    void importDataByExcel(ImportParam importParam);
+    void importDataByCSV(ImportParam importParam);
 
     /**
      * write data to happy_query
