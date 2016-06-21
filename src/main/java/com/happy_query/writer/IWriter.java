@@ -17,9 +17,24 @@ public interface IWriter {
 
     /**
      * write data to happy_query
+     *
      * @param insertResult
      */
     void writeRecord(InsertResult insertResult);
 
+    /**
+     * update data
+     *
+     * @param insertResult
+     */
     void updateRecord(InsertResult insertResult);
+
+    /**
+     * delete record by leftId
+     *
+     * @param leftId
+     * @param category
+     * @param leftIdColumnName
+     */
+    void deleteRecord(long leftId, String category, String leftIdColumnName);
 }

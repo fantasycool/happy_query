@@ -80,7 +80,21 @@ public class Writer implements IWriter {
                  */
                 Map<DataDefinition, Row.Value> m = r.getData();
                 for (DataDefinition d : m.keySet()) {
-
+                    Row.Value v = m.get(d);
+                    if (v == null || v.getValue() == null) {
+                        continue;
+                    }
+                    String valueColumn = DataDefinitionDataType.getColumnNameByDataDefinitionDataType(d.getDataType());
+                    StringBuilder sqlSB = new StringBuilder();
+                    sqlSB.append("insert into ").append(rightTable).append("(left_id,dd_ref_id,sub_key,").append(valueColumn).append(")")
+                            .append("values").append("(?,?,?,?) on duplicate key update ").append(valueColumn).append("=?");
+                    List<Object> parameters = new ArrayList<Object>();
+                    parameters.add(r.getLeftId());
+                    parameters.add(d.getId());
+                    parameters.add(subKey);
+                    parameters.add(v.getValue());
+                    parameters.add(v.getValue());
+                    JDBCUtils.executeUpdate(connection, sqlSB.toString(), parameters);
                 }
             } catch (Exception e) {
                 connection.rollback();
@@ -195,11 +209,39 @@ public class Writer implements IWriter {
         try {
             insertRows(insertResult);
         } catch (SQLException e) {
+            throw new HappyWriterException("write record failed", e);
         }
     }
 
     public void updateRecord(InsertResult insertResult) {
+        try {
+            updateRows(insertResult);
+        } catch (SQLException e) {
+            throw new HappyWriterException("");
+        }
+    }
 
+    public void deleteRecord(long leftId, String category, String leftIdColumnName) {
+        String rightTable = Constant.RIGHT_TABLE_MAP.get(category);
+        String leftTable = Constant.LEFT_TABLE_MAP.get(category);
+        StringBuilder sb = new StringBuilder();
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
+            sb.append("delete from ").append(leftTable).append(" where ").append(leftIdColumnName).append("=?");
+            List<Object> parameters = new ArrayList<Object>();
+            parameters.add(leftId);
+            JDBCUtils.execute(connection, sb.toString(), parameters);
+            sb.setLength(0);
+            sb.append("delete from ").append(rightTable).append(" where left_id=?");
+            JDBCUtils.execute(connection, sb.toString(), parameters);
+            connection.commit();
+        } catch (Exception e) {
+            JDBCUtils.rollback(connection);
+        } finally {
+            JDBCUtils.close(connection);
+        }
     }
 
     public DataSource getDataSource() {

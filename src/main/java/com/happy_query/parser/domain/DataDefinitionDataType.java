@@ -16,6 +16,7 @@ public enum DataDefinitionDataType {
     TEXT;
 
     private static BiMap<String, DataDefinitionDataType> biMap = HashBiMap.create();
+
     static{
         biMap.put("int", INT);
         biMap.put("string", STRING);
@@ -36,5 +37,17 @@ public enum DataDefinitionDataType {
 
     public String toString(){
         return biMap.inverse().get(this);
+    }
+
+    public static String getColumnNameByDataDefinitionDataType(DataDefinitionDataType dataDefinitionDataType){
+        if(dataDefinitionDataType == INT || dataDefinitionDataType == BOOLEAN || dataDefinitionDataType == DATETIME){
+            return "int_value";
+        }else if(dataDefinitionDataType == FLOAT || dataDefinitionDataType == DOUBLE){
+            return "double_value";
+        }else if(dataDefinitionDataType == STRING){
+            return "str_value";
+        }else {
+            return "feature";
+        }
     }
 }

@@ -101,6 +101,27 @@ public abstract class JDBCUtils {
         return executeUpdate(conn, sb.toString(), args);
     }
 
+    public static void commit(Connection conn){
+        if(conn == null){
+            return;
+        }
+        try {
+            conn.commit();
+        } catch (SQLException e) {
+            throw new HappyQueryException("connection commit failed!");
+        }
+    }
+
+    public static void rollback(Connection conn){
+        if(conn == null){
+            return;
+        }
+        try{
+            conn.rollback();
+        }catch(SQLException e){
+            throw new HappyQueryException("connection rollback failed!");
+        }
+    }
 
     /**
      * execute update with parameters and sql
