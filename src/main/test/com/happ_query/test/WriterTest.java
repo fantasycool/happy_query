@@ -59,5 +59,8 @@ public class WriterTest {
         writer.importDataByCSV(importParam);
     }
 
-
+    @Test
+    public void testDeleteRecord() throws IOException {
+        writer.deleteRecord(613477, "user", "id");
+    }
 }

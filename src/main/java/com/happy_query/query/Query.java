@@ -8,11 +8,13 @@ import com.happy_query.parser.JsqlSqlParser;
 import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.domain.QueryResult;
 import com.happy_query.query.domain.Row;
+import com.happy_query.util.Constant;
 import com.happy_query.util.JDBCUtils;
 import com.happy_query.util.HappyQueryException;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +26,7 @@ public class Query implements IQuery {
     private DataSource dataSource;
     private IJsonSqlParser jsonSqlParser;
 
-    public Query(DataSource dataSource){
+    public Query(DataSource dataSource) {
         this.dataSource = dataSource;
         IJsonLogicParser jsonLogicParser = new JsonLogicParser();
         this.jsonSqlParser = new JsqlSqlParser(jsonLogicParser);
@@ -32,7 +34,7 @@ public class Query implements IQuery {
     }
 
     public QueryResult queryByJsonLogic(JsonParseDataParam jsonParseDataParam) {
-        if(!jsonParseDataParam.check()){
+        if (!jsonParseDataParam.check()) {
             throw new IllegalArgumentException("invalid jsonParseDataParam");
         }
 
@@ -40,12 +42,38 @@ public class Query implements IQuery {
         String countSql = jsonSqlParser.convertJsonLogicToCountSql(jsonParseDataParam);
         try {
             //remember to set "SET SESSION group_concat_max_len = 1000000";
-            List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(dataSource, querySql, null);
-            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(dataSource, countSql, null);
+            List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(dataSource, querySql, new ArrayList());
+            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(dataSource, countSql,  new ArrayList());
             QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);
             return queryResult;
         } catch (SQLException e) {
             throw new HappyQueryException("query sql exception", e);
+        }
+    }
+
+    public QueryResult queryByLeftId(long leftId, String categoryType) {
+        String rightTable = Constant.RIGHT_TABLE_MAP.get(categoryType);
+        String leftTable = Constant.LEFT_TABLE_MAP.get(categoryType);
+        String leftIdColumn = Constant.LEFT_ID_COLUMNS.get(categoryType);
+
+        JsonParseDataParam jsonParseDataParam = new JsonParseDataParam();
+        jsonParseDataParam.setLeftTableName(leftTable);
+        jsonParseDataParam.setRightTableName(rightTable);
+        jsonParseDataParam.setLeftPrimaryId(leftIdColumn);
+        jsonParseDataParam.setLimitStart(0);
+        jsonParseDataParam.setSize(1);
+        jsonParseDataParam.setLeftOperationStr(leftIdColumn + "=" + leftId);
+        jsonParseDataParam.setConnectType("left");
+
+        String querySql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "left_id=" + leftId, "query");
+        String countSql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "left_id=" + leftId, "count");
+
+        try {
+            List<Map<String, Row.Value>> queryResult = JDBCUtils.executeQuery(dataSource, querySql, new ArrayList());
+            List<Map<String, Row.Value>> countResult = JDBCUtils.executeQuery(dataSource, countSql, new ArrayList());
+            return QueryResult.createFromOrinalData(jsonParseDataParam, queryResult, countResult);
+        } catch (SQLException e) {
+            throw new HappyQueryException("query by leftId:" + leftId + "failed", e);
         }
     }
 }

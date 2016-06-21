@@ -17,4 +17,12 @@ public interface IQuery {
      * @return
      */
     QueryResult queryByJsonLogic(JsonParseDataParam jsonParseDataParam);
+
+    /**
+     * Get by left table id and category type
+     * @param leftId
+     * @param categoryType
+     * @return
+     */
+    QueryResult queryByLeftId(long leftId, String categoryType);
 }

@@ -19,4 +19,7 @@ public interface IJsonSqlParser {
      * @return
      */
     String convertJsonLogicToCountSql(JsonParseDataParam jsonParseDataParam);
+
+
+    String getFreemarkerSql(JsonParseDataParam jsonParseDataParam, String operationStr, String type);
 }
