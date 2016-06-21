@@ -1,7 +1,5 @@
 package com.happy_query.util;
 
-import freemarker.template.TemplateException;
-
 /**
  * Created by frio on 16/6/15.
  */
