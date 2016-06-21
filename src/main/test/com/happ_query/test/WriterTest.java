@@ -46,7 +46,15 @@ public class WriterTest {
 
     @Test
     public void testImportDataWithId() throws IOException {
-
+        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/import_test1.csv"));
+        ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
+        writer.importDataByCSV(importParam);
     }
 
+    @Test
+    public void testInsertDataWithLeftTable() throws IOException {
+        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/import_test_left.csv"));
+        ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
+        writer.importDataByCSV(importParam);
+    }
 }

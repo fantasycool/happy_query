@@ -37,8 +37,8 @@ public class OpenCSVUtil {
             List<String[]> rows = csvReader.readAll();
             List<Row> resultRows = new ArrayList<Row>();
             List<String> definitionNames = new ArrayList<String>();
-            Map<String, Row.Value> leftDatas = new LinkedHashMap<String, Row.Value>();
             for (int i = 0; i < rows.size(); i++) {
+                Map<String, Row.Value> leftDatas = new LinkedHashMap<String, Row.Value>();
                 if (i > 0) {
                     if (i > 1 && rows.get(i).length <= 1) {
                         LOG.info("import now we have come to the end");
@@ -92,6 +92,7 @@ public class OpenCSVUtil {
                     row.setData(dataMap);
                     row.setLeftTableDefinitionNames(definitionNames);
                     row.setLeftId(leftId);
+                    row.setLeftTableData(leftDatas);
                     resultRows.add(row);
                 }
             }

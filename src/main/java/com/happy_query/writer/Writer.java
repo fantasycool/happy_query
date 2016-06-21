@@ -66,7 +66,7 @@ public class Writer implements IWriter {
                 Map<String, Object> leftDatas = getLeftInsertDatas(leftIdColumn, r);
                 if (leftDatas.size() > 0) {
                     try {
-                        if (r.getLeftId() != null) {
+                        if (r.getLeftId() == null) {
                             JDBCUtils.executeUpdateById(connection, leftTable, leftDatas, leftIdColumn, r.getLeftId());
                         } else {
                             throw new HappyWriterException("leftId is invalid,cannot be null!");
