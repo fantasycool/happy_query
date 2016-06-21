@@ -34,7 +34,7 @@ public class Writer implements IWriter {
         InsertResult insertResult
                 = OpenCSVUtil.readAllDefaultTemplate(importParam.getReader(), dataSource);
         try {
-            insertRows(insertResult);
+            updateRows(insertResult);
         } catch (SQLException e) {
             throw new HappyWriterException("import failed!", e);
         }
@@ -66,19 +66,22 @@ public class Writer implements IWriter {
                 Map<String, Object> leftDatas = getLeftInsertDatas(leftIdColumn, r);
                 if (leftDatas.size() > 0) {
                     try {
-                        if (r.getLeftId() == null) {
+                        if (r.getLeftId() != null) {
                             JDBCUtils.executeUpdateById(connection, leftTable, leftDatas, leftIdColumn, r.getLeftId());
-                        } else {
-                            throw new HappyWriterException("leftId is invalid,cannot be null!");
                         }
                     } catch (SQLException e) {
                         throw new HappyWriterException("execute left table update failed");
                     }
                 }
+                if (r.getLeftId() == null) {
+                    Long leftPrimaryId = JDBCUtils.insertToTable(connection, leftTable, leftDatas);
+                    r.setLeftId(leftPrimaryId);
+                }
                 /**
                  * update right datas information
                  */
                 Map<DataDefinition, Row.Value> m = r.getData();
+                Map<String, List<List<Object>>> cachPr = new HashMap<String, List<List<Object>>>();
                 for (DataDefinition d : m.keySet()) {
                     Row.Value v = m.get(d);
                     if (v == null || v.getValue() == null) {
@@ -89,69 +92,21 @@ public class Writer implements IWriter {
                     sqlSB.append("insert into ").append(rightTable).append("(left_id,dd_ref_id,sub_key,").append(valueColumn).append(")")
                             .append("values").append("(?,?,?,?) on duplicate key update ").append(valueColumn).append("=?");
                     List<Object> parameters = new ArrayList<Object>();
+                    if(r.getLeftId() == null){
+                        System.out.println();
+                    }
                     parameters.add(r.getLeftId());
                     parameters.add(d.getId());
                     parameters.add(subKey);
                     parameters.add(v.getValue());
                     parameters.add(v.getValue());
-                    JDBCUtils.executeUpdate(connection, sqlSB.toString(), parameters);
-                }
-            } catch (Exception e) {
-                connection.rollback();
-                throw new HappyWriterException("met a exception when doing roll insert", e);
-            } finally {
-                connection.commit();
-                JDBCUtils.close(connection);
-            }
-        }
-    }
 
-    private void insertRows(InsertResult insertResult) throws SQLException {
-        // use category type to decide which table to insert datas
-        String rightTable = Constant.RIGHT_TABLE_MAP.get(insertResult.getCategoryType());
-        String leftTable = Constant.LEFT_TABLE_MAP.get(insertResult.getCategoryType());
-        int subKey = Constant.SUB_KEY_MAP.get(insertResult.getCategoryType());
-        String leftIdColumn = Constant.LEFT_ID_COLUMNS.get(insertResult.getCategoryType());
-        //transaction use
-        Connection connection = null;
-
-        /**
-         * do dao insert operation
-         * 1: insert left table;
-         * 2: insert right table;
-         */
-        List<Row> rows = insertResult.getRows();
-        List<Map<String, Object>> leftBatchInsertValues = new ArrayList<Map<String, Object>>();
-        for (Row r : rows) {
-            connection = dataSource.getConnection();
-            connection.setAutoCommit(false);
-            try {
-                /**
-                 * 1: we insert left table first
-                 */
-                Map<String, Object> insertDatas = getLeftInsertDatas(leftIdColumn, r);
-                leftBatchInsertValues.add(insertDatas);
-                if (r.getLeftId() == null) {
-                    Long leftPrimaryId = JDBCUtils.insertToTable(connection, leftTable, insertDatas);
-                    r.setLeftId(leftPrimaryId);
-                }
-                /**
-                 * 2: insert right table
-                 */
-                Map<DataDefinition, Row.Value> m = r.getData();
-                Map<String, List<List<Object>>> cachPr = new HashMap<String, List<List<Object>>>();
-                for (DataDefinition d : m.keySet()) {
-                    List<Object> rightParameters = new ArrayList<Object>();
-                    String insertSql = getInsertSql(d.getDataType(), rightTable, subKey);
-                    rightParameters.add(r.getLeftId());
-                    rightParameters.add(d.getId());
-                    rightParameters.add(m.get(d).getValue());
-                    if (cachPr.get(insertSql) != null) {
-                        cachPr.get(insertSql).add(rightParameters);
+                    if (cachPr.get(sqlSB.toString()) != null) {
+                        cachPr.get(sqlSB.toString()).add(parameters);
                     } else {
                         List<List<Object>> list = new ArrayList<List<Object>>();
-                        list.add(rightParameters);
-                        cachPr.put(insertSql, list);
+                        list.add(parameters);
+                        cachPr.put(sqlSB.toString(), list);
                     }
                 }
                 //batch insert
@@ -166,7 +121,6 @@ public class Writer implements IWriter {
                 JDBCUtils.close(connection);
             }
         }
-
     }
 
     private String getInsertSql(DataDefinitionDataType dataType, String rightTable, int subKey) {
@@ -205,7 +159,7 @@ public class Writer implements IWriter {
 
     public void writeRecord(InsertResult insertResult) {
         try {
-            insertRows(insertResult);
+            updateRows(insertResult);
         } catch (SQLException e) {
             throw new HappyWriterException("write record failed", e);
         }

@@ -1,6 +1,7 @@
 package com.happ_query.test;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.happy_query.query.domain.Row;
 import com.happy_query.writer.Writer;
 import com.happy_query.writer.domain.ImportParam;
 import org.junit.Before;
@@ -57,4 +58,6 @@ public class WriterTest {
         ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
         writer.importDataByCSV(importParam);
     }
+
+
 }
