@@ -1,5 +1,6 @@
 package com.happy_query.writer;
 
+import com.alibaba.fastjson.JSON;
 import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.parser.domain.DataDefinitionDataType;
 import com.happy_query.query.domain.Row;
@@ -179,7 +180,22 @@ public class Writer implements IWriter {
         try {
             updateRows(insertResult);
         } catch (SQLException e) {
-            throw new HappyWriterException("");
+            throw new HappyWriterException("update record failed!");
+        }
+    }
+
+    public void updateRecord(long leftId, String category, Map<Long, Object> values) {
+        InsertResult insertResult = new InsertResult();
+        insertResult.setCategoryType(category);
+        List<Row> rows = new ArrayList<Row>();
+        Row r = Row.createFromFlatData(values, leftId);
+        rows.add(r);
+        insertResult.setRows(rows);
+        try {
+            updateRows(insertResult);
+        } catch (SQLException e) {
+            LOG.error("updateRows failed,leftId:[{}],category:[{}], values[{}]", leftId, category, JSON.toJSONString(values), e);
+            throw new HappyWriterException("update record failed!", e);
         }
     }
 

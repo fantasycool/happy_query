@@ -4,6 +4,8 @@ import com.happy_query.writer.domain.ImportParam;
 import com.happy_query.writer.domain.InsertResult;
 import com.happy_query.writer.domain.Record;
 
+import java.util.Map;
+
 /**
  * Created by frio on 16/6/16.
  */
@@ -28,6 +30,13 @@ public interface IWriter {
      * @param insertResult
      */
     void updateRecord(InsertResult insertResult);
+
+    /**
+     * update data
+     * @param leftId
+     * @param category
+     */
+    void updateRecord(long leftId, String category, Map<Long, Object> update);
 
     /**
      * delete record by leftId

@@ -1,19 +1,26 @@
 package com.happy_query.query.domain;
 
+import com.happy_query.cache.CacheManager;
 import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.util.NullChecker;
 import com.happy_query.util.TemplateUtil;
+import com.happy_query.writer.HappyWriterException;
+import javafx.scene.chart.PieChart;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by frio on 16/6/15.
  */
 public class Row {
+    static Logger LOG = LoggerFactory.getLogger(Row.class);
     /**
      * 字典表指标对应的字段
      */
@@ -165,5 +172,37 @@ public class Row {
 
     public void setLeftId(Long leftId) {
         this.leftId = leftId;
+    }
+
+    /**
+     * create Row data from flatMapData {definitionId->value, ...}
+     * @return
+     */
+    public static Row createFromFlatData(Map<Long, Object> flatMapData, long leftId){
+        Map<String, Value> leftData = new HashMap<String, Value>();
+        Map<DataDefinition, Value> datas = new HashMap<DataDefinition, Value>();
+        Row row = new Row();
+        List<String> leftTableDefinitionName = new ArrayList<String>();
+        for(Long k : flatMapData.keySet()){
+            try {
+                DataDefinition dataDefinition = (DataDefinition) CacheManager.getValue(DataDefinition.createDataDefinitionById(k));
+                if(dataDefinition == null){
+                    LOG.error("we can't find the id");
+                }
+                if(dataDefinition.getLeftData()){
+                    leftTableDefinitionName.add(dataDefinition.getName());
+                    leftData.put(dataDefinition.getLefColName(), Value.createValue(dataDefinition, flatMapData.get(k)));
+                }
+                datas.put(dataDefinition, Value.createValue(dataDefinition, flatMapData.get(k)));
+            } catch (ExecutionException e) {
+                LOG.error("get defifination failed, id is [{}]", k, e);
+                throw new HappyWriterException("get data defintion failed!", e);
+            }
+        }
+        row.setLeftId(leftId);
+        row.setLeftTableData(leftData);
+        row.setData(datas);
+        row.setLeftTableDefinitionNames(leftTableDefinitionName);
+        return row;
     }
 }
