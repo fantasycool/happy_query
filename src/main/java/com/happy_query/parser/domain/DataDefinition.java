@@ -1,11 +1,14 @@
 package com.happy_query.parser.domain;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.base.Joiner;
 import com.happy_query.parser.JsonLogicParseException;
 import com.happy_query.query.domain.Row;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by frio on 16/6/14.
@@ -304,6 +307,10 @@ public class DataDefinition {
      */
     public Row.Value formatStringValue(String value) {
         Row.Value rv = Row.Value.createValue(null, value);
+        if(StringUtils.isBlank(value)){
+            rv.setDataDefinition(this);
+            return rv;
+        }
         switch (dataType) {
             case BOOLEAN:
                 if (value.equals("是") || value.equals("1")) {
@@ -334,6 +341,7 @@ public class DataDefinition {
                 break;
         }
         if (rv.getValue() != null) {
+            rv.setDataDefinition(this);
             return rv;
         }
         throw new JsonLogicParseException("data definition is not valid!");

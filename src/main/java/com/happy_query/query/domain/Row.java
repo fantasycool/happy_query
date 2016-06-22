@@ -92,7 +92,12 @@ public class Row {
          * @return
          */
         public static Value createValue(DataDefinition dataDefinition, Object value){
-            NullChecker.checkNull(value);
+            if(null == value){
+                Value v = new Value();
+                v.setDataDefinition(dataDefinition);
+                v.setValue(value);
+                return v;
+            }
             Value v;
             if(null != dataDefinition){
                 v = dataDefinition.formatStringValue(value.toString());

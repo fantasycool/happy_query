@@ -42,51 +42,21 @@ public class QueryResult {
             Map<String, Row.Value> m = originalQueryResult.get(i);
             Row row = new Row();
             row.setLeftTableData(m);
-
-            /**
-             * right table init
-             */
             Map<String, Row.Value> rm = originalQueryResult.get(i);
             Map<DataDefinition, Row.Value> lr = new HashMap<DataDefinition, Row.Value>();
             for (Map.Entry<String, Row.Value> me : rm.entrySet()) {
-                Object v = me.getValue();
+                Object v = me.getValue().getValue();
                 if (null == v) {
                     continue;
                 }
                 /**
-                 * 左表判断
+                 * column type definition definition data fill
                  */
-                if (!QueryResultConstant.DEFINITION_COLUMNS.contains(me.getKey().toString())) {
-                    if (!me.getKey().equals(jsonParseDataParam.getLeftPrimaryId())) {
-                        try {
-                            DataDefinition leftDefinition = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + me.getKey().toString());
-                            Row.Value value = Row.Value.createValue(leftDefinition, me.getValue().getValue());
-                            lr.put(leftDefinition, value);
-                        } catch (ExecutionException e) {
-                            LOG.error("get definition failed!definition name is:[{}]", me.getKey(), e);
-                        }
-                    }
-                    continue;
-                }
-                String[] kvs = v.toString().split(QueryResultConstant.DEFINITION_SPLIT);
-                for (String kv : kvs) {
-                    String[] idValue = kv.split(QueryResultConstant.KEY_VALUE_SPIT);
-                    String dataDefinitionId = idValue[0]; //definition id
-                    String value = idValue[1]; //definition value
-
-                    try {
-                        Object o = CacheManager.getValue(DataDefinition.createDataDefinitionById(Long.valueOf(dataDefinitionId)));
-                        if (o != null) {
-                            DataDefinition dataDefinition = (DataDefinition) o;
-                            Row.Value rv = Row.Value.createValue(dataDefinition, value);
-
-                            lr.put(dataDefinition, rv);
-                        }
-                    } catch (ExecutionException e) {
-                        LOG.error("get datadefinition value failed!", e);
-                        LOG.error("datadefinition param id is: [{}]", idValue);
-                    }
-                }
+                if (fillLeftTableDefinitionDatas(jsonParseDataParam, lr, me)) continue;
+                /**
+                 * non column type definition definition data fill
+                 */
+                fillRightTableDefinitionDatas(lr, v);
             }
             row.setLeftId(Long.valueOf(originalQueryResult.get(i).get("left_id").toString()));
             row.setData(lr);
@@ -94,6 +64,43 @@ public class QueryResult {
         }
         queryResult.setRows(rows);
         return queryResult;
+    }
+
+    private static void fillRightTableDefinitionDatas(Map<DataDefinition, Row.Value> lr, Object v) {
+        String[] kvs = v.toString().split(QueryResultConstant.DEFINITION_SPLIT);
+        for (String kv : kvs) {
+            String[] idValue = kv.split(QueryResultConstant.KEY_VALUE_SPIT);
+            String dataDefinitionId = idValue[0]; //definition id
+            String value = idValue[1]; //definition value
+
+            try {
+                Object o = CacheManager.getValue(DataDefinition.createDataDefinitionById(Long.valueOf(dataDefinitionId)));
+                if (o != null) {
+                    DataDefinition dataDefinition = (DataDefinition) o;
+                    Row.Value rv = Row.Value.createValue(dataDefinition, value);
+                    lr.put(dataDefinition, rv);
+                }
+            } catch (ExecutionException e) {
+                LOG.error("get datadefinition value failed!", e);
+                LOG.error("datadefinition param id is: [{}]", idValue);
+            }
+        }
+    }
+
+    private static boolean fillLeftTableDefinitionDatas(JsonParseDataParam jsonParseDataParam, Map<DataDefinition, Row.Value> lr, Map.Entry<String, Row.Value> me) {
+        if (!QueryResultConstant.DEFINITION_COLUMNS.contains(me.getKey().toString())) {
+            if (!me.getKey().equals(jsonParseDataParam.getLeftPrimaryId())) {
+                try {
+                    DataDefinition leftDefinition = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + me.getKey().toString());
+                    Row.Value value = Row.Value.createValue(leftDefinition, me.getValue().getValue());
+                    lr.put(leftDefinition, value);
+                } catch (ExecutionException e) {
+                    LOG.error("get definition failed!definition name is:[{}]", me.getKey(), e);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public List<Row> getRows() {

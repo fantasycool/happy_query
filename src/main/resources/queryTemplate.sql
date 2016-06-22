@@ -1,5 +1,6 @@
 SELECT
   a.*,
+  b.left_id,
   b.int_strs,
   b.varchar_strs,
   b.double_strs,
