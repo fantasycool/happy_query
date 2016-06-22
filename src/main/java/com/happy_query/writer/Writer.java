@@ -49,7 +49,7 @@ public class Writer implements IWriter {
      * @return
      * @throws SQLException
      */
-    private List<Long> updateRows(InsertResult insertResult) throws SQLException {
+    private List<Object> updateRows(InsertResult insertResult) throws SQLException {
         // use category type to decide which table to insert datas
         String rightTable = Constant.RIGHT_TABLE_MAP.get(insertResult.getCategoryType());
         String leftTable = Constant.LEFT_TABLE_MAP.get(insertResult.getCategoryType());
@@ -63,7 +63,7 @@ public class Writer implements IWriter {
          * 2: update right table;
          */
         List<Row> rows = insertResult.getRows();
-        List<Long> addIds = new ArrayList<Long>();
+        List<Object> addIds = new ArrayList<Object>();
         for (Row r : rows) {
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
@@ -119,13 +119,8 @@ public class Writer implements IWriter {
                 }
                 //batch insert
                 for (String sql : cachPr.keySet()) {
-                    List<ResultSet> idSets = JDBCUtils.batchExecuteUpdate(connection, sql, cachPr.get(sql));
-                    for (ResultSet rs : idSets) {
-                        Object o = rs.next();
-                        if (null != o) {
-                            addIds.add(Long.valueOf(o.toString()));
-                        }
-                    }
+                    List<Object> idSets = JDBCUtils.batchExecuteUpdate(connection, sql, cachPr.get(sql));
+                    addIds.addAll(idSets);
                 }
             } catch (Exception e) {
                 connection.rollback();
@@ -174,7 +169,7 @@ public class Writer implements IWriter {
 
     public Long writeRecord(InsertResult insertResult) {
         try {
-            return updateRows(insertResult).get(0);
+            return (Long) updateRows(insertResult).get(0);
         } catch (SQLException e) {
             throw new HappyWriterException("write record failed", e);
         }

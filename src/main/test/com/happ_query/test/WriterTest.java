@@ -1,7 +1,7 @@
 package com.happ_query.test;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.happy_query.query.domain.Row;
+import com.happy_query.query.Query;
 import com.happy_query.writer.Writer;
 import com.happy_query.writer.domain.ImportParam;
 import org.junit.Before;
@@ -19,7 +19,7 @@ import java.sql.SQLException;
 public class WriterTest {
     private DataSource dataSource;
     private Writer writer;
-
+    private Query query;
     @Before
     public void init() {
         DruidDataSource dd = new DruidDataSource();
@@ -35,6 +35,7 @@ public class WriterTest {
         dataSource = dd;
         writer = new Writer();
         writer.setDataSource(dataSource);
+        query = new Query(dataSource);
 
     }
 
@@ -61,6 +62,6 @@ public class WriterTest {
 
     @Test
     public void testDeleteRecord() throws IOException {
-        writer.deleteRecord(613477, "user", "id");
+        writer.deleteRecord(613582, "user", "id");
     }
 }

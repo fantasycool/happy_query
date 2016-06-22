@@ -181,7 +181,7 @@ public abstract class JDBCUtils {
      * @return
      * @throws SQLException
      */
-    public static List<ResultSet> batchExecuteUpdate(DataSource dataSource, String sql, List<List<Object>> parameters) throws SQLException {
+    public static List<Object> batchExecuteUpdate(DataSource dataSource, String sql, List<List<Object>> parameters) throws SQLException {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -193,18 +193,21 @@ public abstract class JDBCUtils {
         }
     }
 
-    private static List<ResultSet> executeBatchUpdate(String sql, List<List<Object>> parameters, Connection conn, PreparedStatement stmt, int count) throws SQLException {
-        List<ResultSet> resultList = new ArrayList<ResultSet>();
+    private static List<Object> executeBatchUpdate(String sql, List<List<Object>> parameters, Connection conn, PreparedStatement stmt, int count) throws SQLException {
+        List<Object> resultList = new ArrayList<Object>();
         for (List<Object> l : parameters) {
             try {
-                stmt = conn.prepareStatement(sql);
+                stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 setParameters(stmt, l);
                 stmt.addBatch();
                 if (++count % 100 == 0) {
                     stmt.executeBatch();
                 }
                 ResultSet rs = stmt.getGeneratedKeys();
-                resultList.add(rs);
+                Object next = rs.next();
+                if(next != null){
+                    resultList.add(next);
+                }
             } finally {
                 stmt.executeBatch();
                 close(stmt);
@@ -213,7 +216,7 @@ public abstract class JDBCUtils {
         return resultList;
     }
 
-    public static List<ResultSet> batchExecuteUpdate(Connection connection, String sql, List<List<Object>> parameters) throws SQLException {
+    public static List<Object> batchExecuteUpdate(Connection connection, String sql, List<List<Object>> parameters) throws SQLException {
         PreparedStatement stmt = null;
         int count = 0;
         return executeBatchUpdate(sql, parameters, connection, stmt, count);
