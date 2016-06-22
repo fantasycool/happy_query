@@ -60,7 +60,7 @@ public class QueryResult {
                     if (!me.getKey().equals(jsonParseDataParam.getLeftPrimaryId())) {
                         try {
                             DataDefinition leftDefinition = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + me.getKey().toString());
-                            Row.Value value = leftDefinition.formatStringValue(me.getValue().getValue().toString());
+                            Row.Value value = Row.Value.createValue(leftDefinition, me.getValue().getValue());
                             lr.put(leftDefinition, value);
                         } catch (ExecutionException e) {
                             LOG.error("get definition failed!definition name is:[{}]", me.getKey(), e);

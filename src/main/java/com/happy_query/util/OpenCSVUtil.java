@@ -81,7 +81,7 @@ public class OpenCSVUtil {
                     for (int y = 0; y < flatRow.length; y++) {
                         if (y > 0) {
                             DataDefinition dataDefinition = definitions.get(y);
-                            Row.Value rv = dataDefinition.formatStringValue(flatRow[y]);
+                            Row.Value rv = Row.Value.createValue(dataDefinition, flatRow[y]);
                             if(dataDefinition.getLeftData()){
                                 leftDatas.put(dataDefinition.getLefColName(), rv);
                             }else{
