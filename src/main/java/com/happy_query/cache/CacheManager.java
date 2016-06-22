@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * Cache Manager
  * max number:2000
  * expired after 10 minutes
- *
+ * <p>
  * Created by frio on 16/6/15.
  */
 public class CacheManager {
@@ -52,16 +52,16 @@ public class CacheManager {
             if (key != null && ((DataDefinition) key).getId() > 0) {
                 return DataDefinitionDao.getDataDefinition(dataSource, ((DataDefinition) key).getId());
             }
-        }else if(key instanceof String){
-            if(((String) key).startsWith(TEMPLATE_PREFIX)){
+        } else if (key instanceof String) {
+            if (((String) key).startsWith(TEMPLATE_PREFIX)) {
                 try {
                     Template t = new Template("templateName",
                             new StringReader(((String) key).replace(TemplateUtil.TEMPLATE_PREFIX, "")), TemplateUtil.configuration);
                     return t;
-                }catch(Exception e){
+                } catch (Exception e) {
                     LOG.error("init template failed!", e);
                 }
-            }else if(((String) key).startsWith(DEFININATION_NAME_PREFIX)){
+            } else if (((String) key).startsWith(DEFININATION_NAME_PREFIX)) {
                 return DataDefinitionDao.getDataDefinitionByName(dataSource, key.toString().replace(DEFININATION_NAME_PREFIX, ""));
             }
         }

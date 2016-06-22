@@ -38,6 +38,9 @@ public class JsonParseDataParam {
 
     private String leftOperationStr;
 
+    /**
+     * please tell me you want to use left or join
+     */
     private String connectType;
 
     public JsonParseDataParam(){

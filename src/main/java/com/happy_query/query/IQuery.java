@@ -21,7 +21,7 @@ public interface IQuery {
     /**
      * Get by left table id and category type
      * @param leftId
-     * @param categoryType
+     * @param categoryType please refer to Constant.RIGHT_TABLE_MAP, Constant.LEFT_TABLE_MAP
      * @return
      */
     QueryResult queryByLeftId(long leftId, String categoryType);

@@ -45,6 +45,9 @@ public class QueryResult {
             Map<String, Row.Value> rm = originalQueryResult.get(i);
             Map<DataDefinition, Row.Value> lr = new HashMap<DataDefinition, Row.Value>();
             for (Map.Entry<String, Row.Value> me : rm.entrySet()) {
+                if(me.getKey().equals("left_id")){
+                    continue;
+                }
                 Object v = me.getValue().getValue();
                 if (null == v) {
                     continue;
@@ -58,7 +61,7 @@ public class QueryResult {
                  */
                 fillRightTableDefinitionDatas(lr, v);
             }
-            row.setLeftId(Long.valueOf(originalQueryResult.get(i).get("left_id").toString()));
+            row.setLeftId(Long.valueOf(originalQueryResult.get(i).get("left_id").getValue().toString()));
             row.setData(lr);
             rows.add(row);
         }

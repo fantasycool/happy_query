@@ -2,18 +2,17 @@ package com.happy_query.parser.dao;
 
 import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.query.domain.Row;
+import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;
 import com.happy_query.util.NullChecker;
 import com.happy_query.writer.HappyWriterException;
+import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * hate heavy and big orm
@@ -29,7 +28,7 @@ public class DataDefinitionDao {
         List<Object> list = Arrays.asList((Object) id);
         try {
             List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where id=? order by gmt_create desc limit 1", list);
-            Map<String, Object> m = convertFromValueMap(data);
+            Map<String, Object> m = convertFromValueMap(data.get(0));
             return DataDefinition.createFromMapData(m);
         } catch (SQLException e) {
             LOG.error("getDataDefinition failed!", e);
@@ -38,24 +37,42 @@ public class DataDefinitionDao {
         return null;
     }
 
-    public static DataDefinition getDataDefinitionByName(DataSource dataSource, String name){
+    public static DataDefinition getDataDefinitionByName(DataSource dataSource, String name) {
         NullChecker.checkNull(name);
-        List<Object> list = Arrays.asList((Object)name);
+        List<Object> list = Arrays.asList((Object) name);
         try {
             List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where name=? order by gmt_create desc limit 1", list);
-            Map<String, Object> m = convertFromValueMap(data);
+            Map<String, Object> m = convertFromValueMap(data.get(0));
             return DataDefinition.createFromMapData(m);
         } catch (SQLException e) {
-            LOG.error("getDataDefinitionByName failed!", e);
-            LOG.error("param name is [{}]", name);
+            LOG.error("getDataDefinitionByName failed!param name is [{}]", name, e);
+            throw new HappyQueryException("getDataDefinitionByName failed!param name is " + name, e);
         }
-        return null;
     }
 
-    private static Map<String, Object> convertFromValueMap(List<Map<String, Row.Value>> data) {
+    public static List<DataDefinition> queryBySubType(DataSource dataSource, String subType) {
+        NullChecker.checkNull(dataSource);
+        NullChecker.checkNull(subType);
+        List<Object> list = Arrays.asList((Object) (subType + "%"));
+        try {
+            List<Map<String, Row.Value>> datas = JDBCUtils.executeQuery(dataSource, "select * from data_definition where sub_type like ? order by gmt_create desc limit 1000", list);
+            List<DataDefinition> dds = new ArrayList<DataDefinition>();
+            for (Map<String, Row.Value> d : datas) {
+                Map<String, Object> m = convertFromValueMap(d);
+                DataDefinition dd = DataDefinition.createFromMapData(m);
+                dds.add(dd);
+            }
+            return dds;
+        } catch (SQLException e) {
+            LOG.error("queryBySubType failed!subType is [{}]", subType, e);
+            throw new HappyQueryException("queryBySubType failed!", e);
+        }
+    }
+
+    private static Map<String, Object> convertFromValueMap(Map<String, Row.Value> data) {
         NullChecker.checkNull(data);
         Map<String, Object> m = new HashMap<String, Object>();
-        for (Map.Entry<String, Row.Value> entry : data.get(0).entrySet()) {
+        for (Map.Entry<String, Row.Value> entry : data.entrySet()) {
             m.put(entry.getKey(), entry.getValue().getValue());
         }
         return m;
@@ -81,7 +98,5 @@ public class DataDefinitionDao {
             LOG.error("update datadefinition failed, datadefinition content is:[{}], t is:[{}]", dataDefinition.toString(), e);
             throw new HappyWriterException("update failed", e);
         }
-
     }
-
 }

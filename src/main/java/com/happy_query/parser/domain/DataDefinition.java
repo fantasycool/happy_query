@@ -4,11 +4,9 @@ import com.google.common.base.Joiner;
 import com.happy_query.parser.JsonLogicParseException;
 import com.happy_query.query.domain.Row;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by frio on 16/6/14.
@@ -60,6 +58,8 @@ public class DataDefinition {
      * 字段状态
      */
     private int status;
+
+    private String nickName;
 
     private String subType;
 
@@ -205,6 +205,14 @@ public class DataDefinition {
         isEditable = editable;
     }
 
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
     public boolean equals(Object obj) {
         if (obj instanceof DataDefinition) {
             return ((DataDefinition) obj).getId() == this.getId();
@@ -213,6 +221,7 @@ public class DataDefinition {
     }
 
     public static DataDefinition createFromMapData(Map<String, Object> data) {
+        removeNullValueKey(data);
         DataDefinition dataDefinition = new DataDefinition();
         dataDefinition.setDataOptions(analysisDataOptions(data.get("data_options")));
         dataDefinition.setDataType(analysisDataDefinitionDataType(data.getOrDefault("data_type", "").toString()));
@@ -231,7 +240,18 @@ public class DataDefinition {
         dataDefinition.setEditable(data.getOrDefault("is_editable", "0").toString().equals("1") ? true : false);
         dataDefinition.setLeftData(data.getOrDefault("is_left_data", "0").toString().equals("1") ? true : false);
         dataDefinition.setLefColName(data.getOrDefault("left_col_name", "").toString());
+        dataDefinition.setNickName(data.getOrDefault("nick_name", "").toString());
         return dataDefinition;
+    }
+
+    private static void removeNullValueKey(Map<String, Object> data) {
+        HashSet<String> hashSet = new HashSet<String>();
+        hashSet.addAll(data.keySet());
+        for(String key : hashSet){
+            if(data.get(key) == null){
+                data.remove(key);
+            }
+        }
     }
 
     public static DataDefinition createDataDefinitionById(Long id) {
@@ -266,6 +286,7 @@ public class DataDefinition {
         parameters.put("id", id);
         parameters.put("status", status);
         parameters.put("sub_type", subType);
+        parameters.put("nick_name", nickName);
         return parameters;
     }
 
@@ -345,6 +366,10 @@ public class DataDefinition {
             return rv;
         }
         throw new JsonLogicParseException("data definition is not valid!");
+    }
+
+    public String toString(){
+        return ReflectionToStringBuilder.toString(this);
     }
 
 }

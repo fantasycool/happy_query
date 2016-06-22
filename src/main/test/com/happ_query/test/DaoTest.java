@@ -1,10 +1,9 @@
 package com.happ_query.test;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.fastjson.JSON;
+import com.happy_query.parser.dao.DataDefinitionDao;
+import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.query.Query;
-import com.happy_query.query.domain.QueryResult;
-import com.happy_query.query.domain.Row;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,9 +14,9 @@ import java.util.List;
 /**
  * Created by frio on 16/6/22.
  */
-public class QueryTest {
+public class DaoTest {
     private DataSource dataSource;
-    private Query query;
+
     @Before
     public void init() {
         DruidDataSource dd = new DruidDataSource();
@@ -31,24 +30,13 @@ public class QueryTest {
             e.printStackTrace();
         }
         dataSource = dd;
-        query = new Query(dataSource);
     }
 
-    /**
-     * test query by id
-     */
-
     @Test
-    public void testQueryById(){
-        QueryResult qr = query.queryByLeftId(613523l, "user");
-        List<Row> rows = qr.getRows();
-        for(Row r : rows){
-            System.out.println(JSON.toJSONString(r.getFlatMapData()));
+    public void testQueryBySubType() {
+       List<DataDefinition> list =  DataDefinitionDao.queryBySubType(dataSource, "病史记录");
+        for(DataDefinition d : list){
+            System.out.println(d.toString());
         }
-    }
-
-    @Test
-    public void testQueryByJson(){
-
     }
 }
