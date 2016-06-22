@@ -1,5 +1,5 @@
 SELECT
-  count(*)
+  count(*) as count_num
 from
 (
   SELECT
@@ -8,7 +8,7 @@ from
     ${left_table}
   <#if left_operation_str ??>
   where
-    $left_operation_str
+    ${left_operation_str}
   </#if>
 
 ) a

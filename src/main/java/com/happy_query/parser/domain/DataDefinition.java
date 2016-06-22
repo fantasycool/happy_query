@@ -303,7 +303,7 @@ public class DataDefinition {
      * @return
      */
     public Row.Value formatStringValue(String value) {
-        Row.Value rv = new Row.Value();
+        Row.Value rv = Row.Value.createValue(null, value);
         switch (dataType) {
             case BOOLEAN:
                 if (value.equals("是") || value.equals("1")) {

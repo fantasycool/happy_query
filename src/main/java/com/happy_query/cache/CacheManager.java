@@ -25,7 +25,8 @@ import java.util.concurrent.TimeUnit;
 public class CacheManager {
     public static DataSource dataSource;
     static Logger LOG = LoggerFactory.getLogger(CacheManager.class);
-
+    public static String DEFININATION_NAME_PREFIX = "definition_name_";
+    public static String TEMPLATE_PREFIX = "template_";
 
     private static LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
             .maximumSize(2000)
@@ -52,7 +53,7 @@ public class CacheManager {
                 return DataDefinitionDao.getDataDefinition(dataSource, ((DataDefinition) key).getId());
             }
         }else if(key instanceof String){
-            if(((String) key).startsWith("template_")){
+            if(((String) key).startsWith(TEMPLATE_PREFIX)){
                 try {
                     Template t = new Template("templateName",
                             new StringReader(((String) key).replace(TemplateUtil.TEMPLATE_PREFIX, "")), TemplateUtil.configuration);
@@ -60,8 +61,8 @@ public class CacheManager {
                 }catch(Exception e){
                     LOG.error("init template failed!", e);
                 }
-            }else if(((String) key).startsWith("definition_name_")){
-
+            }else if(((String) key).startsWith(DEFININATION_NAME_PREFIX)){
+                return DataDefinitionDao.getDataDefinitionByName(dataSource, key.toString().replace(DEFININATION_NAME_PREFIX, ""));
             }
         }
         return null;

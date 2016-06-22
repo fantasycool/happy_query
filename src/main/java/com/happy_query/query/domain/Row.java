@@ -1,7 +1,9 @@
 package com.happy_query.query.domain;
 
 import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.util.NullChecker;
 import com.happy_query.util.TemplateUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,15 +80,8 @@ public class Row {
          */
         Object value;
 
-        public Value(Object value, int columnType, DataDefinition dataDefinition){
-            this.dataDefinition = dataDefinition;
-            this.value = value;
-            this.columnType = columnType;
-        }
+        private Value(){
 
-        public Value(Object value, int columnType){
-            this.value = value;
-            this.columnType = columnType;
         }
 
         /**
@@ -96,18 +91,23 @@ public class Row {
          * @param value
          * @return
          */
-        public static Value createValue(DataDefinition dataDefinition, String value){
-            Value v= new Value();
-            Map<String, Object> context = new HashMap<String, Object>();
-            context.put(dataDefinition.getTemplate(), value);
-            String viewValue = TemplateUtil.getViewValueByTemplateStr(dataDefinition.getTemplate(), context);
-            v.setViewValue(viewValue);
+        public static Value createValue(DataDefinition dataDefinition, Object value){
+            NullChecker.checkNull(value);
+            Value v;
+            if(null != dataDefinition){
+                v = dataDefinition.formatStringValue(value.toString());
+                if(StringUtils.isNoneBlank(dataDefinition.getTemplate())){
+                    Map<String, Object> context = new HashMap<String, Object>();
+                    context.put(dataDefinition.getTemplate(), value);
+                    v.viewValue = TemplateUtil.getViewValueByTemplateStr(dataDefinition.getTemplate(), context);
+                }
+            }else {
+                v = new Value();
+                v.setValue(value);
+            }
             return v;
         }
 
-        public Value(){
-
-        }
 
         /**
          * 读取template脚本,进行渲染

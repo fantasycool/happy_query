@@ -94,7 +94,7 @@ public class MockUtil {
         List<Row> rows = new ArrayList<Row>();
         Map<DataDefinition, Row.Value> result = new HashMap<DataDefinition, Row.Value>();
         for(DataDefinition d : list){
-            Row.Value v = new Row.Value();
+            Row.Value v = Row.Value.createValue(d, 123131);
             v.setDataDefinition(d);
             v.setValue(123213);
             result.put(d, v);

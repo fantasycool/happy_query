@@ -43,7 +43,7 @@ public abstract class JDBCUtils {
                 for (int i = 0, size = rsMeta.getColumnCount(); i < size; ++i) {
                     String columnName = rsMeta.getColumnLabel(i + 1);
                     Object value = rs.getObject(i + 1);
-                    Row.Value v = new Row.Value(value, rsMeta.getColumnType(i + 1));
+                    Row.Value v = Row.Value.createValue(null, value);
                     row.put(columnName, v);
                 }
                 rows.add(row);
@@ -73,7 +73,7 @@ public abstract class JDBCUtils {
                 for (int i = 0, size = rsMeta.getColumnCount(); i < size; ++i) {
                     String columnName = rsMeta.getColumnLabel(i + 1);
                     Object value = rs.getObject(i + 1);
-                    Row.Value v = new Row.Value(value, rsMeta.getColumnType(i + 1));
+                    Row.Value v = Row.Value.createValue(null, value);
                     row.put(columnName, v);
                 }
                 rows.add(row);

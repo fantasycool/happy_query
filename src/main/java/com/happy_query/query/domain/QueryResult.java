@@ -32,7 +32,7 @@ public class QueryResult {
         checkNull(originalQueryResult);
         checkNull(countQueryResult);
 
-        int countNum = Integer.valueOf(countQueryResult.get(0).get(QueryResultConstant.COUNT_COLUMN_NAME).toString());
+        int countNum = Integer.valueOf(countQueryResult.get(0).get(QueryResultConstant.COUNT_COLUMN_NAME).getValue().toString());
         QueryResult queryResult = new QueryResult();
         queryResult.setCount(countNum);
         queryResult.setJsonParseDataParam(jsonParseDataParam);
@@ -46,11 +46,26 @@ public class QueryResult {
             /**
              * right table init
              */
-            Map<String, Row.Value> rm = countQueryResult.get(i);
+            Map<String, Row.Value> rm = originalQueryResult.get(i);
             Map<DataDefinition, Row.Value> lr = new HashMap<DataDefinition, Row.Value>();
             for (Map.Entry<String, Row.Value> me : rm.entrySet()) {
                 Object v = me.getValue();
                 if (null == v) {
+                    continue;
+                }
+                /**
+                 * 左表判断
+                 */
+                if (!QueryResultConstant.DEFINITION_COLUMNS.contains(me.getKey().toString())) {
+                    if (!me.getKey().equals(jsonParseDataParam.getLeftPrimaryId())) {
+                        try {
+                            DataDefinition leftDefinition = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + me.getKey().toString());
+                            Row.Value value = leftDefinition.formatStringValue(me.getValue().getValue().toString());
+                            lr.put(leftDefinition, value);
+                        } catch (ExecutionException e) {
+                            LOG.error("get definition failed!definition name is:[{}]", me.getKey(), e);
+                        }
+                    }
                     continue;
                 }
                 String[] kvs = v.toString().split(QueryResultConstant.DEFINITION_SPLIT);
@@ -58,6 +73,7 @@ public class QueryResult {
                     String[] idValue = kv.split(QueryResultConstant.KEY_VALUE_SPIT);
                     String dataDefinitionId = idValue[0]; //definition id
                     String value = idValue[1]; //definition value
+
                     try {
                         Object o = CacheManager.getValue(DataDefinition.createDataDefinitionById(Long.valueOf(dataDefinitionId)));
                         if (o != null) {

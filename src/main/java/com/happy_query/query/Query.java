@@ -45,8 +45,8 @@ public class Query implements IQuery {
         try {
             connection = dataSource.getConnection();
             JDBCUtils.execute(connection, "SET SESSION group_concat_max_len = 1000000", new ArrayList<Object>());
-            List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList());
-            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(connection, countSql,  new ArrayList());
+            List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList(0));
+            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(connection, countSql,  new ArrayList(0));
             QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);
             return queryResult;
         } catch (SQLException e) {
@@ -75,8 +75,9 @@ public class Query implements IQuery {
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
-            List<Map<String, Row.Value>> queryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList());
-            List<Map<String, Row.Value>> countResult = JDBCUtils.executeQuery(connection, countSql, new ArrayList());
+            JDBCUtils.execute(connection, "SET SESSION group_concat_max_len = 1000000", new ArrayList<Object>());
+            List<Map<String, Row.Value>> queryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList(0));
+            List<Map<String, Row.Value>> countResult = JDBCUtils.executeQuery(connection, countSql, new ArrayList(0));
             return QueryResult.createFromOrinalData(jsonParseDataParam, queryResult, countResult);
         } catch (SQLException e) {
             throw new HappyQueryException("query by leftId:" + leftId + "failed", e);
