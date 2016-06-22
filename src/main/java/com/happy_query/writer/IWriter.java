@@ -20,7 +20,7 @@ public interface IWriter {
      *
      * @param insertResult
      */
-    void writeRecord(InsertResult insertResult);
+    Long writeRecord(InsertResult insertResult);
 
     /**
      * update data

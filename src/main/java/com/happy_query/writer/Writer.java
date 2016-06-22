@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +42,14 @@ public class Writer implements IWriter {
 
     }
 
-    private void updateRows(InsertResult insertResult) throws SQLException {
+    /**
+     * new add record ids
+     *
+     * @param insertResult
+     * @return
+     * @throws SQLException
+     */
+    private List<Long> updateRows(InsertResult insertResult) throws SQLException {
         // use category type to decide which table to insert datas
         String rightTable = Constant.RIGHT_TABLE_MAP.get(insertResult.getCategoryType());
         String leftTable = Constant.LEFT_TABLE_MAP.get(insertResult.getCategoryType());
@@ -55,7 +63,7 @@ public class Writer implements IWriter {
          * 2: update right table;
          */
         List<Row> rows = insertResult.getRows();
-
+        List<Long> addIds = new ArrayList<Long>();
         for (Row r : rows) {
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
@@ -92,7 +100,7 @@ public class Writer implements IWriter {
                     sqlSB.append("insert into ").append(rightTable).append("(left_id,dd_ref_id,sub_key,").append(valueColumn).append(")")
                             .append("values").append("(?,?,?,?) on duplicate key update ").append(valueColumn).append("=?");
                     List<Object> parameters = new ArrayList<Object>();
-                    if(r.getLeftId() == null){
+                    if (r.getLeftId() == null) {
                         System.out.println();
                     }
                     parameters.add(r.getLeftId());
@@ -111,7 +119,13 @@ public class Writer implements IWriter {
                 }
                 //batch insert
                 for (String sql : cachPr.keySet()) {
-                    JDBCUtils.batchExecuteUpdate(connection, sql, cachPr.get(sql));
+                    List<ResultSet> idSets = JDBCUtils.batchExecuteUpdate(connection, sql, cachPr.get(sql));
+                    for (ResultSet rs : idSets) {
+                        Object o = rs.next();
+                        if (null != o) {
+                            addIds.add(Long.valueOf(o.toString()));
+                        }
+                    }
                 }
             } catch (Exception e) {
                 connection.rollback();
@@ -121,6 +135,7 @@ public class Writer implements IWriter {
                 JDBCUtils.close(connection);
             }
         }
+        return addIds;
     }
 
     private String getInsertSql(DataDefinitionDataType dataType, String rightTable, int subKey) {
@@ -141,7 +156,7 @@ public class Writer implements IWriter {
             insertSql
                     = "insert into " + rightTable + "(left_id, dd_ref_id,str_value,sub_key) " +
                     "values(?,?,?," + subKey + ")";
-        }  else {
+        } else {
             insertSql
                     = "insert into " + rightTable + "(left_id, dd_ref_id,feature,sub_key) " +
                     "values(?,?,?," + subKey + ")";
@@ -157,9 +172,9 @@ public class Writer implements IWriter {
         return result;
     }
 
-    public void writeRecord(InsertResult insertResult) {
+    public Long writeRecord(InsertResult insertResult) {
         try {
-            updateRows(insertResult);
+            return updateRows(insertResult).get(0);
         } catch (SQLException e) {
             throw new HappyWriterException("write record failed", e);
         }

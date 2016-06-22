@@ -1,6 +1,7 @@
 package com.happy_query.util;
 
 import com.happy_query.query.domain.Row;
+import com.sun.corba.se.spi.orbutil.fsm.Guard;
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 
 import javax.sql.DataSource;
@@ -130,8 +131,8 @@ public abstract class JDBCUtils {
         return executeUpdate(conn, sb.toString(), args);
     }
 
-    public static void commit(Connection conn){
-        if(conn == null){
+    public static void commit(Connection conn) {
+        if (conn == null) {
             return;
         }
         try {
@@ -141,13 +142,13 @@ public abstract class JDBCUtils {
         }
     }
 
-    public static void rollback(Connection conn){
-        if(conn == null){
+    public static void rollback(Connection conn) {
+        if (conn == null) {
             return;
         }
-        try{
+        try {
             conn.rollback();
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new HappyQueryException("connection rollback failed!");
         }
     }
@@ -180,19 +181,20 @@ public abstract class JDBCUtils {
      * @return
      * @throws SQLException
      */
-    public static void batchExecuteUpdate(DataSource dataSource, String sql, List<List<Object>> parameters) throws SQLException {
+    public static List<ResultSet> batchExecuteUpdate(DataSource dataSource, String sql, List<List<Object>> parameters) throws SQLException {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
             PreparedStatement stmt = null;
             int count = 0;
-            executeBatchUpdate(sql, parameters, conn, stmt, count);
+            return executeBatchUpdate(sql, parameters, conn, stmt, count);
         } finally {
             close(conn);
         }
     }
 
-    private static void executeBatchUpdate(String sql, List<List<Object>> parameters, Connection conn, PreparedStatement stmt, int count) throws SQLException {
+    private static List<ResultSet> executeBatchUpdate(String sql, List<List<Object>> parameters, Connection conn, PreparedStatement stmt, int count) throws SQLException {
+        List<ResultSet> resultList = new ArrayList<ResultSet>();
         for (List<Object> l : parameters) {
             try {
                 stmt = conn.prepareStatement(sql);
@@ -201,17 +203,20 @@ public abstract class JDBCUtils {
                 if (++count % 100 == 0) {
                     stmt.executeBatch();
                 }
+                ResultSet rs = stmt.getGeneratedKeys();
+                resultList.add(rs);
             } finally {
                 stmt.executeBatch();
                 close(stmt);
             }
         }
+        return resultList;
     }
 
-    public static void batchExecuteUpdate(Connection connection, String sql, List<List<Object>> parameters) throws SQLException {
+    public static List<ResultSet> batchExecuteUpdate(Connection connection, String sql, List<List<Object>> parameters) throws SQLException {
         PreparedStatement stmt = null;
         int count = 0;
-        executeBatchUpdate(sql, parameters, connection, stmt, count);
+        return executeBatchUpdate(sql, parameters, connection, stmt, count);
     }
 
     /**
@@ -246,11 +251,10 @@ public abstract class JDBCUtils {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-            insertToTable(conn, tableName, data);
+            return insertToTable(conn, tableName, data);
         } finally {
             close(conn);
         }
-        return null;
     }
 
     /**
@@ -309,7 +313,7 @@ public abstract class JDBCUtils {
     }
 
     public static String makeInsertToTableSql(String tableName, Collection<String> names) {
-        if(names.size() == 0){
+        if (names.size() == 0) {
             return "insert into " + tableName + "(id) values (null)";
         }
         StringBuilder sql = new StringBuilder() //
