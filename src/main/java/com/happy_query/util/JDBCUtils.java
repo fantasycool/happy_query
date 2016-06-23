@@ -3,6 +3,8 @@ package com.happy_query.util;
 import com.happy_query.query.domain.Row;
 import com.sun.corba.se.spi.orbutil.fsm.Guard;
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.PrintStream;
@@ -17,6 +19,7 @@ import java.util.*;
  * Created by frio on 16/6/15.
  */
 public abstract class JDBCUtils {
+    static Logger LOG = LoggerFactory.getLogger(JDBCUtils.class);
 
     /**
      * execute query, return list result
@@ -110,6 +113,7 @@ public abstract class JDBCUtils {
             }
         }
         sb.append(" where ").append(idName).append("=").append(id);
+        LOG.info("executeUpdateById, sql:[{}]", sb.toString());
         return executeUpdate(dataSource, sb.toString(), args);
     }
 
@@ -122,12 +126,14 @@ public abstract class JDBCUtils {
             if (v != null) {
                 sb.append(parameters.keySet().toArray()[i]).append("=").append("?");
                 args.add(v);
-                if (i < parameters.keySet().size()) {
+                if (i < parameters.keySet().size() - 1) {
                     sb.append(",");
                 }
             }
         }
         sb.append(" where ").append(idName).append("=").append(id);
+        LOG.info("executeUploadById sql is:[{}]", sb.toString());
+        System.out.println(sb.toString());
         return executeUpdate(conn, sb.toString(), args);
     }
 

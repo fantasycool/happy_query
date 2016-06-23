@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by frio on 16/6/21.
@@ -63,5 +65,13 @@ public class WriterTest {
     @Test
     public void testDeleteRecord() throws IOException {
         writer.deleteRecord(613582, "user", "id");
+    }
+
+    @Test
+    public void testUpdateRecord(){
+        Map<Long, Object> updateMap = new HashMap<Long, Object>();
+        updateMap.put(3l, "文本1");
+        updateMap.put(6l, "adfafsfasfadsasf");
+        writer.updateRecord(613581, "user", updateMap);
     }
 }

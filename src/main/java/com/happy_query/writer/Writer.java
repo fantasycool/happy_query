@@ -79,7 +79,8 @@ public class Writer implements IWriter {
                             JDBCUtils.executeUpdateById(connection, leftTable, leftDatas, leftIdColumn, r.getLeftId());
                         }
                     } catch (SQLException e) {
-                        throw new HappyWriterException("execute left table update failed");
+                        LOG.error("execute left datas update failed, leftDatas:[{}], leftTable:[{}], leftId:[{}]", leftDatas, leftTable, r.getLeftId(), e);
+                        throw new HappyWriterException("execute left table update failed", e);
                     }
                 }
                 if (r.getLeftId() == null) {
@@ -132,32 +133,6 @@ public class Writer implements IWriter {
             }
         }
         return addIds;
-    }
-
-    private String getInsertSql(DataDefinitionDataType dataType, String rightTable, int subKey) {
-        String insertSql;
-        if (dataType == DataDefinitionDataType.BOOLEAN
-                || dataType == DataDefinitionDataType.DATETIME
-                || dataType == DataDefinitionDataType.INT) {
-            insertSql = "insert into " + rightTable + "(left_id, dd_ref_id,int_value,sub_key) " +
-                    "values(?,?,?," + subKey + ")";
-
-        } else if (dataType == DataDefinitionDataType.FLOAT
-                || dataType == DataDefinitionDataType.DOUBLE) {
-            insertSql
-                    = "insert into " + rightTable + "(left_id, dd_ref_id,double_value,sub_key) " +
-                    "values(?,?,?," + subKey + ")";
-
-        } else if (dataType == DataDefinitionDataType.STRING) {
-            insertSql
-                    = "insert into " + rightTable + "(left_id, dd_ref_id,str_value,sub_key) " +
-                    "values(?,?,?," + subKey + ")";
-        } else {
-            insertSql
-                    = "insert into " + rightTable + "(left_id, dd_ref_id,feature,sub_key) " +
-                    "values(?,?,?," + subKey + ")";
-        }
-        return insertSql;
     }
 
     private Map<String, Object> getLeftInsertDatas(String leftIdColumn, Row r) {

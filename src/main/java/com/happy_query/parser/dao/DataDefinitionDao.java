@@ -19,7 +19,7 @@ import java.util.*;
  * like clean jdbc call
  * Created by frio on 16/6/15.
  */
-public class DataDefinitionDao {
+public abstract class DataDefinitionDao {
     static Logger LOG = LoggerFactory.getLogger(DataDefinitionDao.class);
     public static String TABLE_NAME = "data_definition";
 
