@@ -23,8 +23,8 @@ public class Constant {
     public static Map<String, String> LEFT_TABLE_MAP = new HashMap<String, String>();
 
     static {
-        LEFT_TABLE_MAP.put("user", "left_table");
-        LEFT_TABLE_MAP.put("service", "left_table");
+        LEFT_TABLE_MAP.put("user", "customer");
+        LEFT_TABLE_MAP.put("service", "customer");
     }
 
     /**

@@ -174,9 +174,11 @@ public class Writer implements IWriter {
         }
     }
 
-    public void deleteRecord(long leftId, String category, String leftIdColumnName) {
+    public void deleteRecord(long leftId, String category) {
         String rightTable = Constant.RIGHT_TABLE_MAP.get(category);
         String leftTable = Constant.LEFT_TABLE_MAP.get(category);
+        String leftIdColumnName = Constant.LEFT_ID_COLUMNS.get(category);
+
         StringBuilder sb = new StringBuilder();
         Connection connection = null;
         try {

@@ -45,5 +45,5 @@ public interface IWriter {
      * @param category
      * @param leftIdColumnName
      */
-    void deleteRecord(long leftId, String category, String leftIdColumnName);
+    void deleteRecord(long leftId, String category);
 }
