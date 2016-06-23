@@ -26,9 +26,13 @@ public class Row {
      */
     private Map<DataDefinition, Value> data = new HashMap<DataDefinition, Value>();
     /**
-     * left table 对应的固有列的值
+     * left table 对应的固有列的值 columnName->value
      */
     private Map<String, Value> leftTableData = new HashMap<String, Value>();
+    /**
+     * left table 對應Definition-> value
+     */
+    private Map<DataDefinition, Value> leftTableDefinitionDatas = new HashMap<DataDefinition, Value>();
 
     private List<String> leftTableDefinitionNames = new ArrayList<String>();
 
@@ -204,5 +208,13 @@ public class Row {
         row.setData(datas);
         row.setLeftTableDefinitionNames(leftTableDefinitionName);
         return row;
+    }
+
+    public Map<DataDefinition, Value> getLeftTableDefinitionDatas() {
+        return leftTableDefinitionDatas;
+    }
+
+    public void setLeftTableDefinitionDatas(Map<DataDefinition, Value> leftTableDefinitionDatas) {
+        this.leftTableDefinitionDatas = leftTableDefinitionDatas;
     }
 }

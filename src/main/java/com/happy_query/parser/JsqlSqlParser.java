@@ -43,8 +43,7 @@ public class JsqlSqlParser implements IJsonSqlParser {
         String jsonStr = jsonParseDataParam.getJsonOperation();
         String operationStr = jsonLogicParser.convertJsonToLogicExpression(jsonStr,
                 jsonParseDataParam.getPrefix(), jsonParseDataParam.getContextParameters());
-
-        return getFreemarkerSql(jsonParseDataParam, operationStr, "query");
+        return getFreemarkerSql(jsonParseDataParam, operationStr, type);
     }
 
     public String getFreemarkerSql(JsonParseDataParam jsonParseDataParam, String operationStr, String type){

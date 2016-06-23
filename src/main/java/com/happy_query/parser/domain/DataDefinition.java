@@ -241,6 +241,7 @@ public class DataDefinition {
         dataDefinition.setLeftData(data.getOrDefault("is_left_data", "0").toString().equals("1") ? true : false);
         dataDefinition.setLefColName(data.getOrDefault("left_col_name", "").toString());
         dataDefinition.setNickName(data.getOrDefault("nick_name", "").toString());
+        dataDefinition.setName(data.getOrDefault("name", "").toString());
         return dataDefinition;
     }
 

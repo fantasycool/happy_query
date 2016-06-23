@@ -39,13 +39,15 @@ public class QueryResult {
         List<Row> rows = new ArrayList<Row>();
 
         for (int i = 0; i < originalQueryResult.size(); i++) {
-            Map<String, Row.Value> m = originalQueryResult.get(i);
             Row row = new Row();
-            row.setLeftTableData(m);
             Map<String, Row.Value> rm = originalQueryResult.get(i);
-            Map<DataDefinition, Row.Value> lr = new HashMap<DataDefinition, Row.Value>();
+            Map<DataDefinition, Row.Value> datas = new HashMap<DataDefinition, Row.Value>();
+            //left data (datadefinition->value)
+            Map<DataDefinition, Row.Value> leftDefinitionDatas = new HashMap<DataDefinition, Row.Value>();
+            //left data (columnname->value)
+            Map<String, Row.Value> leftDatas = new HashMap<String, Row.Value>();
             for (Map.Entry<String, Row.Value> me : rm.entrySet()) {
-                if(me.getKey().equals("left_id")){
+                if (me.getKey().equals("left_id")) {
                     continue;
                 }
                 Object v = me.getValue().getValue();
@@ -55,14 +57,16 @@ public class QueryResult {
                 /**
                  * column type definition definition data fill
                  */
-                if (fillLeftTableDefinitionDatas(jsonParseDataParam, lr, me)) continue;
+                if (fillLeftTableDefinitionDatas(jsonParseDataParam, datas, me, leftDatas, leftDefinitionDatas)) continue;
                 /**
                  * non column type definition definition data fill
                  */
-                fillRightTableDefinitionDatas(lr, v);
+                fillRightTableDefinitionDatas(datas, v);
             }
             row.setLeftId(Long.valueOf(originalQueryResult.get(i).get("left_id").getValue().toString()));
-            row.setData(lr);
+            row.setData(datas);
+            row.setLeftTableData(leftDatas);
+            row.setLeftTableDefinitionDatas(leftDefinitionDatas);
             rows.add(row);
         }
         queryResult.setRows(rows);
@@ -90,13 +94,22 @@ public class QueryResult {
         }
     }
 
-    private static boolean fillLeftTableDefinitionDatas(JsonParseDataParam jsonParseDataParam, Map<DataDefinition, Row.Value> lr, Map.Entry<String, Row.Value> me) {
+    private static boolean fillLeftTableDefinitionDatas(JsonParseDataParam jsonParseDataParam, Map<DataDefinition, Row.Value> lr,
+                                                        Map.Entry<String, Row.Value> me, Map<String, Row.Value> leftDatas,
+                                                        Map<DataDefinition, Row.Value> leftDefinitionDatas) {
         if (!QueryResultConstant.DEFINITION_COLUMNS.contains(me.getKey().toString())) {
             if (!me.getKey().equals(jsonParseDataParam.getLeftPrimaryId())) {
                 try {
-                    DataDefinition leftDefinition = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + me.getKey().toString());
-                    Row.Value value = Row.Value.createValue(leftDefinition, me.getValue().getValue());
-                    lr.put(leftDefinition, value);
+                    DataDefinition definition = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + me.getKey().toString());
+                    Row.Value value = Row.Value.createValue(definition, me.getValue().getValue());
+                    if(definition.getLeftData()){
+                        /**
+                         * put data to left result
+                         */
+                        leftDefinitionDatas.put(definition, value);
+                        leftDatas.put(definition.getLefColName(), value);
+                    }
+                    lr.put(definition, value);
                 } catch (ExecutionException e) {
                     LOG.error("get definition failed!definition name is:[{}]", me.getKey(), e);
                 }

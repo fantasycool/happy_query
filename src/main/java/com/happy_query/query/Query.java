@@ -41,6 +41,8 @@ public class Query implements IQuery {
 
         String querySql = jsonSqlParser.convertJsonLogicToQuerySql(jsonParseDataParam);
         String countSql = jsonSqlParser.convertJsonLogicToCountSql(jsonParseDataParam);
+        System.out.println(querySql);
+        System.out.println(countSql);
         Connection connection = null;
         try {
             connection = dataSource.getConnection();

@@ -106,6 +106,8 @@ public class JsonLogicParser implements IJsonLogicParser {
     public String getOperator(String operator){
         if(operator.equals("in")){
             return BLANK + operator + BLANK;
+        }else if(operator.equals("like")){
+            return BLANK + operator + BLANK;
         }else{
             return operator;
         }
