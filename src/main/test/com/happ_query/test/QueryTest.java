@@ -53,37 +53,27 @@ public class QueryTest {
         String j = "[\n" +
                 "      \"or\",\n" +
                 "          {\n" +
-                "              \"attr\":\"1\",\n" +
+                "              \"attr\":\"109\",\n" +
                 "              \"operator\":\">\",\n" +
-                "              \"value\":\"110\"\n" +
+                "              \"value\":\"97.0\"\n" +
                 "          },\n" +
                 "          {\n" +
-                "              \"attr\":\"1\",\n" +
+                "              \"attr\":\"110\",\n" +
                 "              \"operator\": \"<\",\n" +
-                "              \"value\":\"112\"\n" +
-                "          },\n" +
+                "              \"value\":\"142\"\n" +
+                "          }"+
                 "          {\n" +
-                "              \"attr\":\"2\",\n" +
-                "              \"operator\":\"=\",\n" +
-                "              \"value\":\"23\"\n" +
-                "          },\n" +
-                "          {\n" +
-                "              \"attr\":\"3\",\n" +
-                "              \"operator\":\"like\",\n" +
-                "              \"value\":\"文%\"\n" +
-                "          },\n" +
-                "          {\n" +
-                "              \"attr\":\"4\",\n" +
-                "              \"operator\":\"in\",\n" +
-                "              \"value\":[1,2,3,4]\n" +
-                "          }\n" +
+                "              \"attr\":\"106\",\n" +
+                "              \"operator\": \">\",\n" +
+                "              \"value\":\"172.0\"\n" +
+                "          }"+
                 "  ]";
         JsonParseDataParam jsonParseDataParam = new JsonParseDataParam();
         jsonParseDataParam.setJsonOperation(j);
-        jsonParseDataParam.setLeftPrimaryId("id");
-        jsonParseDataParam.setLeftTableName("left_table");
+        jsonParseDataParam.setLeftPrimaryId("cus_id");
+        jsonParseDataParam.setLeftTableName("customer");
         jsonParseDataParam.setLimitStart(0);
-        jsonParseDataParam.setSize(30);
+        jsonParseDataParam.setSize(20);
         jsonParseDataParam.setRightTableName("data_definition_value");
         QueryResult queryResult = query.queryByJsonLogic(jsonParseDataParam);
         List<Row> rows = queryResult.getRows();
