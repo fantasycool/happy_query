@@ -72,6 +72,6 @@ public class WriterTest {
         Map<Long, Object> updateMap = new HashMap<Long, Object>();
         updateMap.put(3l, "文本1");
         updateMap.put(6l, "adfafsfasfadsasf");
-        writer.updateRecord(613581, "user", updateMap);
+        writer.updateRecord(613581, "mock", updateMap);
     }
 }

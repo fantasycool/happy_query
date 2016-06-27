@@ -15,6 +15,7 @@ public class Constant {
     static {
         SUB_KEY_MAP.put("user", 0);
         SUB_KEY_MAP.put("service", 1);
+        SUB_KEY_MAP.put("mock", 2);
     }
 
     /**
@@ -24,7 +25,8 @@ public class Constant {
 
     static {
         LEFT_TABLE_MAP.put("user", "customer");
-        LEFT_TABLE_MAP.put("service", "customer");
+        LEFT_TABLE_MAP.put("service", "contact_record");
+        LEFT_TABLE_MAP.put("mock", "left_table");
     }
 
     /**
@@ -35,6 +37,7 @@ public class Constant {
     static {
         RIGHT_TABLE_MAP.put("user", "data_definition_value");
         RIGHT_TABLE_MAP.put("service", "data_definition_value");
+        RIGHT_TABLE_MAP.put("mock", "data_definition_value");
     }
 
     /**
@@ -42,7 +45,8 @@ public class Constant {
      */
     public static Map<String, String> LEFT_ID_COLUMNS = new HashMap<String, String>();
     static {
-        LEFT_ID_COLUMNS.put("user", "id");
-        LEFT_ID_COLUMNS.put("service", "id");
+        LEFT_ID_COLUMNS.put("user", "cus_id");
+        LEFT_ID_COLUMNS.put("service", "contact_id");
+        LEFT_ID_COLUMNS.put("mock", "id");
     }
 }

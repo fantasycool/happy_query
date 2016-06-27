@@ -1,5 +1,5 @@
 导入模板说明,,,,,,,,
-user,,,,,,,,
+mock,,,,,,,,
 id[用户id|服务id],dd1[数字],dd2[数字],dd3[文本:可筛选],dd4[下拉框],dd5[小数:可筛选],dd6[文本:不可篩選],key1[文本:可筛选],key2[文本:可筛选]
 ,111,23,文本,1,3.45,啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦大法師法第三方asdfasdfddsafasfdsa傅asdfdasfdsafdsfdsafdsafdsafdsafdsafdsafdsa,abcdfda,的但是范德萨发大水
 ,111,23,文本,2,3.45,啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦大法師法第三方asdfasdfddsafasfdsa傅asdfdasfdsafdsfdsafdsafdsafdsafdsafdsafdsa,abcdfda,爱的是范德萨发
