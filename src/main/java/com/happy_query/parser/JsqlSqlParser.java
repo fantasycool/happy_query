@@ -28,10 +28,8 @@ public class JsqlSqlParser implements IJsonSqlParser {
     public JsqlSqlParser(IJsonLogicParser jsonLogicParser) {
         this.jsonLogicParser = jsonLogicParser;
         Configuration configuration = new Configuration();
-        URL url = JsqlSqlParser.class.getResource("/");
         try {
-            File f = new File(url.toURI());
-            configuration.setDirectoryForTemplateLoading(f);
+            configuration.setClassForTemplateLoading(this.getClass(), "/");
             this.queryTemplate = configuration.getTemplate("queryTemplate.sql");
             this.countTemplate = configuration.getTemplate("countTemplate.sql");
         }catch(Exception e){
