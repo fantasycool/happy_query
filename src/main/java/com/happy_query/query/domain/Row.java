@@ -213,6 +213,21 @@ public class Row {
         return row;
     }
 
+    /**
+     * create Row from Map<DataDefinition, Object>
+     * @param datas
+     * @return
+     */
+    public static Row createFromData(Map<DataDefinition, Object> datas){
+        Row row = new Row();
+        Map<DataDefinition, Value> result = new HashMap<DataDefinition, Value>();
+        for(DataDefinition d : datas.keySet()){
+            result.put(d, Row.Value.createValue(d, datas.get(d)));
+        }
+        row.setData(result);
+        return row;
+    }
+
     public Map<DataDefinition, Value> getLeftTableDefinitionDatas() {
         return leftTableDefinitionDatas;
     }
