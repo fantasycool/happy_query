@@ -82,7 +82,7 @@ public abstract class DataDefinitionDao {
         NullChecker.checkNull(dataDefinition);
         Map<String, Object> map = dataDefinition.inverseDataDefinition();
         try {
-            JDBCUtils.insertToTable(dataSource, TABLE_NAME, map);
+            dataDefinition.setId(JDBCUtils.insertToTable(dataSource, TABLE_NAME, map));
         } catch (SQLException e) {
             LOG.error("insert datadefinition failed, datadefinition content is:[{}], t is:[{}]", dataDefinition.toString(), e);
             throw new HappyWriterException("insert failed", e);
