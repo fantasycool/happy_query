@@ -130,7 +130,10 @@ public class Row {
          * @return
          */
         public String getViewValue(){
-            return "";
+            if(value == null){
+                return "";
+            }
+            return value.toString();
         }
 
         public DataDefinition getDataDefinition() {
