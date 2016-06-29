@@ -59,11 +59,12 @@ public class Row {
 
     /**
      * 返回id->value的result
+     *
      * @return
      */
-    public Map<Long, Value> getFlatMapData(){
+    public Map<Long, Value> getFlatMapData() {
         Map<Long, Value> result = new HashMap<Long, Value>();
-        for(Map.Entry<DataDefinition, Value> e: data.entrySet()){
+        for (Map.Entry<DataDefinition, Value> e : data.entrySet()) {
             result.put(e.getKey().getId(), e.getValue());
         }
         return result;
@@ -91,33 +92,34 @@ public class Row {
          */
         Object value;
 
-        private Value(){
+        private Value() {
 
         }
 
         /**
          * when creating value
          * generate view value with datadefinition template
+         *
          * @param dataDefinition
          * @param value
          * @return
          */
-        public static Value createValue(DataDefinition dataDefinition, Object value){
-            if(null == value){
+        public static Value createValue(DataDefinition dataDefinition, Object value) {
+            if (null == value) {
                 Value v = new Value();
                 v.setDataDefinition(dataDefinition);
                 v.setValue(value);
                 return v;
             }
             Value v;
-            if(null != dataDefinition){
+            if (null != dataDefinition) {
                 v = dataDefinition.formatStringValue(value.toString());
-                if(StringUtils.isNoneBlank(dataDefinition.getTemplate())){
+                if (StringUtils.isNoneBlank(dataDefinition.getTemplate())) {
                     Map<String, Object> context = new HashMap<String, Object>();
                     context.put(dataDefinition.getTemplate(), value);
                     v.viewValue = TemplateUtil.getViewValueByTemplateStr(dataDefinition.getTemplate(), context);
                 }
-            }else {
+            } else {
                 v = new Value();
                 v.setValue(value);
             }
@@ -127,10 +129,11 @@ public class Row {
 
         /**
          * 读取template脚本,进行渲染
+         *
          * @return
          */
-        public String getViewValue(){
-            if(value == null){
+        public String getViewValue() {
+            if (value == null) {
                 return "";
             }
             return value.toString();
@@ -183,20 +186,21 @@ public class Row {
 
     /**
      * create Row data from flatMapData {definitionId->value, ...}
+     *
      * @return
      */
-    public static Row createFromFlatData(Map<Long, Object> flatMapData, long leftId){
+    public static Row createFromFlatData(Map<Long, Object> flatMapData, long leftId) {
         Map<String, Value> leftData = new HashMap<String, Value>();
         Map<DataDefinition, Value> datas = new HashMap<DataDefinition, Value>();
         Row row = new Row();
         List<String> leftTableDefinitionName = new ArrayList<String>();
-        for(Long k : flatMapData.keySet()){
+        for (Long k : flatMapData.keySet()) {
             try {
                 DataDefinition dataDefinition = (DataDefinition) CacheManager.getValue(DataDefinition.createDataDefinitionById(k));
-                if(dataDefinition == null){
+                if (dataDefinition == null) {
                     LOG.error("we can't find the id");
                 }
-                if(dataDefinition.getLeftData()){
+                if (dataDefinition.getLeftData()) {
                     leftTableDefinitionName.add(dataDefinition.getName());
                     leftData.put(dataDefinition.getLefColName(), Value.createValue(dataDefinition, flatMapData.get(k)));
                 }
@@ -213,18 +217,46 @@ public class Row {
         return row;
     }
 
+    public static Row createFromDataAndLeftId(Map<DataDefinition, Object> flatMapData, long leftId) {
+        Map<String, Value> leftData = new HashMap<String, Value>();
+        Map<DataDefinition, Value> datas = new HashMap<DataDefinition, Value>();
+        Row row = new Row();
+        List<String> leftTableDefinitionName = new ArrayList<String>();
+        for (DataDefinition k : flatMapData.keySet()) {
+            if (k.getLeftData()) {
+                leftTableDefinitionName.add(k.getName());
+                leftData.put(k.getLefColName(), Value.createValue(k, flatMapData.get(k)));
+            }
+            datas.put(k, Value.createValue(k, flatMapData.get(k)));
+        }
+        row.setLeftId(leftId);
+        row.setLeftTableData(leftData);
+        row.setData(datas);
+        row.setLeftTableDefinitionNames(leftTableDefinitionName);
+        return row;
+    }
+
     /**
      * create Row from Map<DataDefinition, Object>
+     *
      * @param datas
      * @return
      */
-    public static Row createFromData(Map<DataDefinition, Object> datas){
+    public static Row createFromData(Map<DataDefinition, Object> datas) {
         Row row = new Row();
         Map<DataDefinition, Value> result = new HashMap<DataDefinition, Value>();
-        for(DataDefinition d : datas.keySet()){
+        List<String> leftTableDefinitionName = new ArrayList<String>();
+        Map<String, Value> leftData = new HashMap<String, Value>();
+        for (DataDefinition d : datas.keySet()) {
+            if (d.getLeftData()) {
+                leftTableDefinitionName.add(d.getName());
+                leftData.put(d.getLefColName(), Row.Value.createValue(d, datas.get(d)));
+            }
             result.put(d, Row.Value.createValue(d, datas.get(d)));
         }
         row.setData(result);
+        row.setLeftTableData(leftData);
+        row.setLeftTableDefinitionNames(leftTableDefinitionName);
         return row;
     }
 
