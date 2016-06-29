@@ -42,6 +42,9 @@ public abstract class DataDefinitionDao {
         List<Object> list = Arrays.asList((Object) name);
         try {
             List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where name=? order by gmt_create desc limit 1", list);
+            if(data.size() == 0){
+                return null;
+            }
             Map<String, Object> m = convertFromValueMap(data.get(0));
             return DataDefinition.createFromMapData(m);
         } catch (SQLException e) {
