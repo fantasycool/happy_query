@@ -49,7 +49,7 @@ public class JsonLogicParser implements IJsonLogicParser {
                     JSONObject o = (JSONObject) jsonArray.get(i);
                     sb.append("(");
                     Long dd_ref_id = o.getLong("attr");
-                    sb.append("dd_ref_id=").append(dd_ref_id).append(BLANK).append(AND).append(BLANK);
+                    sb.append("bb.dd_ref_id=").append(dd_ref_id).append(BLANK).append(AND).append(BLANK);
                     DataDefinition dataDefinition = null;
                     try {
                         dataDefinition = (DataDefinition) CacheManager.getValue(DataDefinition.createDataDefinitionById(dd_ref_id));
@@ -59,12 +59,12 @@ public class JsonLogicParser implements IJsonLogicParser {
                     if(dataDefinition.getDataType() == DataDefinitionDataType.INT
                             ||dataDefinition.getDataType() == DataDefinitionDataType.BOOLEAN
                             ||dataDefinition.getDataType() == DataDefinitionDataType.DATETIME){
-                        sb.append("int_value").append(getOperator(o.getString("operator"))).append(getStringValue(o, "int"));
+                        sb.append("bb.int_value").append(getOperator(o.getString("operator"))).append(getStringValue(o, "int"));
                     }else if(dataDefinition.getDataType() == DataDefinitionDataType.DOUBLE
                             ||dataDefinition.getDataType()==DataDefinitionDataType.FLOAT){
-                        sb.append("double_value").append(getOperator(o.getString("operator"))).append(getStringValue(o, "double"));
+                        sb.append("bb.double_value").append(getOperator(o.getString("operator"))).append(getStringValue(o, "double"));
                     }else{
-                        sb.append("str_value").append(getOperator(o.getString("operator"))).append(getStringValue(o, "str"));
+                        sb.append("bb.str_value").append(getOperator(o.getString("operator"))).append(getStringValue(o, "str"));
                     }
                     sb.append(")").append(BLANK);
                     if (i < jsonArray.size() - 1) {

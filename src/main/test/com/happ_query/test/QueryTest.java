@@ -80,11 +80,11 @@ public class QueryTest {
         for(Row r : rows){
             System.out.println("==========================new row coming======================");
             Long leftId = r.getLeftId();
-            System.out.println("leftId is:" + leftId);
-            System.out.println("==============================================================");
-            System.out.println("leftTableData is :" + JSON.toJSONString(r.getLeftTableData()));
-            System.out.println("==============================================================");
-            System.out.println("datas is:" + JSON.toJSONString(r.getFlatMapData()));
+//            System.out.println("leftId is:" + leftId);
+//            System.out.println("==============================================================");
+//            System.out.println("leftTableData is :" + JSON.toJSONString(r.getLeftTableData()));
+//            System.out.println("==============================================================");
+//            System.out.println("datas is:" + JSON.toJSONString(r.getFlatMapData()));
         }
     }
 }

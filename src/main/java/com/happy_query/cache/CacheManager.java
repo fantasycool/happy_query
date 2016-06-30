@@ -30,7 +30,7 @@ public class CacheManager {
 
     private static LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
             .maximumSize(2000)
-            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .expireAfterWrite(1, TimeUnit.MINUTES)
             .build(
                     new CacheLoader<Object, Object>() {
                         public Object load(Object key) throws Exception {
@@ -62,9 +62,20 @@ public class CacheManager {
                     LOG.error("init template failed!", e);
                 }
             } else if (((String) key).startsWith(DEFININATION_NAME_PREFIX)) {
-                return DataDefinitionDao.getDataDefinitionByName(dataSource, key.toString().replace(DEFININATION_NAME_PREFIX, ""));
+                DataDefinition dataDefinition = DataDefinitionDao.getDataDefinitionByName(dataSource, key.toString().replace(DEFININATION_NAME_PREFIX, ""));
+                if(dataDefinition == null){
+                    return new NullValue();
+                }
+                return dataDefinition;
             }
         }
-        return null;
+        return new NullValue();
+    }
+
+    /**
+     * represent value is null
+     */
+    public static class NullValue{
+
     }
 }

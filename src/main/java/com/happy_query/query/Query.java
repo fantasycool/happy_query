@@ -11,6 +11,8 @@ import com.happy_query.query.domain.Row;
 import com.happy_query.util.Constant;
 import com.happy_query.util.JDBCUtils;
 import com.happy_query.util.HappyQueryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -26,6 +28,7 @@ import java.util.Map;
 public class Query implements IQuery {
     private DataSource dataSource;
     private IJsonSqlParser jsonSqlParser;
+    static Logger LOG = LoggerFactory.getLogger(Query.class);
 
     public Query(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -47,8 +50,11 @@ public class Query implements IQuery {
         try {
             connection = dataSource.getConnection();
             JDBCUtils.execute(connection, "SET SESSION group_concat_max_len = 1000000", new ArrayList<Object>());
+            long t1 = System.currentTimeMillis();
             List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList(0));
-            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(connection, countSql,  new ArrayList(0));
+            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(connection, countSql, new ArrayList(0));
+            LOG.info("##############happy query executing time ############### time:[{}]", System.currentTimeMillis() - t1);
+            System.out.println(String.format("##############happy query executing time ############### time:[%d]", System.currentTimeMillis() - t1));
             QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);
             return queryResult;
         } catch (SQLException e) {
@@ -83,7 +89,7 @@ public class Query implements IQuery {
             return QueryResult.createFromOrinalData(jsonParseDataParam, queryResult, countResult);
         } catch (SQLException e) {
             throw new HappyQueryException("query by leftId:" + leftId + "failed", e);
-        }finally {
+        } finally {
             JDBCUtils.close(connection);
         }
     }
