@@ -78,8 +78,8 @@ public class Query implements IQuery {
         jsonParseDataParam.setLeftOperationStr(leftIdColumn + "=" + leftId);
         jsonParseDataParam.setConnectType("left");
 
-        String querySql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "left_id=" + leftId, "query");
-        String countSql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "left_id=" + leftId, "count");
+        String querySql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "bb.left_id=" + leftId, "query");
+        String countSql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "bb.left_id=" + leftId, "count");
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
