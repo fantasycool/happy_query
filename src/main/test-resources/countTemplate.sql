@@ -28,7 +28,6 @@ ${connect_type} join
 		${operation_str}
 	group BY
 	  bb.left_id
-	limit ${start_index}, ${size}
 )b
 on
 	a.${primary_id}=b.left_id
