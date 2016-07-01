@@ -54,17 +54,17 @@ public class QueryTest {
                 "      \"or\",\n" +
                 "          {\n" +
                 "              \"attr\":\"109\",\n" +
-                "              \"operator\":\">\",\n" +
+                "              \"operator\":\"=\",\n" +
                 "              \"value\":\"97.0\"\n" +
                 "          },\n" +
                 "          {\n" +
                 "              \"attr\":\"110\",\n" +
-                "              \"operator\": \"<\",\n" +
+                "              \"operator\": \"=\",\n" +
                 "              \"value\":\"142\"\n" +
                 "          }"+
                 "          {\n" +
                 "              \"attr\":\"106\",\n" +
-                "              \"operator\": \">\",\n" +
+                "              \"operator\": \"=\",\n" +
                 "              \"value\":\"172.0\"\n" +
                 "          }"+
                 "  ]";
@@ -76,6 +76,7 @@ public class QueryTest {
         jsonParseDataParam.setSize(20);
         jsonParseDataParam.setRightTableName("data_definition_value");
         QueryResult queryResult = query.queryByJsonLogic(jsonParseDataParam);
+        System.out.println(queryResult.getCount());
         List<Row> rows = queryResult.getRows();
         for(Row r : rows){
             System.out.println("==========================new row coming======================");
