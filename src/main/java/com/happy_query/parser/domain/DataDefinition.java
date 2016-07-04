@@ -298,9 +298,9 @@ public class DataDefinition {
         Map<String, Object> parameters = new HashMap<String, Object>();
         if (dataOptions != null)
             parameters.put("data_options", dataOptions);
-        parameters.put("data_type", dataType);
+        parameters.put("data_type", dataType.toString());
         parameters.put("description", description);
-        parameters.put("definition_type", definitionType);
+        parameters.put("definition_type", definitionType.toString());
         if (isTag != null)
             parameters.put("is_tag", isTag ? 1 : 0);
         parameters.put("rule", rule);

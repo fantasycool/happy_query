@@ -52,7 +52,9 @@ public class Query implements IQuery {
             JDBCUtils.execute(connection, "SET SESSION group_concat_max_len = 1000000", new ArrayList<Object>());
             long t1 = System.currentTimeMillis();
             List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList(0));
+            System.out.println(String.format("query time is:%d" ,System.currentTimeMillis() - t1));
             List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(connection, countSql, new ArrayList(0));
+            System.out.println(String.format("all time is:%d" ,System.currentTimeMillis() - t1));
             LOG.info("##############happy query executing time ############### time:[{}]", System.currentTimeMillis() - t1);
             System.out.println(String.format("##############happy query executing time ############### time:[%d]", System.currentTimeMillis() - t1));
             QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);

@@ -11,6 +11,9 @@ public class Constant {
      * table data_definition_value category->sub_key values
      */
     public static Map<String, Integer> SUB_KEY_MAP = new HashMap<String, Integer>();
+    public static String USER_CATEGORY_TYPE = "user";
+    public static String FUWU_CATEGORY_TYPE = "service";
+    public static String MOCK_CATEGORY_TYPE = "mock";
 
     static {
         SUB_KEY_MAP.put("user", 0);
