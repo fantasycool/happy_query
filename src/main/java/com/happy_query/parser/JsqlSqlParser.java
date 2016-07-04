@@ -68,18 +68,18 @@ public class JsqlSqlParser implements IJsonSqlParser {
         root.put("left_table", jsonParseDataParam.getLeftTableName());
         root.put("right_table", jsonParseDataParam.getRightTableName());
         //control operationStr
+        boolean isLeft = false;
         if(StringUtils.isBlank(operationStr)){
             operationStr = "1=1"; //set default operation;
             root.put("only_left", true);
-            root.put("only_right", false);
+            isLeft = true;
         }
         root.put("operation_str", operationStr);
         root.put("primary_id", jsonParseDataParam.getLeftPrimaryId());
         root.put("start_index", jsonParseDataParam.getLimitStart());
         root.put("size", jsonParseDataParam.getSize());
-        if(StringUtils.isBlank(jsonParseDataParam.getLeftOperationStr())){
+        if(StringUtils.isBlank(jsonParseDataParam.getLeftOperationStr()) && !isLeft){
             root.put("only_right", true);
-            root.put("only_left", false);
         }
         root.put("left_operation_str", jsonParseDataParam.getLeftOperationStr());
         //control left or right join
