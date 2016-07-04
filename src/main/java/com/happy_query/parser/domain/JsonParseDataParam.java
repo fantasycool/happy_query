@@ -43,6 +43,8 @@ public class JsonParseDataParam {
      */
     private String connectType;
 
+    private List<Long> leftIds; //we can use this to query left in (leftId1, leftId2, leftId3)
+
     public JsonParseDataParam(){
 
     }
@@ -145,5 +147,13 @@ public class JsonParseDataParam {
 
     public void setConnectType(String connectType) {
         this.connectType = connectType;
+    }
+
+    public List<Long> getLeftIds() {
+        return leftIds;
+    }
+
+    public void setLeftIds(List<Long> leftIds) {
+        this.leftIds = leftIds;
     }
 }
