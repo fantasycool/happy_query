@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,7 +42,24 @@ public class JsqlSqlParser implements IJsonSqlParser {
         String jsonStr = jsonParseDataParam.getJsonOperation();
         String operationStr = jsonLogicParser.convertJsonToLogicExpression(jsonStr,
                 jsonParseDataParam.getPrefix(), jsonParseDataParam.getContextParameters());
+        //add leftId in operation
+        if(jsonParseDataParam.getLeftIds() != null){
+            operationStr = getLeftIdsInStr(jsonParseDataParam.getLeftIds()) + " and " + operationStr;
+        }
         return getFreemarkerSql(jsonParseDataParam, operationStr, type);
+    }
+
+    private String getLeftIdsInStr(List<Long> leftIds) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("bb.left_id in (");
+        for(int i = 0; i < leftIds.size(); i ++){
+            sb.append(leftIds.get(i));
+            if(i < leftIds.size() - 1){
+                sb.append(",");
+            }
+        }
+        sb.append(")");
+        return sb.toString();
     }
 
     public String getFreemarkerSql(JsonParseDataParam jsonParseDataParam, String operationStr, String type){

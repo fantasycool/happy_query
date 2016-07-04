@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -74,6 +75,14 @@ public class QueryTest {
         jsonParseDataParam.setLeftTableName("customer");
         jsonParseDataParam.setLimitStart(0);
         jsonParseDataParam.setSize(20);
+        List<Long> leftIds = new ArrayList<Long>();
+        leftIds.add(103709l);
+        leftIds.add(103298l);
+        leftIds.add(104952l);
+        leftIds.add(105071l);
+        leftIds.add(10531l);
+        jsonParseDataParam.setLeftIds(leftIds);
+
         jsonParseDataParam.setRightTableName("data_definition_value");
         QueryResult queryResult = query.queryByJsonLogic(jsonParseDataParam);
         System.out.println(queryResult.getCount());
