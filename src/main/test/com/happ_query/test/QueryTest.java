@@ -53,21 +53,7 @@ public class QueryTest {
     public void testQueryByJson(){
         String j = "[\n" +
                 "      \"or\",\n" +
-                "          {\n" +
-                "              \"attr\":\"109\",\n" +
-                "              \"operator\":\"=\",\n" +
-                "              \"value\":\"97.0\"\n" +
-                "          },\n" +
-                "          {\n" +
-                "              \"attr\":\"110\",\n" +
-                "              \"operator\": \"=\",\n" +
-                "              \"value\":\"142\"\n" +
-                "          }"+
-                "          {\n" +
-                "              \"attr\":\"106\",\n" +
-                "              \"operator\": \"=\",\n" +
-                "              \"value\":\"172.0\"\n" +
-                "          }"+
+
                 "  ]";
         JsonParseDataParam jsonParseDataParam = new JsonParseDataParam();
         jsonParseDataParam.setJsonOperation(j);
@@ -75,13 +61,13 @@ public class QueryTest {
         jsonParseDataParam.setLeftTableName("customer");
         jsonParseDataParam.setLimitStart(0);
         jsonParseDataParam.setSize(20);
-        List<Long> leftIds = new ArrayList<Long>();
-        leftIds.add(103709l);
-        leftIds.add(103298l);
-        leftIds.add(104952l);
-        leftIds.add(105071l);
-        leftIds.add(10531l);
-        jsonParseDataParam.setLeftIds(leftIds);
+//        List<Long> leftIds = new ArrayList<Long>();
+//        leftIds.add(103709l);
+//        leftIds.add(103298l);
+//        leftIds.add(104952l);
+//        leftIds.add(105071l);
+//        leftIds.add(10531l);
+//        jsonParseDataParam.setLeftIds(leftIds);
 
         jsonParseDataParam.setRightTableName("data_definition_value");
         QueryResult queryResult = query.queryByJsonLogic(jsonParseDataParam);
