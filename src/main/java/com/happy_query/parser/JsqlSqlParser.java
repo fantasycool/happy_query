@@ -35,6 +35,7 @@ public class JsqlSqlParser implements IJsonSqlParser {
             this.countTemplate = configuration.getTemplate("countTemplate.sql");
         }catch(Exception e){
            LOG.error("init JsqlSqlParser failed!", e);
+            e.printStackTrace();
         }
     }
 
@@ -69,11 +70,17 @@ public class JsqlSqlParser implements IJsonSqlParser {
         //control operationStr
         if(StringUtils.isBlank(operationStr)){
             operationStr = "1=1"; //set default operation;
+            root.put("only_left", true);
+            root.put("only_right", false);
         }
         root.put("operation_str", operationStr);
         root.put("primary_id", jsonParseDataParam.getLeftPrimaryId());
         root.put("start_index", jsonParseDataParam.getLimitStart());
         root.put("size", jsonParseDataParam.getSize());
+        if(StringUtils.isBlank(jsonParseDataParam.getLeftOperationStr())){
+            root.put("only_right", true);
+            root.put("only_left", false);
+        }
         root.put("left_operation_str", jsonParseDataParam.getLeftOperationStr());
         //control left or right join
         root.put("connect_type", jsonParseDataParam.getConnectType() != null ? jsonParseDataParam.getConnectType() : "right");
