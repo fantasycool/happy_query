@@ -73,6 +73,32 @@ public class DataDefinition {
 
     private Date gmtModified;
 
+    private List<DataOption> dataOptionList;
+
+    public List<DataOption> getDataOptionList() {
+        return dataOptionList;
+    }
+
+    public void setDataOptionList(List<DataOption> dataOptionList) {
+
+        if(this.dataOptions==""||this.dataOptions ==null||this.dataOptions.length() ==0){
+            System.out.println("没有选项~");
+        }else{
+            String[] option = this.dataOptions.split(";");
+            DataOption dataOption = new DataOption();
+            for(String op :option){
+                dataOption.setCode(op.split(":")[0]);
+                dataOption.setValue(op.split(":")[1]);
+                dataOptionList.add(dataOption);
+            }
+
+        }
+        this.dataOptionList = dataOptionList;
+
+
+
+    }
+
     public Boolean getLeftData() {
         return isLeftData;
     }
@@ -242,6 +268,7 @@ public class DataDefinition {
         dataDefinition.setLefColName(data.getOrDefault("left_col_name", "").toString());
         dataDefinition.setNickName(data.getOrDefault("nick_name", "").toString());
         dataDefinition.setName(data.getOrDefault("name", "").toString());
+        dataDefinition.setDataOptionList(new ArrayList<DataOption>());
         return dataDefinition;
     }
 
@@ -254,6 +281,7 @@ public class DataDefinition {
             }
         }
     }
+
 
     public static DataDefinition createDataDefinitionById(Long id) {
         DataDefinition d = new DataDefinition();
