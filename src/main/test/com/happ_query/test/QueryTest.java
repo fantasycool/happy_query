@@ -54,15 +54,11 @@ public class QueryTest {
         String j = "[\n" +
                 "      \"and\",\n" +
                 "          {\n" +
-                "              \"attr\":\"110\",\n" +
-                "              \"operator\":\">\",\n" +
-                "              \"value\":\"110\"\n" +
-                "          },\n" +
-                "          {\n" +
-                "              \"attr\":\"109\",\n" +
+                "              \"attr\":\"83\",\n" +
                 "              \"operator\":\"=\",\n" +
-                "              \"value\":\"120.0\"\n" +
-                "          }\n" +
+                "              \"value\":\"1\"\n" +
+                "          }" +
+
                 "  ]";
         JsonParseDataParam jsonParseDataParam = new JsonParseDataParam();
         jsonParseDataParam.setJsonOperation(j);

@@ -44,7 +44,8 @@ public interface IJsonLogicParser {
      * @param prefix        when converting, add prefix to attribute name(if attributesMap arg is used,
      *                      prefix will be added after attribute converted to value)
      * @param attributesMap when converting, replace attribute to map value
+     * @param leftStringBuilder left table query condition
      * @return
      */
-    String convertJsonToLogicExpression(String json, String prefix, Map<String, String> attributesMap);
+    String convertJsonToLogicExpression(String json, String prefix, Map<String, String> attributesMap, StringBuilder leftStringBuilder);
 }
