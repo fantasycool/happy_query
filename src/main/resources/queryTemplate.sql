@@ -40,7 +40,7 @@
 <#elseif only_left ??>
     SELECT
       a.*,
-      b.left_id,
+      a.${primary_id} as left_id,
       b.int_strs,
       b.varchar_strs,
       b.double_strs,
@@ -66,7 +66,26 @@
             group_concat(concat(aa.dd_ref_id, ':::', aa.double_value) separator '|||') as double_strs,
             group_concat(concat(aa.dd_ref_id, ':::', aa.feature) separator '|||') as feature_strs
       from
-        data_definition_value aa
+        (
+          select
+          z.*
+          from
+          data_definition_value z
+          right join
+          (
+            SELECT
+              *
+            FROM
+              ${left_table}
+            <#if left_operation_str ??>
+            where
+              ${left_operation_str}
+            </#if>
+            limit ${start_index}, ${size}
+          ) y
+          on
+          z.left_id = y.${primary_id}
+        ) aa
       INNER JOIN data_definition_value bb
       on aa.left_id = bb.left_id
       where
@@ -77,9 +96,9 @@
     on
       a.${primary_id}=b.left_id
 <#else>
-  SELECT
+    SELECT
       a.*,
-      b.left_id,
+      a.${primary_id} as left_id,
       b.int_strs,
       b.varchar_strs,
       b.double_strs,
@@ -104,7 +123,25 @@
             group_concat(concat(aa.dd_ref_id, ':::', aa.double_value) separator '|||') as double_strs,
             group_concat(concat(aa.dd_ref_id, ':::', aa.feature) separator '|||') as feature_strs
       from
-        data_definition_value aa
+      (
+          select
+          z.*
+          from
+          data_definition_value z
+          right join
+          (
+            SELECT
+              ${primary_id}
+            FROM
+              ${left_table}
+            <#if left_operation_str ??>
+            where
+              ${left_operation_str}
+            </#if>
+          ) y
+          on
+          z.left_id = y.${primary_id}
+      ) aa
       INNER JOIN data_definition_value bb
       on aa.left_id = bb.left_id
       where
