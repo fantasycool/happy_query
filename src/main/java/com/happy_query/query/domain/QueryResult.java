@@ -77,6 +77,9 @@ public class QueryResult {
         String[] kvs = v.toString().split(QueryResultConstant.DEFINITION_SPLIT);
         for (String kv : kvs) {
             String[] idValue = kv.split(QueryResultConstant.KEY_VALUE_SPIT);
+            if(idValue.length < 2){
+                continue;
+            }
             String dataDefinitionId = idValue[0]; //definition id
             String value = idValue[1]; //definition value
 
