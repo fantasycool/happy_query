@@ -132,14 +132,16 @@ public class JsqlSqlParser implements IJsonSqlParser {
         try {
             if (type.equals("query")) {
                 if (isAndQuery) {
-                    queryTemplate = andQueryTemplate;
+                    andQueryTemplate.process(root, sw);
+                }else{
+                    queryTemplate.process(root, sw);
                 }
-                queryTemplate.process(root, sw);
             } else {
                 if (isAndQuery) {
-                    countTemplate = andCountTemplate;
+                    andCountTemplate.process(root, sw);
+                }else{
+                    countTemplate.process(root, sw);
                 }
-                countTemplate.process(root, sw);
             }
         } catch (TemplateException e) {
             LOG.error("sql template render failed!param= [{}]", jsonParseDataParam.toString());
