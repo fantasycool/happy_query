@@ -16,6 +16,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by frio on 16/6/15.
@@ -23,7 +25,12 @@ import java.util.Map;
 public class JsqlSqlParser implements IJsonSqlParser {
     private IJsonLogicParser jsonLogicParser;
     private Template queryTemplate;
+    private Template andQueryTemplate;
+    private Template andCountTemplate;
     private Template countTemplate;
+    static String And_Match_Pattern = "\\(.*?\\)\\s+and\\s+";
+    static String Find_Match_Pattern = "\\(.*?\\)";
+
     private static Logger LOG = LoggerFactory.getLogger(JsqlSqlParser.class);
 
     public JsqlSqlParser(IJsonLogicParser jsonLogicParser) {
@@ -33,6 +40,8 @@ public class JsqlSqlParser implements IJsonSqlParser {
             configuration.setClassForTemplateLoading(this.getClass(), "/");
             this.queryTemplate = configuration.getTemplate("queryTemplate.sql");
             this.countTemplate = configuration.getTemplate("countTemplate.sql");
+            this.andQueryTemplate = configuration.getTemplate("andQueryTemplate.sql");
+            this.andCountTemplate = configuration.getTemplate("andCountTemplate.sql");
         }catch(Exception e){
            LOG.error("init JsqlSqlParser failed!", e);
             e.printStackTrace();
@@ -75,6 +84,30 @@ public class JsqlSqlParser implements IJsonSqlParser {
             isLeft = true;
         }
         root.put("operation_str", operationStr);
+        /**
+         * now we do generate join strs
+         */
+        String matchStr = operationStr;
+        Pattern pattern = Pattern.compile(And_Match_Pattern);
+        Matcher m = pattern.matcher(matchStr);
+        boolean isAndQuery = false;
+        if(m.find()){
+            //ok, that's an and operation
+            StringBuilder joinStr = new StringBuilder();
+            pattern = Pattern.compile(Find_Match_Pattern);
+            isAndQuery = true;
+            m = pattern.matcher(matchStr);
+            int counter = 0;
+            while(m.find()){
+                String tableName = "z" + ++counter + "";
+                String operation = m.group();
+                operation = operation.replace("bb.", tableName + ".").replace("aa.", tableName + ".");
+                joinStr.append(String.format(" JOIN data_definition_value %s on " +
+                        "aa.left_id = %s.left_id and %s", tableName, tableName, operation));
+            }
+            root.put("join_str", joinStr.toString());
+        }
+
         root.put("primary_id", jsonParseDataParam.getLeftPrimaryId());
         root.put("start_index", jsonParseDataParam.getLimitStart());
         root.put("size", jsonParseDataParam.getSize());
@@ -87,8 +120,14 @@ public class JsqlSqlParser implements IJsonSqlParser {
         StringWriter sw = new StringWriter();
         try {
             if(type.equals("query")){
+                if(isAndQuery){
+                    queryTemplate = andQueryTemplate;
+                }
                 queryTemplate.process(root, sw);
             }else{
+                if(isAndQuery){
+                    countTemplate = andCountTemplate;
+                }
                 countTemplate.process(root, sw);
             }
         } catch (TemplateException e) {
