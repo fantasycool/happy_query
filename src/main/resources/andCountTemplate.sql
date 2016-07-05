@@ -27,7 +27,7 @@
       ${left_operation_str}
     </#if>
   ) a
-  ${connect_type} join
+  join
   (
     select
         aa.left_id
