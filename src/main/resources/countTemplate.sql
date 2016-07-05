@@ -1,12 +1,10 @@
 <#if only_right ??>
   select
-     count(bb.left_id) as count_num
+     count(distinct left_id) as count_num
   from
     data_definition_value bb
 	where
 		${operation_str}
-	group by
-	  bb.left_id
 <#elseif only_left ??>
     SELECT
       count(*) as count_num
