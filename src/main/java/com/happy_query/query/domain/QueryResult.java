@@ -78,11 +78,11 @@ public class QueryResult {
         for (String kv : kvs) {
             String[] idValue = kv.split(QueryResultConstant.KEY_VALUE_SPIT);
             if(idValue.length < 2){
+                LOG.error("Have found illegal id Value:[{}]", idValue);
                 continue;
             }
             String dataDefinitionId = idValue[0]; //definition id
             String value = idValue[1]; //definition value
-
             try {
                 Object o = CacheManager.getValue(DataDefinition.createDataDefinitionById(Long.valueOf(dataDefinitionId)));
                 if (o != null) {
