@@ -53,7 +53,21 @@ public class QueryTest {
     public void testQueryByJson(){
         String j = "[\n" +
                 "      \"or\",\n" +
-
+                "          {\n" +
+                "              \"attr\":\"109\",\n" +
+                "              \"operator\":\"=\",\n" +
+                "              \"value\":\"97.0\"\n" +
+                "          },\n" +
+                "          {\n" +
+                "              \"attr\":\"110\",\n" +
+                "              \"operator\": \"=\",\n" +
+                "              \"value\":\"142\"\n" +
+                "          }"+
+                "          {\n" +
+                "              \"attr\":\"106\",\n" +
+                "              \"operator\": \"=\",\n" +
+                "              \"value\":\"172.0\"\n" +
+                "          }"+
                 "  ]";
         JsonParseDataParam jsonParseDataParam = new JsonParseDataParam();
         jsonParseDataParam.setJsonOperation(j);
