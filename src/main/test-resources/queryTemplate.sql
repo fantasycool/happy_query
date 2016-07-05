@@ -30,7 +30,7 @@
       JOIN data_definition_value bb <#if force_index ??> ${force_index} </#if>
       on aa.left_id = bb.left_id
       and
-        ${operation_str}
+        (${operation_str})
       group BY
         bb.left_id
       limit ${start_index}, ${size}
@@ -89,7 +89,7 @@
       INNER JOIN data_definition_value bb <#if force_index ??> ${force_index} </#if>
       on aa.left_id = bb.left_id
       and
-        ${operation_str}
+        (${operation_str})
       group BY
         bb.left_id
     )b
@@ -145,7 +145,7 @@
       INNER JOIN data_definition_value bb <#if force_index ??> ${force_index} </#if>
       on aa.left_id = bb.left_id
       and
-        ${operation_str}
+        (${operation_str})
       group BY
         bb.left_id
     )b
