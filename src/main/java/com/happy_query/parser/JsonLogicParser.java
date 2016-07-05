@@ -21,12 +21,12 @@ public class JsonLogicParser implements IJsonLogicParser {
     public JsonLogicParser(){
     }
 
-    public String convertJsonToLogicExpression(String json, String prefix, Map<String, String> attributesMap) {
+    public String convertJsonToLogicExpression(String json, String prefix, Map<String, String> attributesMap, StringBuilder leftStringBuilder) {
         try {
             Object o = JSON.parse(json);
             if (o instanceof JSONArray) {
                 String connector = ((JSONArray) o).get(0).toString();
-                return appendOperation(connector, (JSONArray) o);
+                return appendOperation(connector, (JSONArray) o, leftStringBuilder);
             } else {
                 throw new JsonLogicParseException(String.format("invalid json logic format:%s", o.toString()));
             }
@@ -35,7 +35,7 @@ public class JsonLogicParser implements IJsonLogicParser {
         }
     }
 
-    public String appendOperation(String connector, JSONArray jsonArray) {
+    public String appendOperation(String connector, JSONArray jsonArray, StringBuilder leftStringBuilder) {
         StringBuilder sb = new StringBuilder();
         if (jsonArray.get(0) instanceof String) {
             for (int i = 0; i < jsonArray.size(); i++) {
@@ -43,19 +43,34 @@ public class JsonLogicParser implements IJsonLogicParser {
                     continue;
                 } else if (jsonArray.get(i) instanceof JSONArray) {
                     sb.append("(");
-                    sb.append(appendOperation(((JSONArray) jsonArray.get(i)).getString(0), (JSONArray) jsonArray.get(i)));
+                    sb.append(appendOperation(((JSONArray) jsonArray.get(i)).getString(0), (JSONArray) jsonArray.get(i), leftStringBuilder));
                     sb.append(")");
                 } else {
                     JSONObject o = (JSONObject) jsonArray.get(i);
-                    sb.append("(");
                     Long dd_ref_id = o.getLong("attr");
-                    sb.append("bb.dd_ref_id=").append(dd_ref_id).append(BLANK).append(AND).append(BLANK);
                     DataDefinition dataDefinition = null;
                     try {
                         dataDefinition = (DataDefinition) CacheManager.getValue(DataDefinition.createDataDefinitionById(dd_ref_id));
                     } catch (ExecutionException e) {
                         throw new JsonLogicParseException(String.format("cache get failed!dd_ref_id %d", dd_ref_id), e);
                     }
+                    if(dataDefinition.getLeftData()){
+                        if(dataDefinition.getDataType() == DataDefinitionDataType.INT
+                                ||dataDefinition.getDataType() == DataDefinitionDataType.BOOLEAN
+                                ||dataDefinition.getDataType() == DataDefinitionDataType.DATETIME){
+                            leftStringBuilder.append(dataDefinition.getLefColName()).append(o.getString("operator")).append(getStringValue(o, "int"));
+                        }else if(dataDefinition.getDataType() == DataDefinitionDataType.DOUBLE
+                                ||dataDefinition.getDataType()==DataDefinitionDataType.FLOAT){
+                            leftStringBuilder.append(dataDefinition.getLefColName()).append(o.getString("operator")).append(getStringValue(o, "double"));
+                        }else{
+                            leftStringBuilder.append(dataDefinition.getLefColName()).append(o.getString("operator")).append(getStringValue(o, "str"));
+                        }
+                        leftStringBuilder.append(" and ");
+                        continue;
+                    }
+
+                    sb.append("(");
+                    sb.append("bb.dd_ref_id=").append(dd_ref_id).append(BLANK).append(AND).append(BLANK);
                     if(dataDefinition.getDataType() == DataDefinitionDataType.INT
                             ||dataDefinition.getDataType() == DataDefinitionDataType.BOOLEAN
                             ||dataDefinition.getDataType() == DataDefinitionDataType.DATETIME){

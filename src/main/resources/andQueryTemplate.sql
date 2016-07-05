@@ -27,12 +27,9 @@
             group_concat(concat(aa.dd_ref_id, ':::', aa.feature) separator '|||') as feature_strs
       from
         data_definition_value aa
-      JOIN data_definition_value bb <#if force_index ??> ${force_index} </#if>
-      on aa.left_id = bb.left_id
-      and
-        ${operation_str}
+      ${join_str}
       group BY
-        bb.left_id
+        aa.left_id
       limit ${start_index}, ${size}
     )b
     on
@@ -86,12 +83,9 @@
           on
           z.left_id = y.${primary_id}
         ) aa
-      INNER JOIN data_definition_value bb <#if force_index ??> ${force_index} </#if>
-      on aa.left_id = bb.left_id
-      and
-        ${operation_str}
+      ${join_str}
       group BY
-        bb.left_id
+        aa.left_id
     )b
     on
       a.${primary_id}=b.left_id
@@ -142,12 +136,9 @@
           on
           z.left_id = y.${primary_id}
       ) aa
-      INNER JOIN data_definition_value bb <#if force_index ??> ${force_index} </#if>
-      on aa.left_id = bb.left_id
-      and
-        ${operation_str}
+      ${join_str}
       group BY
-        bb.left_id
+        aa.left_id
     )b
     on
       a.${primary_id}=b.left_id
