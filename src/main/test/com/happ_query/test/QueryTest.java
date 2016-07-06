@@ -52,12 +52,7 @@ public class QueryTest {
     @Test
     public void testQueryByJson(){
         String j = "[\n" +
-                "      \"and\",\n" +
-                "          {\n" +
-                "              \"attr\":\"1\",\n" +
-                "              \"operator\":\">\",\n" +
-                "              \"value\":\"1\"\n" +
-                "          },\n" +
+                "      \"and\"\n" +
                 "  ]";
         JsonParseDataParam jsonParseDataParam = new JsonParseDataParam();
         jsonParseDataParam.setJsonOperation(j);

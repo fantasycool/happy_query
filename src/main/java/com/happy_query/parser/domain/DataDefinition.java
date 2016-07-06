@@ -5,6 +5,8 @@ import com.happy_query.parser.JsonLogicParseException;
 import com.happy_query.query.domain.Row;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -12,6 +14,7 @@ import java.util.*;
  * Created by frio on 16/6/14.
  */
 public class DataDefinition {
+    static Logger LOG = LoggerFactory.getLogger(DataDefinition.class);
     private long id;
     /**
      * 字典名称
@@ -333,34 +336,40 @@ public class DataDefinition {
             rv.setDataDefinition(this);
             return rv;
         }
-        switch (dataType) {
-            case BOOLEAN:
-                if (value.equals("是") || value.equals("1")) {
-                    rv.setValue(Integer.valueOf("1"));
-                } else {
-                    rv.setValue(Integer.valueOf("0"));
-                }
-                break;
-            case INT:
-                rv.setValue(Long.valueOf(value));
-                break;
-            case STRING:
-                rv.setValue(value);
-                break;
-            case DATETIME:
-                rv.setValue(Long.valueOf(value));
-                break;
-            case FLOAT:
-                rv.setValue(Float.valueOf(value));
-                break;
-            case DOUBLE:
-                rv.setValue(Double.valueOf(value));
-                break;
-            case TEXT:
-                rv.setValue(String.valueOf(value));
-                break;
-            default:
-                break;
+        try {
+            switch (dataType) {
+                case BOOLEAN:
+                    if (value.equals("是") || value.equals("1")) {
+                        rv.setValue(Integer.valueOf("1"));
+                    } else {
+                        rv.setValue(Integer.valueOf("0"));
+                    }
+                    break;
+                case INT:
+                    rv.setValue(Long.valueOf(value));
+                    break;
+                case STRING:
+                    rv.setValue(value);
+                    break;
+                case DATETIME:
+                    rv.setValue(Long.valueOf(value));
+                    break;
+                case FLOAT:
+                    rv.setValue(Float.valueOf(value));
+                    break;
+                case DOUBLE:
+                    rv.setValue(Double.valueOf(value));
+                    break;
+                case TEXT:
+                    rv.setValue(String.valueOf(value));
+                    break;
+                default:
+                    break;
+            }
+        }catch(NumberFormatException e){
+            LOG.error("when we do number format operation,we have met an error,the type is [{}], value is [{}]",
+                    this.definitionType.toString(), value, e);
+            rv.setValue("-1");
         }
         if (rv.getValue() != null) {
             rv.setDataDefinition(this);
