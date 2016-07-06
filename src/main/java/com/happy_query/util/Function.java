@@ -46,7 +46,7 @@ public class Function {
             }
             if (dataDefinition.getTemplate() != null
                     && !StringUtils.isNullOrEmpty(dataDefinition.getTemplate())
-                    && dataDefinition.getTemplate().split(";").length == 2){
+                    && dataDefinition.getTemplate().split(";").length <= 2){
                 String methodName = dataDefinition.getTemplate().split(";")[0];
                 Class<?>[] paramCls = new Class[]{Row.Value.class, DataDefinition.class};
                 Object[] args = new Object[]{value, dataDefinition};
