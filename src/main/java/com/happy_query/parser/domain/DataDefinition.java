@@ -57,6 +57,9 @@ public class DataDefinition {
     /**
      * 字段状态
      */
+
+    private String unit;
+
     private int status;
 
     private String nickName;
@@ -97,6 +100,14 @@ public class DataDefinition {
 
 
 
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public Boolean getLeftData() {
@@ -265,6 +276,7 @@ public class DataDefinition {
         dataDefinition.setSubType(data.getOrDefault("sub_type", "").toString());
         dataDefinition.setEditable(data.getOrDefault("is_editable", "0").toString().equals("1") ? true : false);
         dataDefinition.setLeftData(data.getOrDefault("is_left_data", "0").toString().equals("1") ? true : false);
+        dataDefinition.setUnit(data.getOrDefault("unit","").toString());
         dataDefinition.setLefColName(data.getOrDefault("left_col_name", "").toString());
         dataDefinition.setNickName(data.getOrDefault("nick_name", "").toString());
         dataDefinition.setName(data.getOrDefault("name", "").toString());
