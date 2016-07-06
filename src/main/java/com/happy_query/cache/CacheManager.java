@@ -54,6 +54,7 @@ public class CacheManager {
                 if(null == dataDefinition){
                     return new NullValue();
                 }
+                return dataDefinition;
             }
         } else if (key instanceof String) {
             if (((String) key).startsWith(TEMPLATE_PREFIX)) {
