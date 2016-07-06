@@ -50,7 +50,10 @@ public class CacheManager {
     public static Object createValue(Object key) {
         if (key instanceof DataDefinition) {
             if (key != null && ((DataDefinition) key).getId() > 0) {
-                return DataDefinitionDao.getDataDefinition(dataSource, ((DataDefinition) key).getId());
+                DataDefinition dataDefinition = DataDefinitionDao.getDataDefinition(dataSource, ((DataDefinition) key).getId());
+                if(null == dataDefinition){
+                    return new NullValue();
+                }
             }
         } else if (key instanceof String) {
             if (((String) key).startsWith(TEMPLATE_PREFIX)) {
@@ -75,7 +78,7 @@ public class CacheManager {
     /**
      * represent value is null
      */
-    public static class NullValue{
+    public static class NullValue extends DataDefinition{
 
     }
 }
