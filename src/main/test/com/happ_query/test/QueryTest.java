@@ -42,7 +42,7 @@ public class QueryTest {
 
     @Test
     public void testQueryById(){
-        QueryResult qr = query.queryByLeftId(613523l, "user");
+        QueryResult qr = query.queryByLeftId(529642l, "user");
         List<Row> rows = qr.getRows();
         for(Row r : rows){
             System.out.println(JSON.toJSONString(r.getFlatMapData()));
