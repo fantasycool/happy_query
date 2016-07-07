@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * if you use template column to define functions, Please extend this class
+ * if you want to use template column to define functions, Please extend this class
  * Created by frio on 16/7/6.
  */
 public class Function {
@@ -70,7 +70,9 @@ public class Function {
                 return value.getValue();
             }
         } catch (ExecutionException e) {
-            LOG.error("get cache value failed!", e);
+            LOG.error("get cache value failed!, dId is [{}], argValue is [{}]", id, value.getValue(), e);
+        } catch (Exception e){
+            LOG.error("unexpected exception, dId is [{}], argValue is [{}]", id, value.getValue(), e);
         }
         return value.getValue();
     }
@@ -105,8 +107,10 @@ public class Function {
             }
             return value;
         } catch (ExecutionException e) {
-            LOG.error("get cache value failed!", e);
-            return value;
+            LOG.error("get cache value failed!, dId is: [{}], argValue:[{}]", id, value, e);
+        } catch (Exception e){
+            LOG.error("unexpected exception, dId is: [{}], argValue:[{}]", id, value, e);
         }
+        return value;
     }
 }
