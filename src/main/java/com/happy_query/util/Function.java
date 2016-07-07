@@ -109,13 +109,4 @@ public class Function {
             return value;
         }
     }
-
-    public static void main(String[] args) {
-        Pattern FUNCTION_NAME_SPACE = Pattern.compile("([a-zA-Z0-9]+)\\((.*?)\\)");
-        Matcher m = FUNCTION_NAME_SPACE.matcher("regionValue(list,detail);reverseRegionValue(detail)");
-        if(m.find()){
-            System.out.println(m.group(2));
-            System.out.println(Arrays.asList(m.group(2).split(",")).contains("detail"));
-        }
-    }
 }
