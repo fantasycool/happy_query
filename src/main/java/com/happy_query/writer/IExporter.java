@@ -5,6 +5,7 @@ import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.domain.QueryResult;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -18,5 +19,5 @@ public interface IExporter {
      * @param definitionIds definitions that need to be exported
      * @return
      */
-    File queryByJsonLogic(JsonParseDataParam jsonParseDataParam, String tmpDir, String token, List<DataDefinition> definitionIds);
+    File queryByJsonLogic(JsonParseDataParam jsonParseDataParam, String tmpDir, String token, List<DataDefinition> definitionIds) throws IOException;
 }
