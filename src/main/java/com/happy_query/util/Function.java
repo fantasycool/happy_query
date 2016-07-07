@@ -34,7 +34,7 @@ public class Function {
      * @param id
      * @return
      */
-    public String render(Row.Value value, Long id) {
+    public Object render(Row.Value value, Long id) {
         try {
             if(null == value){
                 return "";
@@ -54,8 +54,7 @@ public class Function {
                 value.setViewValue(viewValue);
                 return viewValue;
             }else{
-                value.setViewValue(value.toString());
-                return value.getValue().toString();
+                return value.getValue();
             }
         } catch (ExecutionException e) {
             LOG.error("get cache value failed!", e);

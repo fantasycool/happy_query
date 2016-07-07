@@ -18,8 +18,7 @@ public class Exporter implements IExporter {
         this.query = query;
     }
 
-    public File queryByJsonLogic(JsonParseDataParam jsonParseDataParam, String tmpDir, List<DataDefinition> definitionIds) {
-        query.queryByJsonLogic(jsonParseDataParam);
+    public File queryByJsonLogic(JsonParseDataParam jsonParseDataParam, String tmpDir, List<DataDefinition> definitions) {
         return null;
     }
 }
