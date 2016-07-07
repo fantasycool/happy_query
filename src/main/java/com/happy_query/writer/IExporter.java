@@ -18,5 +18,5 @@ public interface IExporter {
      * @param definitionIds definitions that need to be exported
      * @return
      */
-    File queryByJsonLogic(JsonParseDataParam jsonParseDataParam, String tmpDir, List<DataDefinition> definitionIds);
+    File queryByJsonLogic(JsonParseDataParam jsonParseDataParam, String tmpDir, String token, List<DataDefinition> definitionIds);
 }
