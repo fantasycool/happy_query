@@ -4,6 +4,7 @@ import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.IQuery;
 import com.happy_query.query.domain.QueryResult;
+import com.happy_query.query.domain.Row;
 
 import java.io.File;
 import java.util.List;
@@ -28,9 +29,13 @@ public class Exporter implements IExporter {
         jsonParseDataParam.setSize(PAGE_MAX_SIZE);
         while(true){
             QueryResult queryResult = query.queryByJsonLogic(jsonParseDataParam);
+            List<Row> rows = queryResult.getRows();
+            for(Row r : rows) {
+            }
             if(queryResult.getCount() < PAGE_MAX_SIZE){
                 break;
             }
+            jsonParseDataParam.setLimitStart(jsonParseDataParam.getLimitStart() + jsonParseDataParam.getSize());
         }
         return file;
     }

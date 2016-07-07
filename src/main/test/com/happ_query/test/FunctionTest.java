@@ -32,12 +32,12 @@ public class FunctionTest {
     @Test
     public void testReverseRender(){
         Function function = new Function();
-        function.render(Row.Value.createValue(null, "abc"), 2l);
+        function.render(Row.Value.createValue(null, "abc"), 2l, "detail");
     }
 
     @Test
     public void testRender(){
         Function function = new Function();
-        function.reverseRender("abc", 2l);
+        function.reverseRender("abc", 2l, "detail");
     }
 }
