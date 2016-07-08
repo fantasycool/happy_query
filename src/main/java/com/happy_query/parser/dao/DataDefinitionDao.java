@@ -58,9 +58,11 @@ public abstract class DataDefinitionDao {
 
     public static DataDefinition getDataDefinitionByNickName(DataSource dataSource, String name) {
         NullChecker.checkNull(name);
-        List<Object> list = Arrays.asList((Object) name);
+        List<Object> list = new ArrayList();
+        list.add(name);
+        list.add(name);
         try {
-            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where nick_name=? order by gmt_create desc limit 1", list);
+            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where nick_name=? or name=? order by gmt_create desc limit 1", list);
             if(data.size() == 0){
                 return null;
             }

@@ -67,6 +67,7 @@ public class Transformer {
             }
             return result;
         }catch(Exception e){
+            LOG.error("", e);
             throw new DefinitionException(String.format("指标[%s]的解析出现问题,请确认数据格式是否正确", d.getNickName()));
         }
     }
