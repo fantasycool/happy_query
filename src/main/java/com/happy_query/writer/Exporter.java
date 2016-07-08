@@ -10,6 +10,7 @@ import com.happy_query.query.domain.Row;
 import com.happy_query.util.Function;
 import com.happy_query.util.HappyQueryException;
 import com.opencsv.CSVWriter;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public class Exporter implements IExporter {
         this.function = function;
     }
 
-    public File queryByJsonLogic(JsonParseDataParam jsonParseDataParam, String tmpDir, String token, List<DataDefinition> definitions) throws IOException {
+    public File export(JsonParseDataParam jsonParseDataParam, String tmpDir, String token, List<DataDefinition> definitions) throws IOException {
         String fileName = tmpDir + File.separator + System.currentTimeMillis() + "_" + token + ".csv";
         File file = new File(fileName);
         try {
@@ -48,6 +49,18 @@ public class Exporter implements IExporter {
         jsonParseDataParam.setSize(PAGE_MAX_SIZE);
         int countNum = 0;
         CSVWriter writer = new CSVWriter(new FileWriter(fileName), '\t');
+        /**
+         * write header first
+         */
+        String[] headers = new String[definitions.size()];
+        for(int i = 0; i < definitions.size(); i ++){
+            headers[i] = StringUtils.isBlank(definitions.get(i).getNickName())?
+                    definitions.get(i).getName() : definitions.get(i).getNickName();
+        }
+        writer.writeNext(headers);
+        /**
+         * ok, let's write data to file
+         */
         try {
             while (true) {
                 QueryResult queryResult = query.queryByJsonLogic(jsonParseDataParam);
@@ -61,15 +74,20 @@ public class Exporter implements IExporter {
                         Row.Value v = m.get(id);
                         String viewStr = "无";
                         if (v != null && v.getValue() != null) {
-                            if (dataDefinition.getDefinitionType() == DefinitionType.SELECT) {
-                                viewStr = getFromDataOptionList(dataDefinition.getDataOptionList(), v.getValue());
-                            } else if (dataDefinition.getDefinitionType() == DefinitionType.DATETIME) {
-                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                viewStr = simpleDateFormat.format(new Date(Long.valueOf(v.getValue().toString())));
-                            } else if (dataDefinition.getTag()) {
-                                viewStr = dataDefinition.getNickName();
-                            } else {
-                                viewStr = function.render(v, dataDefinition.getId(), "export").toString();
+                            try {
+                                if (dataDefinition.getDefinitionType() == DefinitionType.SELECT) {
+                                    viewStr = getFromDataOptionList(dataDefinition.getDataOptionList(), v.getValue());
+                                } else if (dataDefinition.getDefinitionType() == DefinitionType.DATETIME) {
+                                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                    viewStr = simpleDateFormat.format(new Date(Long.valueOf(v.getValue().toString())));
+                                } else if (dataDefinition.getTag()) {
+                                    viewStr = dataDefinition.getNickName();
+                                } else {
+                                    viewStr = function.render(v, dataDefinition.getId(), "export").toString();
+                                }
+                            }catch(Exception e){
+                                LOG.error("data convert failed!", e);
+                                viewStr = "-";
                             }
                             entries[index] = viewStr;
                             index++;
@@ -78,7 +96,7 @@ public class Exporter implements IExporter {
                     }
                     writer.writeNext(entries);
                 }
-                if (queryResult.getCount() < PAGE_MAX_SIZE || countNum > 10000) {
+                if (queryResult.getRows().size() < PAGE_MAX_SIZE || countNum > 10000) {
                     break;
                 }
                 jsonParseDataParam.setLimitStart(jsonParseDataParam.getLimitStart() + jsonParseDataParam.getSize());

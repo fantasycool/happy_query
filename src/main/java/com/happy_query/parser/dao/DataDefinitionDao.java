@@ -56,6 +56,7 @@ public abstract class DataDefinitionDao {
         }
     }
 
+
     public static List<DataDefinition> queryBySubType(DataSource dataSource, String subType) {
         NullChecker.checkNull(dataSource);
         NullChecker.checkNull(subType);

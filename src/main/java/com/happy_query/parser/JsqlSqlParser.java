@@ -120,7 +120,7 @@ public class JsqlSqlParser implements IJsonSqlParser {
         }
 
         root.put("primary_id", jsonParseDataParam.getLeftPrimaryId());
-        root.put("start_index", jsonParseDataParam.getLimitStart());
+        root.put("start_index", String.valueOf(jsonParseDataParam.getLimitStart()));
         root.put("size", jsonParseDataParam.getSize());
         if (StringUtils.isBlank(jsonParseDataParam.getLeftOperationStr()) && !isLeft) {
             root.put("only_right", true);

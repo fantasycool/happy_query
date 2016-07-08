@@ -60,6 +60,8 @@ public class Query implements IQuery {
             QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);
             return queryResult;
         } catch (SQLException e) {
+            LOG.error("querySqlIs:[{}], countSqlIs:[{}]", querySql, countSql);
+            System.out.println(String.format("querySqlIs:%s, countSqlIs:%s", querySql, countSql));
             throw new HappyQueryException("query sql exception", e);
         } finally {
             JDBCUtils.close(connection);
