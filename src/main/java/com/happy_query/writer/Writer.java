@@ -40,7 +40,6 @@ public class Writer implements IWriter {
         } catch (SQLException e) {
             throw new HappyWriterException("import failed!", e);
         }
-
     }
 
     /**

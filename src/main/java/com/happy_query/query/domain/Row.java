@@ -97,41 +97,28 @@ public class Row {
         }
 
         /**
-         * when creating value
-         * generate view value with datadefinition template
+         * creating value method
          *
          * @param dataDefinition
          * @param value
          * @return
          */
         public static Value createValue(DataDefinition dataDefinition, Object value) {
-            if (null == value) {
+            if(null != dataDefinition && (value instanceof String)){
+                Value v = dataDefinition.formatStringValue(value.toString());
+                return v;
+            }else if(null == dataDefinition){
+                Value v = new Value();
+                v.setValue(value);
+                return v;
+            }else {
                 Value v = new Value();
                 v.setDataDefinition(dataDefinition);
                 v.setValue(value);
                 return v;
             }
-            Value v;
-            if (null != dataDefinition) {
-                v = dataDefinition.formatStringValue(value.toString());
-                if (StringUtils.isNoneBlank(dataDefinition.getTemplate())) {
-                    Map<String, Object> context = new HashMap<String, Object>();
-                    context.put(dataDefinition.getTemplate(), value);
-                    v.viewValue = TemplateUtil.getViewValueByTemplateStr(dataDefinition.getTemplate(), context);
-                }
-            } else {
-                v = new Value();
-                v.setValue(value);
-            }
-            return v;
         }
 
-
-        /**
-         * 读取template脚本,进行渲染
-         *
-         * @return
-         */
         public String getViewValue() {
             if (value == null) {
                 return "";

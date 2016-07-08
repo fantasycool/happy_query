@@ -56,6 +56,21 @@ public abstract class DataDefinitionDao {
         }
     }
 
+    public static DataDefinition getDataDefinitionByNickName(DataSource dataSource, String name) {
+        NullChecker.checkNull(name);
+        List<Object> list = Arrays.asList((Object) name);
+        try {
+            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where nick_name=? order by gmt_create desc limit 1", list);
+            if(data.size() == 0){
+                return null;
+            }
+            Map<String, Object> m = convertFromValueMap(data.get(0));
+            return DataDefinition.createFromMapData(m);
+        } catch (SQLException e) {
+            LOG.error("getDataDefinitionByNickName failed!param name is [{}]", name, e);
+            throw new HappyQueryException("getDataDefinitionByName failed!param name is " + name, e);
+        }
+    }
 
     public static List<DataDefinition> queryBySubType(DataSource dataSource, String subType) {
         NullChecker.checkNull(dataSource);

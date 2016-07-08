@@ -9,6 +9,7 @@ import com.happy_query.query.domain.QueryResult;
 import com.happy_query.query.domain.Row;
 import com.happy_query.util.Function;
 import com.happy_query.util.HappyQueryException;
+import com.happy_query.util.Transformer;
 import com.opencsv.CSVWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -53,8 +54,8 @@ public class Exporter implements IExporter {
          * write header first
          */
         String[] headers = new String[definitions.size()];
-        for(int i = 0; i < definitions.size(); i ++){
-            headers[i] = StringUtils.isBlank(definitions.get(i).getNickName())?
+        for (int i = 0; i < definitions.size(); i++) {
+            headers[i] = StringUtils.isBlank(definitions.get(i).getNickName()) ?
                     definitions.get(i).getName() : definitions.get(i).getNickName();
         }
         writer.writeNext(headers);
@@ -72,20 +73,11 @@ public class Exporter implements IExporter {
                     for (DataDefinition dataDefinition : definitions) {
                         long id = dataDefinition.getId();
                         Row.Value v = m.get(id);
-                        String viewStr = "无";
+                        String viewStr;
                         if (v != null && v.getValue() != null) {
                             try {
-                                if (dataDefinition.getDefinitionType() == DefinitionType.SELECT) {
-                                    viewStr = getFromDataOptionList(dataDefinition.getDataOptionList(), v.getValue());
-                                } else if (dataDefinition.getDefinitionType() == DefinitionType.DATETIME) {
-                                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    viewStr = simpleDateFormat.format(new Date(Long.valueOf(v.getValue().toString())));
-                                } else if (dataDefinition.getTag()) {
-                                    viewStr = dataDefinition.getNickName();
-                                } else {
-                                    viewStr = function.render(v, dataDefinition.getId(), "export").toString();
-                                }
-                            }catch(Exception e){
+                                viewStr = Transformer.dressUp(dataDefinition, v, new Function());
+                            } catch (Exception e) {
                                 LOG.error("data convert failed!", e);
                                 viewStr = "-";
                             }
@@ -102,21 +94,12 @@ public class Exporter implements IExporter {
                 jsonParseDataParam.setLimitStart(jsonParseDataParam.getLimitStart() + jsonParseDataParam.getSize());
                 countNum++;
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             LOG.error("when doing export, we have met an unexpected exception", e);
             throw new HappyQueryException(e);
-        }finally {
+        } finally {
             writer.close();
         }
         return file;
-    }
-
-    private String getFromDataOptionList(List<DataOption> dataOptions, Object value) {
-        for(DataOption d : dataOptions){
-            if(d.getCode().equals(value.toString())){
-                return d.getValue();
-            }
-        }
-        return value.toString();
     }
 }

@@ -23,9 +23,9 @@ public class QueryTest {
     @Before
     public void init() {
         DruidDataSource dd = new DruidDataSource();
-        dd.setUrl("jdbc:mysql://localhost/crucial");
-        dd.setUsername("frio");
-        dd.setPassword("fm7583165");
+        dd.setUrl("jdbc:mysql://122.226.111.103:3300/crucial");
+        dd.setUsername("qa");
+        dd.setPassword("qa");
         dd.setMaxActive(5);
         try {
             dd.init();
@@ -52,7 +52,12 @@ public class QueryTest {
     @Test
     public void testQueryByJson(){
         String j = "[\n" +
-                "      \"and\"\n" +
+                "      \"and\",\n" +
+                "          {\n" +
+                "              \"attr\":\"253\",\n" +
+                "              \"operator\":\"like\",\n" +
+                "              \"value\":\"糖友_%\"\n" +
+                "          }\n" +
                 "  ]";
         JsonParseDataParam jsonParseDataParam = new JsonParseDataParam();
         jsonParseDataParam.setJsonOperation(j);

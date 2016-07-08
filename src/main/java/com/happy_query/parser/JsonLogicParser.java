@@ -58,12 +58,12 @@ public class JsonLogicParser implements IJsonLogicParser {
                         if(dataDefinition.getDataType() == DataDefinitionDataType.INT
                                 ||dataDefinition.getDataType() == DataDefinitionDataType.BOOLEAN
                                 ||dataDefinition.getDataType() == DataDefinitionDataType.DATETIME){
-                            leftStringBuilder.append(dataDefinition.getLefColName()).append(o.getString("operator")).append(getStringValue(o, "int"));
+                            leftStringBuilder.append(dataDefinition.getLefColName()).append(" " + o.getString("operator") + " ").append(getStringValue(o, "int"));
                         }else if(dataDefinition.getDataType() == DataDefinitionDataType.DOUBLE
                                 ||dataDefinition.getDataType()==DataDefinitionDataType.FLOAT){
-                            leftStringBuilder.append(dataDefinition.getLefColName()).append(o.getString("operator")).append(getStringValue(o, "double"));
+                            leftStringBuilder.append(dataDefinition.getLefColName()).append(" " + o.getString("operator") + " ").append(getStringValue(o, "double"));
                         }else{
-                            leftStringBuilder.append(dataDefinition.getLefColName()).append(o.getString("operator")).append(getStringValue(o, "str"));
+                            leftStringBuilder.append(dataDefinition.getLefColName()).append(" " + o.getString("operator") + " ").append(getStringValue(o, "str"));
                         }
                         leftStringBuilder.append(" and ");
                         continue;
