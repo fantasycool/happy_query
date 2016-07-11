@@ -107,7 +107,7 @@ public abstract class JDBCUtils {
             if (v != null) {
                 sb.append(parameters.keySet().toArray()[i]).append("=").append("?");
                 args.add(v);
-                if (i < parameters.keySet().size()) {
+                if (i < (parameters.keySet().size() - 1)) {
                     sb.append(",");
                 }
             }
