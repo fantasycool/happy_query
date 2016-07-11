@@ -101,8 +101,8 @@ public class DataDefinition {
             LOG.warn("there is no options, datadefinition id is:[{}]", this.getId());
         }else{
             String[] option = this.dataOptions.split(";");
-            DataOption dataOption = new DataOption();
             for(String op :option){
+                DataOption dataOption = new DataOption();
                 dataOption.setCode(op.split(":")[0]);
                 dataOption.setValue(op.split(":")[1]);
                 dataOptionList.add(dataOption);
