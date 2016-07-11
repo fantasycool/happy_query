@@ -81,6 +81,16 @@ public class DataDefinition {
 
     private List<DataOption> dataOptionList;
 
+    private String isRequired;
+
+    public String getIsRequired() {
+        return isRequired;
+    }
+
+    public void setIsRequired(String isRequired) {
+        this.isRequired = isRequired;
+    }
+
     public List<DataOption> getDataOptionList() {
         return dataOptionList;
     }
@@ -280,6 +290,7 @@ public class DataDefinition {
         dataDefinition.setLefColName(data.getOrDefault("left_col_name", "").toString());
         dataDefinition.setNickName(data.getOrDefault("nick_name", "").toString());
         dataDefinition.setName(data.getOrDefault("name", "").toString());
+        dataDefinition.setIsRequired(data.getOrDefault("is_required","").toString());
         dataDefinition.setDataOptionList(new ArrayList<DataOption>());
         return dataDefinition;
     }
