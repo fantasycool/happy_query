@@ -98,7 +98,7 @@ public class DataDefinition {
     public void setDataOptionList(List<DataOption> dataOptionList) {
 
         if(this.dataOptions==""||this.dataOptions ==null||this.dataOptions.length() ==0){
-            LOG.warn("there is no options, datadefinition id is:[{}]", this.getId());
+//            LOG.warn("there is no options, datadefinition id is:[{}]", this.getId());
         }else{
             String[] option = this.dataOptions.split(";");
             DataOption dataOption = new DataOption();
