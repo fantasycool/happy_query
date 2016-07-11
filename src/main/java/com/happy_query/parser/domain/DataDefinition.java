@@ -15,7 +15,7 @@ import java.util.*;
  */
 public class DataDefinition {
     static Logger LOG = LoggerFactory.getLogger(DataDefinition.class);
-    private long id;
+    private Long id;
     /**
      * 字典名称
      */
@@ -126,11 +126,11 @@ public class DataDefinition {
         this.lefColName = lefColName;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -324,7 +324,9 @@ public class DataDefinition {
             parameters.put("is_left_data", isLeftData ? 1 : 0);
         parameters.put("left_col_name", lefColName);
         parameters.put("type", type);
-        parameters.put("id", id);
+        if(null != id){
+            parameters.put("id", id);
+        }
         parameters.put("status", status);
         parameters.put("sub_type", subType);
         parameters.put("nick_name", nickName);
