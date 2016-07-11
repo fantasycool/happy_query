@@ -30,7 +30,7 @@ public class DataDefinitionTemplate extends Template {
     }
 
     public int hashCode() {
-        return (int)dataDefinition.getId();
+        return Integer.valueOf(dataDefinition.getId().toString());
     }
 
     public boolean equals(Object o){
