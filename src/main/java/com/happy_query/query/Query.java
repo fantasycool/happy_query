@@ -69,6 +69,7 @@ public class Query implements IQuery {
     }
 
     public QueryResult queryByLeftId(long leftId, String categoryType) {
+        long t1 = System.currentTimeMillis();
         String rightTable = Constant.RIGHT_TABLE_MAP.get(categoryType);
         String leftTable = Constant.LEFT_TABLE_MAP.get(categoryType);
         String leftIdColumn = Constant.LEFT_ID_COLUMNS.get(categoryType);
@@ -94,6 +95,7 @@ public class Query implements IQuery {
         } catch (SQLException e) {
             throw new HappyQueryException("query by leftId:" + leftId + "failed", e);
         } finally {
+            LOG.info("queryByLeftId time is [{}]", System.currentTimeMillis() - t1);
             JDBCUtils.close(connection);
         }
     }

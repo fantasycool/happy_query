@@ -2,8 +2,10 @@ package com.happy_query.util;
 
 import com.happy_query.cache.CacheManager;
 import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.parser.domain.DataDefinitionDataType;
 import com.happy_query.query.domain.Row;
 import com.mysql.jdbc.StringUtils;
+import freemarker.template.utility.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,6 +105,16 @@ public class Function {
                         Object[] args = new Object[]{value, dataDefinition};
                         return ReflectionUtil.invokeMethod(methodName, this, paramCls, args);
                     }
+                }
+            }
+            //we need to add convert logic here
+            if(dataDefinition.getDataType() == DataDefinitionDataType.BOOLEAN
+                    || dataDefinition.getDataType() == DataDefinitionDataType.INT
+                    || dataDefinition.getDataType() == DataDefinitionDataType.DOUBLE
+                    || dataDefinition.getDataType() == DataDefinitionDataType.FLOAT
+                    || dataDefinition.getDataType() == DataDefinitionDataType.DATETIME){
+                if(StringUtils.isNullOrEmpty(value)){
+                    return 0;
                 }
             }
             return value;

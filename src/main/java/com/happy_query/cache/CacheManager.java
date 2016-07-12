@@ -30,7 +30,7 @@ public class CacheManager {
 
     private static LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
             .maximumSize(2000)
-            .expireAfterWrite(1, TimeUnit.MINUTES)
+            .expireAfterWrite(60, TimeUnit.MINUTES)
             .build(
                     new CacheLoader<Object, Object>() {
                         public Object load(Object key) throws Exception {
