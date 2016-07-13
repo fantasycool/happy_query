@@ -7,16 +7,18 @@
       b.double_strs,
       b.feature_strs
     from
+    <#if left_operation_str ??>
     (
       SELECT
         *
       FROM
         ${left_table}
-      <#if left_operation_str ??>
       where
         ${left_operation_str}
-      </#if>
     ) a
+    <#else>
+      ${left_table} a
+    </#if>
     right join
     (
       select
