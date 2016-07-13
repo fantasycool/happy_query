@@ -76,7 +76,7 @@ public class Exporter implements IExporter {
                         String viewStr;
                         if (v != null && v.getValue() != null) {
                             try {
-                                viewStr = Transformer.dressUp(dataDefinition, v, new Function());
+                                viewStr = Transformer.dressUp(dataDefinition, v.getValue(), new Function());
                             } catch (Exception e) {
                                 LOG.error("data convert failed!", e);
                                 viewStr = "-";
