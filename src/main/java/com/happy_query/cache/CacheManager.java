@@ -28,7 +28,7 @@ public class CacheManager {
     public static String DEFININATION_NAME_PREFIX = "definition_name_";
     public static String TEMPLATE_PREFIX = "template_";
 
-    private static LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
+    public static LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
             .maximumSize(2000)
             .expireAfterWrite(60, TimeUnit.MINUTES)
             .build(
