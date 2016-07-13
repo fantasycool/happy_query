@@ -7,7 +7,7 @@ import com.google.common.collect.HashBiMap;
  * Created by frio on 16/6/15.
  */
 public enum DefinitionType {
-    INPUT, SELECT, MULTISELECT, CHECKBOX, DATETIME, CITYINPUT;
+    INPUT, SELECT, MULTISELECT, CHECKBOX, DATETIME, CITYINPUT, UNKNOWN;
     private static BiMap<String, DefinitionType> biMap = HashBiMap.create();
 
     static {
@@ -17,6 +17,7 @@ public enum DefinitionType {
         biMap.put("checkbox", CHECKBOX);
         biMap.put("datetime", DATETIME);
         biMap.put("cityinput", CITYINPUT);
+        biMap.put("unknown", UNKNOWN);
     }
 
     public static DefinitionType getByValue(String v) {
