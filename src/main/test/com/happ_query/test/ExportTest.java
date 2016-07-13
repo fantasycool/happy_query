@@ -73,6 +73,6 @@ public class ExportTest {
         args.add(d4);
         args.add(d5);
         args.add(d6);
-        exporter.export(jsonParseDataParam, "/Users/frio/tmp/", "abc", args);
+        exporter.export(jsonParseDataParam, "/Users/frio/tmp/", "abc", args, new Function());
     }
 }

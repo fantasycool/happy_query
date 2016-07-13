@@ -105,15 +105,12 @@ public class Transformer {
             viewStr = getValueFromCode(d.getDataOptionList(), o);
         }else if(d.getDefinitionType() == DefinitionType.MULTISELECT || d.getDefinitionType() == DefinitionType.CHECKBOX){
             viewStr = dressOnMultiSelectData(d, o);
-        } else if (d.getDefinitionType() == DefinitionType.DATETIME) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            viewStr = simpleDateFormat.format(new Date(Long.valueOf(o.toString())));
         } else if (d.getTag()) {
             viewStr = d.getNickName();
         } else {
             viewStr = function.render(Row.Value.createValue(d, o), d.getId(), "export").toString();
         }
-        return "";
+        return viewStr;
     }
 
     /**

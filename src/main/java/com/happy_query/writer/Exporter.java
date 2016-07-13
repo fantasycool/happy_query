@@ -38,7 +38,7 @@ public class Exporter implements IExporter {
         this.function = function;
     }
 
-    public File export(JsonParseDataParam jsonParseDataParam, String tmpDir, String token, List<DataDefinition> definitions) throws IOException {
+    public File export(JsonParseDataParam jsonParseDataParam, String tmpDir, String token, List<DataDefinition> definitions, Function function) throws IOException {
         String fileName = tmpDir + File.separator + System.currentTimeMillis() + "_" + token + ".csv";
         File file = new File(fileName);
         try {
@@ -76,7 +76,7 @@ public class Exporter implements IExporter {
                         String viewStr;
                         if (v != null && v.getValue() != null) {
                             try {
-                                viewStr = Transformer.dressUp(dataDefinition, v.getValue(), new Function());
+                                viewStr = Transformer.dressUp(dataDefinition, v.getValue(), function);
                             } catch (Exception e) {
                                 LOG.error("data convert failed!", e);
                                 viewStr = "-";
