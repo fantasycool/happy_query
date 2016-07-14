@@ -83,8 +83,9 @@ public class Exporter implements IExporter {
                             }
                             entries[index] = viewStr;
                             index++;
+                        }else{
+                            entries[index] = "无";
                         }
-
                     }
                     writer.writeNext(entries);
                 }
