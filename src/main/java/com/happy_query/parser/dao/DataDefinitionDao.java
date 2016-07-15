@@ -27,7 +27,7 @@ public abstract class DataDefinitionDao {
         NullChecker.checkNull(id);
         List<Object> list = Arrays.asList((Object) id);
         try {
-            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where id=? order by gmt_create desc limit 1", list);
+            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where id=? and status=0 order by gmt_create desc limit 1", list);
             if(data == null || data.size() == 0){
                 return null;
             }
@@ -44,7 +44,7 @@ public abstract class DataDefinitionDao {
         NullChecker.checkNull(name);
         List<Object> list = Arrays.asList((Object) name);
         try {
-            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where name=? order by gmt_create desc limit 1", list);
+            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where name=? and status=0 order by gmt_create desc limit 1", list);
             if(data.size() == 0){
                 return null;
             }
@@ -62,7 +62,7 @@ public abstract class DataDefinitionDao {
         list.add(name);
         list.add(name);
         try {
-            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where nick_name=? or name=? order by gmt_create desc limit 1", list);
+            List<Map<String, Row.Value>> data = JDBCUtils.executeQuery(dataSource, "select * from data_definition where (nick_name=? or name=?) and status=0 order by gmt_create desc limit 1", list);
             if(data.size() == 0){
                 return null;
             }
@@ -79,7 +79,7 @@ public abstract class DataDefinitionDao {
         NullChecker.checkNull(subType);
         List<Object> list = Arrays.asList((Object) (subType + "%"));
         try {
-            List<Map<String, Row.Value>> datas = JDBCUtils.executeQuery(dataSource, "select * from data_definition where sub_type like ? order by gmt_create desc limit 1000", list);
+            List<Map<String, Row.Value>> datas = JDBCUtils.executeQuery(dataSource, "select * from data_definition where sub_type like ? and status=0 order by gmt_create desc limit 1000", list);
             List<DataDefinition> dds = new ArrayList<DataDefinition>();
             for (Map<String, Row.Value> d : datas) {
                 Map<String, Object> m = convertFromValueMap(d);

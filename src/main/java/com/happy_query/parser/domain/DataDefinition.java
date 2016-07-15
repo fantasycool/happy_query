@@ -341,6 +341,7 @@ public class DataDefinition {
         parameters.put("status", status);
         parameters.put("sub_type", subType);
         parameters.put("nick_name", nickName);
+        parameters.put("name",  name);
         return parameters;
     }
 
