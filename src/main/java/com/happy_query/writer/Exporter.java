@@ -77,15 +77,18 @@ public class Exporter implements IExporter {
                         if (v != null && v.getValue() != null) {
                             try {
                                 viewStr = Transformer.dressUp(dataDefinition, v.getValue(), function);
+                                if(StringUtils.isBlank(viewStr)){
+                                    viewStr = "无";
+                                }
                             } catch (Exception e) {
                                 LOG.error("data convert failed!", e);
                                 viewStr = "-";
                             }
                             entries[index] = viewStr;
-                            index++;
                         }else{
                             entries[index] = "无";
                         }
+                        index++;
                     }
                     writer.writeNext(entries);
                 }

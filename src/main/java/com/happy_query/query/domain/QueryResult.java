@@ -1,16 +1,15 @@
 package com.happy_query.query.domain;
 
+import com.alibaba.fastjson.JSON;
 import com.happy_query.cache.CacheManager;
 import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.parser.domain.JsonParseDataParam;
 import com.happy_query.query.QueryResultConstant;
+import com.happy_query.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static com.happy_query.util.NullChecker.checkNull;
@@ -63,6 +62,11 @@ public class QueryResult {
                  */
                 fillRightTableDefinitionDatas(datas, v);
             }
+            /**
+             * we do some thing ugly here,just for some datadefinitions to be computed twice,
+             * //TODO fixme
+             */
+            fillComputedDataDefinitions(datas);
             row.setLeftId(Long.valueOf(originalQueryResult.get(i).get("left_id").getValue().toString()));
             row.setData(datas);
             row.setLeftTableData(leftDatas);
@@ -71,6 +75,37 @@ public class QueryResult {
         }
         queryResult.setRows(rows);
         return queryResult;
+    }
+
+    private static void fillComputedDataDefinitions(Map<DataDefinition, Row.Value> datas) {
+        try {
+            //年龄计算
+            DataDefinition age = (DataDefinition)CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + "age");
+            DataDefinition birthDataDefinition = (DataDefinition)CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + "birth");
+            if(datas.get(birthDataDefinition) != null && datas.get(birthDataDefinition).getValue() != null){
+                Date birth = new Date(Long.valueOf(datas.get(birthDataDefinition).getValue().toString()));
+                Date now = new Date();
+                datas.put(age,  Row.Value.createValue(age, DateUtil.getDiffYears(birth, now)));
+            }
+            DataDefinition bmiDataDefinition = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + "BMI");
+            DataDefinition weight = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + "weight");
+            DataDefinition height = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + "height");
+            //weight, height
+            Row.Value weightValue = datas.get(weight);
+            Row.Value heightValue = datas.get(height);
+            if(null != weightValue
+                    && null != heightValue
+                    && weightValue.getValue() != null
+                    && heightValue.getValue() != null){
+                Double numberH = Double.valueOf(heightValue.getValue().toString());
+                Double numberW = Double.valueOf(weightValue.getValue().toString());
+                double bmi = numberW / Math.pow((numberH / 100), 2);
+                Row.Value bmRv = Row.Value.createValue(bmiDataDefinition, String.format("%.2f", bmi));
+                datas.put(bmiDataDefinition, bmRv);
+            }
+        } catch (Exception e) {
+            LOG.error("fill bmi or age failed.datas:[{}]", JSON.toJSONString(datas), e);
+        }
     }
 
     private static void fillRightTableDefinitionDatas(Map<DataDefinition, Row.Value> lr, Object v) {
