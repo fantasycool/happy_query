@@ -79,12 +79,14 @@ public class QueryResult {
 
     private static void fillComputedDataDefinitions(Map<DataDefinition, Row.Value> datas) {
         try {
+            LOG.info("start to call fill computed data definitions");
             //年龄计算
             DataDefinition age = (DataDefinition)CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + "age");
             DataDefinition birthDataDefinition = (DataDefinition)CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + "birth");
             if(datas.get(birthDataDefinition) != null && datas.get(birthDataDefinition).getValue() != null){
                 Date birth = new Date(Long.valueOf(datas.get(birthDataDefinition).getValue().toString()));
                 Date now = new Date();
+                LOG.info("age is [{}]", DateUtil.getDiffYears(birth, now));
                 datas.put(age,  Row.Value.createValue(age, DateUtil.getDiffYears(birth, now)));
             }
             DataDefinition bmiDataDefinition = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + "BMI");
