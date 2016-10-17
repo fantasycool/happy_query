@@ -85,6 +85,7 @@
             where
               ${left_operation_str}
             </#if>
+            order by ${primary_id} desc
             limit ${start_index}, ${size}
           ) y
           on

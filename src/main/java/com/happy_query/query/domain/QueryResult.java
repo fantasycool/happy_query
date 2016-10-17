@@ -138,7 +138,7 @@ public class QueryResult {
                                                         Map.Entry<String, Row.Value> me, Map<String, Row.Value> leftDatas,
                                                         Map<DataDefinition, Row.Value> leftDefinitionDatas) {
         if (!QueryResultConstant.DEFINITION_COLUMNS.contains(me.getKey().toString())) {
-            if (!me.getKey().equals(jsonParseDataParam.getLeftPrimaryId())) {
+//            if (!me.getKey().equals(jsonParseDataParam.getLeftPrimaryId())) {
                 try {
                     DataDefinition definition = (DataDefinition) CacheManager.getValue(CacheManager.DEFININATION_NAME_PREFIX + me.getKey().toString());
                     Row.Value value = Row.Value.createValue(definition, me.getValue().getValue());
@@ -153,7 +153,7 @@ public class QueryResult {
                 } catch (ExecutionException e) {
                     LOG.error("get definition failed!definition name is:[{}]", me.getKey(), e);
                 }
-            }
+//            }
             return true;
         }
         return false;
