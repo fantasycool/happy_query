@@ -1,14 +1,11 @@
 package com.happy_query.parser.domain;
 
-import com.google.common.base.Joiner;
-import com.happy_query.parser.JsonLogicParseException;
-import com.happy_query.query.domain.Row;
-import org.apache.commons.lang3.StringUtils;
+import com.happy_query.util.HappyQueryException;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Date;
 
 /**
  * Created by frio on 16/6/14.
@@ -16,20 +13,33 @@ import java.util.*;
 public class DataDefinition {
     static Logger LOG = LoggerFactory.getLogger(DataDefinition.class);
     private long id;
+    private Long parentId;
+    private Integer type;
+    private String childCommentName;
+    private Integer updateType;
+    private Integer rank;
+    private String computationRule;
+    private Integer tagType;
+    private String definitionType;
+    private String dataType;
+    private DataDefinition parent;
+    private DataDefinition childComment;
+
     /**
      * 字典名称
      */
-    private String name;
+    private String key;
+
     /**
      * 字段数据类型
      */
-    private DataDefinitionDataType dataType;
+    private DataDefinitionDataType dataTypeEnum;
 
-    private DefinitionType definitionType;
+    private DefinitionType definitionTypeEnum;
     /**
-     * 是否为标签类型
+     * 是否支持筛选
      */
-    private Boolean isTag;
+    private Boolean isQuery;
     /**
      * 字段描述
      */
@@ -51,23 +61,16 @@ public class DataDefinition {
      * 控制是否使用template
      */
     private Boolean isUseTemplate;
-
-    /**
-     * 字典类型
-     */
-    private String type;
-
     /**
      * 字段状态
      */
-
     private String unit;
+
+    private String sourceData;
 
     private int status;
 
     private String nickName;
-
-    private String subType;
 
     private Boolean isEditable;
 
@@ -79,41 +82,50 @@ public class DataDefinition {
 
     private Date gmtModified;
 
-    private List<DataOption> dataOptionList;
-
     private String isRequired;
+
+    public String getComputationRule() {
+        return computationRule;
+    }
+
+    public void setComputationRule(String computationRule) {
+        this.computationRule = computationRule;
+    }
+
+    public Integer getRank() {
+        return rank;
+    }
+
+    public void setRank(Integer rank) {
+        this.rank = rank;
+    }
 
     public String getIsRequired() {
         return isRequired;
+    }
+
+    public String getSourceData() {
+        return sourceData;
+    }
+
+    public void setSourceData(String sourceData) {
+        this.sourceData = sourceData;
     }
 
     public void setIsRequired(String isRequired) {
         this.isRequired = isRequired;
     }
 
-    public List<DataOption> getDataOptionList() {
-        return dataOptionList;
-    }
-
-    public void setDataOptionList(List<DataOption> dataOptionList) {
-
-        if(this.dataOptions==""||this.dataOptions ==null||this.dataOptions.length() ==0){
-//            LOG.warn("there is no options, datadefinition id is:[{}]", this.getId());
-        }else{
-            String[] option = this.dataOptions.split(";");
-            for(String op :option){
-                DataOption dataOption = new DataOption();
-                dataOption.setCode(op.split(":")[0]);
-                dataOption.setValue(op.split(":")[1]);
-                dataOptionList.add(dataOption);
-            }
-
-        }
-        this.dataOptionList = dataOptionList;
-    }
-
     public String getUnit() {
         return unit;
+    }
+
+    public Integer getUpdateType() {
+        return updateType;
+    }
+
+    public void setUpdateType(Integer updateType) {
+        this.updateType = updateType;
     }
 
     public void setUnit(String unit) {
@@ -144,14 +156,6 @@ public class DataDefinition {
         this.id = id;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public Boolean getUseTemplate() {
         return isUseTemplate;
     }
@@ -160,28 +164,28 @@ public class DataDefinition {
         isUseTemplate = useTemplate;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public DataDefinitionDataType getDataType() {
-        return dataType;
+    public DataDefinitionDataType getDataTypeEnum() {
+        return dataTypeEnum;
     }
 
-    public void setDataType(DataDefinitionDataType dataType) {
-        this.dataType = dataType;
+    public void setDataTypeEnum(DataDefinitionDataType dataTypeEnum) {
+        this.dataTypeEnum = dataTypeEnum;
     }
 
-    public Boolean getTag() {
-        return isTag;
+    public Long getParentId() {
+        return parentId;
     }
 
-    public void setTag(Boolean tag) {
-        isTag = tag;
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     public String getDescription() {
@@ -232,12 +236,12 @@ public class DataDefinition {
         this.gmtModified = gmtModified;
     }
 
-    public DefinitionType getDefinitionType() {
-        return definitionType;
+    public DefinitionType getDefinitionTypeEnum() {
+        return definitionTypeEnum;
     }
 
-    public void setDefinitionType(DefinitionType definitionType) {
-        this.definitionType = definitionType;
+    public void setDefinitionTypeEnum(DefinitionType definitionTypeEnum) {
+        this.definitionTypeEnum = definitionTypeEnum;
     }
 
     public int hashCode() {
@@ -260,6 +264,14 @@ public class DataDefinition {
         this.nickName = nickName;
     }
 
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
+    }
+
     public boolean equals(Object obj) {
         if (obj instanceof DataDefinition) {
             return ((DataDefinition) obj).getId() == this.getId();
@@ -267,169 +279,144 @@ public class DataDefinition {
         return false;
     }
 
-    public static DataDefinition createFromMapData(Map<String, Object> data) {
-        removeNullValueKey(data);
-        DataDefinition dataDefinition = new DataDefinition();
-        dataDefinition.setDataOptions(analysisDataOptions(data.get("data_options")));
-        dataDefinition.setDataType(analysisDataDefinitionDataType(data.getOrDefault("data_type", "").toString()));
-        dataDefinition.setDescription(data.getOrDefault("description", "").toString());
-        dataDefinition.setDefinitionType(DefinitionType.getByValue(data.getOrDefault("definition_type", "").toString()));
-        dataDefinition.setTag(data.getOrDefault("is_tag", "0").toString().equals("1") ? true : false);
-        dataDefinition.setRule(data.getOrDefault("rule", "").toString());
-        dataDefinition.setTemplate(data.getOrDefault("template", "").toString());
-        dataDefinition.setUseTemplate(data.getOrDefault("is_use_template", "0").toString().equals("1") ? true : false);
-        dataDefinition.setType(data.getOrDefault("type", "0").toString());
-        dataDefinition.setGmtCreate((Date) data.get("gmt_create"));
-        dataDefinition.setGmtModified((Date) data.get("gmt_modified"));
-        dataDefinition.setId((Long) data.get("id"));
-        dataDefinition.setStatus(0);
-        dataDefinition.setSubType(data.getOrDefault("sub_type", "").toString());
-        dataDefinition.setEditable(data.getOrDefault("is_editable", "0").toString().equals("1") ? true : false);
-        dataDefinition.setLeftData(data.getOrDefault("is_left_data", "0").toString().equals("1") ? true : false);
-        dataDefinition.setUnit(data.getOrDefault("unit","").toString());
-        dataDefinition.setLefColName(data.getOrDefault("left_col_name", "").toString());
-        dataDefinition.setNickName(data.getOrDefault("nick_name", "").toString());
-        dataDefinition.setName(data.getOrDefault("name", "").toString());
-        dataDefinition.setIsRequired(data.getOrDefault("is_required","").toString());
-        dataDefinition.setDataOptionList(new ArrayList<DataOption>());
-        return dataDefinition;
-    }
-
-    private static void removeNullValueKey(Map<String, Object> data) {
-        HashSet<String> hashSet = new HashSet<String>();
-        hashSet.addAll(data.keySet());
-        for(String key : hashSet){
-            if(data.get(key) == null){
-                data.remove(key);
-            }
-        }
-    }
-
-
-    public static DataDefinition createDataDefinitionById(Long id) {
-        DataDefinition d = new DataDefinition();
-        d.setId(id);
-        return d;
-    }
-
-    /**
-     * don't use reflect for performance
-     *
-     * @return map arguments
-     */
-    public Map<String, Object> inverseDataDefinition() {
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        if (dataOptions != null)
-            parameters.put("data_options", dataOptions);
-        parameters.put("data_type", dataType.toString());
-        parameters.put("description", description);
-        parameters.put("definition_type", definitionType.toString());
-        if (isTag != null)
-            parameters.put("is_tag", isTag ? 1 : 0);
-        parameters.put("rule", rule);
-        if (isUseTemplate != null)
-            parameters.put("is_use_template", isUseTemplate ? 1 : 0);
-        if (isEditable != null)
-            parameters.put("is_editable", isUseTemplate ? 1 : 0);
-        if (isLeftData != null)
-            parameters.put("is_left_data", isLeftData ? 1 : 0);
-        parameters.put("left_col_name", lefColName);
-        parameters.put("type", type);
-        if(id != 0){
-            parameters.put("id", id);
-        }
-        parameters.put("status", status);
-        parameters.put("sub_type", subType);
-        parameters.put("nick_name", nickName);
-        parameters.put("name",  name);
-        return parameters;
-    }
-
-    private static String analysisDataOptions(Object data_options) {
-        if (data_options != null) {
-            return data_options.toString();
-        }
-        return null;
-    }
-
-    private static String inverseDataOptions(List<String> options) {
-        return Joiner.on(",").join(options);
-    }
-
-    public static DataDefinitionDataType analysisDataDefinitionDataType(String ddt) {
-        return DataDefinitionDataType.getByValue(ddt);
-    }
 
     public int getStatus() {
         return status;
+    }
+
+    public void initEnum(){
+        this.definitionTypeEnum = DefinitionType.getByValue(definitionType);
+        this.dataTypeEnum = DataDefinitionDataType.getByValue(dataType);
     }
 
     public void setStatus(int status) {
         this.status = status;
     }
 
-    public String getSubType() {
-        return subType;
+//    /**
+//     * format string value to Row.Value
+//     *
+//     * @return
+//     */
+//    public Row.Value formatStringValue(String value) {
+//        Row.Value rv = Row.Value.createValue(null, value);
+//        if (StringUtils.isBlank(value)) {
+//            rv.setDataDefinition(this);
+//            return rv;
+//        }
+//        try {
+//            switch (dataTypeEnum) {
+//                case BOOLEAN:
+//                    if (value.equals("是") || value.equals("1")) {
+//                        rv.setValue(Integer.valueOf("1"));
+//                    } else {
+//                        rv.setValue(Integer.valueOf("0"));
+//                    }
+//                    break;
+//                case INT:
+//                    rv.setValue(Long.valueOf(value));
+//                    break;
+//                case STRING:
+//                    rv.setValue(value);
+//                    break;
+//                case DATETIME:
+//                    rv.setValue(Long.valueOf(value));
+//                    break;
+//                case FLOAT:
+//                    rv.setValue(Float.valueOf(value));
+//                    break;
+//                case DOUBLE:
+//                    rv.setValue(Double.valueOf(value));
+//                    break;
+//                case TEXT:
+//                    rv.setValue(String.valueOf(value));
+//                    break;
+//                default:
+//                    break;
+//            }
+//        } catch (NumberFormatException e) {
+//            LOG.error("when we do number format operation,we have met an error,the type is [{}], value is [{}]",
+//                    this.definitionTypeEnum.toString(), value, e);
+//            rv.setValue("-1");
+//        }
+//        if (rv.getValue() != null) {
+//            rv.setDataDefinition(this);
+//            return rv;
+//        }
+//        throw new JsonLogicParseException("data definition is not valid!");
+//    }
+
+    public String getDataType() {
+        return dataType;
     }
 
-    public void setSubType(String subType) {
-        this.subType = subType;
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
-    /**
-     * format string value to Row.Value
-     *
-     * @return
-     */
-    public Row.Value formatStringValue(String value) {
-        Row.Value rv = Row.Value.createValue(null, value);
-        if(StringUtils.isBlank(value)){
-            rv.setDataDefinition(this);
-            return rv;
-        }
-        try {
-            switch (dataType) {
-                case BOOLEAN:
-                    if (value.equals("是") || value.equals("1")) {
-                        rv.setValue(Integer.valueOf("1"));
-                    } else {
-                        rv.setValue(Integer.valueOf("0"));
-                    }
-                    break;
-                case INT:
-                    rv.setValue(Long.valueOf(value));
-                    break;
-                case STRING:
-                    rv.setValue(value);
-                    break;
-                case DATETIME:
-                    rv.setValue(Long.valueOf(value));
-                    break;
-                case FLOAT:
-                    rv.setValue(Float.valueOf(value));
-                    break;
-                case DOUBLE:
-                    rv.setValue(Double.valueOf(value));
-                    break;
-                case TEXT:
-                    rv.setValue(String.valueOf(value));
-                    break;
-                default:
-                    break;
-            }
-        }catch(NumberFormatException e){
-            LOG.error("when we do number format operation,we have met an error,the type is [{}], value is [{}]",
-                    this.definitionType.toString(), value, e);
-            rv.setValue("-1");
-        }
-        if (rv.getValue() != null) {
-            rv.setDataDefinition(this);
-            return rv;
-        }
-        throw new JsonLogicParseException("data definition is not valid!");
+    public Integer getTagType() {
+        return tagType;
     }
 
-    public String toString(){
+    public void setTagType(Integer tagType) {
+        this.tagType = tagType;
+    }
+
+    public String getDefinitionType() {
+        return definitionType;
+    }
+
+    public void setDefinitionType(String definitionType) {
+        this.definitionType = definitionType;
+    }
+
+    public DataDefinition getParent() {
+        return parent;
+    }
+
+    public void setParent(DataDefinition parent) {
+        this.parent = parent;
+    }
+
+    public String getChildCommentName() {
+        return childCommentName;
+    }
+
+    public void setChildCommentName(String childCommentName) {
+        this.childCommentName = childCommentName;
+    }
+
+    public DataDefinition getChildComment() {
+        return childComment;
+    }
+
+    public void setChildComment(DataDefinition childComment) {
+        this.childComment = childComment;
+    }
+
+    public Boolean getQuery() {
+        return isQuery;
+    }
+
+    public void setQuery(Boolean query) {
+        isQuery = query;
+    }
+
+    public String getValueColumnName(){
+        if(dataTypeEnum == DataDefinitionDataType.DOUBLE || dataTypeEnum == DataDefinitionDataType.FLOAT){
+            return "double_value";
+        }else if(dataTypeEnum == DataDefinitionDataType.TEXT){
+            return "feature";
+        }else if(dataTypeEnum == DataDefinitionDataType.BOOLEAN || dataTypeEnum == DataDefinitionDataType.INT || dataTypeEnum == DataDefinitionDataType.DATETIME){
+            return "int_value";
+        }else if(dataTypeEnum == DataDefinitionDataType.STRING){
+            return "str_value";
+        }else{
+            throw new HappyQueryException("DataDefinitionValue ");
+        }
+    }
+
+    public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
 

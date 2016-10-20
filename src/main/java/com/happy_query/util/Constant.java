@@ -7,6 +7,14 @@ import java.util.Map;
  * Created by frio on 16/6/20.
  */
 public class Constant {
+    public static final String OPERATOR = "operator";
+    public static final String AND = "and";
+    public static final String OR = "or";
+    public static final String RANGE = "range";
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS = "equals";
+    public static final String VALUE = "value";
+    public static final String MULTISELECT = "multiselect";
     /**
      * table data_definition_value category->sub_key values
      */
@@ -52,4 +60,10 @@ public class Constant {
         LEFT_ID_COLUMNS.put("service", "contact_id");
         LEFT_ID_COLUMNS.put("mock", "id");
     }
+
+    //new added
+
+    public static String PRM_USER_INFO = "prm_user_info";
+    public static String DATA_DEFINITION_VALUE = "data_definition_value";
+    public static String COMMENT_PREFIX = "_comment";
 }

@@ -1,6 +1,6 @@
 package com.happy_query.util;
 
-import com.happy_query.cache.CacheManager;
+import com.happy_query.cache.DataDefinitionCacheManager;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
@@ -27,7 +27,7 @@ public class TemplateUtil {
     public static String getViewValueByTemplateStr(String templateStr,
                                                    Map<String, Object> contextParameters) {
         try {
-            Template t = (Template) CacheManager.getValue(TEMPLATE_PREFIX + templateStr);
+            Template t = (Template) DataDefinitionCacheManager.getValue(TEMPLATE_PREFIX + templateStr);
             StringWriter out = new StringWriter();
             t.process(contextParameters, out);
             return out.toString();

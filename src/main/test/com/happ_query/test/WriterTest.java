@@ -41,37 +41,37 @@ public class WriterTest {
 
     }
 
-    @Test
-    public void testImportDataByCSV() throws IOException {
-        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/import_test.csv"));
-        ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
-        writer.importDataByCSV(importParam);
-    }
-
-    @Test
-    public void testImportDataWithId() throws IOException {
-        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/import_test1.csv"));
-        ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
-        writer.importDataByCSV(importParam);
-    }
-
-    @Test
-    public void testInsertDataWithLeftTable() throws IOException {
-        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/import_test_left.csv"));
-        ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
-        writer.importDataByCSV(importParam);
-    }
+//    @Test
+//    public void testImportDataByCSV() throws IOException {
+//        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/import_test.csv"));
+//        ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
+//        writer.importDataByCSV(importParam);
+//    }
+//
+//    @Test
+//    public void testImportDataWithId() throws IOException {
+//        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/import_test1.csv"));
+//        ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
+//        writer.importDataByCSV(importParam);
+//    }
+//
+//    @Test
+//    public void testInsertDataWithLeftTable() throws IOException {
+//        Reader reader = new InputStreamReader(this.getClass().getResourceAsStream("/import_test_left.csv"));
+//        ImportParam importParam = new ImportParam("left_table", "id", "data_definition_value", reader, 0);
+//        writer.importDataByCSV(importParam);
+//    }
 
     @Test
     public void testDeleteRecord() throws IOException {
 //        writer.deleteRecord(613582, "user", "id");
     }
 
-    @Test
-    public void testUpdateRecord(){
-        Map<Long, Object> updateMap = new HashMap<Long, Object>();
-        updateMap.put(3l, "文本1");
-        updateMap.put(6l, "adfafsfasfadsasf");
-        writer.updateRecord(613581, "mock", updateMap);
-    }
+//    @Test
+//    public void testUpdateRecord(){
+//        Map<Long, Object> updateMap = new HashMap<Long, Object>();
+//        updateMap.put(3l, "文本1");
+//        updateMap.put(6l, "adfafsfasfadsasf");
+//        writer.updateRecord(613581, "mock", updateMap);
+//    }
 }

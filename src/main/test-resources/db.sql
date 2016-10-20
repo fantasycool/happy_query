@@ -1,6 +1,6 @@
 CREATE TABLE `data_definition` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL,
+  `key` varchar(45) NOT NULL,
   `definition_type` varchar(45) NOT NULL COMMENT 'select,input,checkbox, multiselect',
   `data_type` varchar(45) NOT NULL COMMENT 'int,string,boolean,datetime',
   `is_tag` tinyint(4) NOT NULL,

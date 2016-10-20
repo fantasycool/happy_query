@@ -1,7 +1,5 @@
 package com.happy_query.util;
 
-import com.happy_query.query.domain.Row;
-import com.sun.corba.se.spi.orbutil.fsm.Guard;
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +19,45 @@ import java.util.*;
 public abstract class JDBCUtils {
     static Logger LOG = LoggerFactory.getLogger(JDBCUtils.class);
 
+//    /**
+//     * execute query, return list result
+//     *
+//     * @param dataSource
+//     * @param sql
+//     * @param parameters query parameters to be set
+//     * @return
+//     */
+//    public static List<Map<String, Row.Value>> executeQuery(DataSource dataSource, String sql, List<Object> parameters) throws SQLException {
+//        Connection connection = null;
+//        List<Map<String, Row.Value>> rows = new ArrayList<Map<String, Row.Value>>();
+//        PreparedStatement stmt = null;
+//        ResultSet rs = null;
+//        try {
+//            connection = dataSource.getConnection();
+//            stmt = connection.prepareStatement(sql);
+//            setParameters(stmt, parameters);
+//            if (null != parameters) {
+//                rs = stmt.executeQuery();
+//            }
+//            ResultSetMetaData rsMeta = rs.getMetaData();
+//            while (rs.next()) {
+//                Map<String, Row.Value> row = new LinkedHashMap<String, Row.Value>();
+//                for (int i = 0, size = rsMeta.getColumnCount(); i < size; ++i) {
+//                    String columnName = rsMeta.getColumnLabel(i + 1);
+//                    Object value = rs.getObject(i + 1);
+//                    Row.Value v = Row.Value.createValue(null, value);
+//                    row.put(columnName, v);
+//                }
+//                rows.add(row);
+//            }
+//        } finally {
+//            close(rs);
+//            close(stmt);
+//            close(connection);
+//        }
+//        return rows;
+//    }
+
     /**
      * execute query, return list result
      *
@@ -29,9 +66,9 @@ public abstract class JDBCUtils {
      * @param parameters query parameters to be set
      * @return
      */
-    public static List<Map<String, Row.Value>> executeQuery(DataSource dataSource, String sql, List<Object> parameters) throws SQLException {
+    public static List<Map<String, Object>> executeQuery(DataSource dataSource, String sql, List<Object> parameters) throws SQLException {
         Connection connection = null;
-        List<Map<String, Row.Value>> rows = new ArrayList<Map<String, Row.Value>>();
+        List<Map<String, Object>> rows = new ArrayList<>();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -43,12 +80,11 @@ public abstract class JDBCUtils {
             }
             ResultSetMetaData rsMeta = rs.getMetaData();
             while (rs.next()) {
-                Map<String, Row.Value> row = new LinkedHashMap<String, Row.Value>();
+                Map<String, Object> row = new LinkedHashMap<>();
                 for (int i = 0, size = rsMeta.getColumnCount(); i < size; ++i) {
                     String columnName = rsMeta.getColumnLabel(i + 1);
                     Object value = rs.getObject(i + 1);
-                    Row.Value v = Row.Value.createValue(null, value);
-                    row.put(columnName, v);
+                    row.put(columnName, value);
                 }
                 rows.add(row);
             }
@@ -61,8 +97,8 @@ public abstract class JDBCUtils {
     }
 
 
-    public static List<Map<String, Row.Value>> executeQuery(Connection connection, String sql, List<Object> parameters) throws SQLException {
-        List<Map<String, Row.Value>> rows = new ArrayList<Map<String, Row.Value>>();
+    public static List<Map<String, Object>> executeQuery(Connection connection, String sql, List<Object> parameters) throws SQLException {
+        List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
@@ -73,12 +109,11 @@ public abstract class JDBCUtils {
             }
             ResultSetMetaData rsMeta = rs.getMetaData();
             while (rs.next()) {
-                Map<String, Row.Value> row = new LinkedHashMap<String, Row.Value>();
+                Map<String, Object> row = new LinkedHashMap<String, Object>();
                 for (int i = 0, size = rsMeta.getColumnCount(); i < size; ++i) {
                     String columnName = rsMeta.getColumnLabel(i + 1);
                     Object value = rs.getObject(i + 1);
-                    Row.Value v = Row.Value.createValue(null, value);
-                    row.put(columnName, v);
+                    row.put(columnName, value);
                 }
                 rows.add(row);
             }
@@ -88,6 +123,7 @@ public abstract class JDBCUtils {
         }
         return rows;
     }
+
 
     /**
      * execute update return take effect number

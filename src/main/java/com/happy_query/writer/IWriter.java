@@ -1,8 +1,6 @@
 package com.happy_query.writer;
 
-import com.happy_query.writer.domain.ImportParam;
-import com.happy_query.writer.domain.InsertResult;
-import com.happy_query.writer.domain.Record;
+import com.happy_query.util.HappyQueryException;
 
 import java.util.Map;
 
@@ -10,40 +8,25 @@ import java.util.Map;
  * Created by frio on 16/6/16.
  */
 public interface IWriter {
-    /**
-     * import data to happy_query from csv file
-     *
-     * @param importParam
-     */
-    void importDataByCSV(ImportParam importParam);
 
     /**
-     * write data to happy_query
-     *
-     * @param insertResult
+     * 指标数据新增
+     * 指标key-> 指标值
+     * @param keyDatas
+     * @param userKey
+     * @param source 用户来源(zsty|other)
+     * @param empName 操作人
      */
-    Long writeRecord(InsertResult insertResult);
+    long insertRecord(Map<String, Object> keyDatas, String source, String userKey, String empName)throws HappyQueryException;
 
     /**
-     * update data
-     *
-     * @param insertResult
+     * 指标数据更新
+     * @param keyDatas
+     * @param prmId
+     * @param empName
+     * @throws HappyWriterException
      */
-    void updateRecord(InsertResult insertResult);
+    void updateRecord(Map<String, Object> keyDatas, long prmId, String empName)throws HappyQueryException;
 
-    /**
-     * update data
-     * @param leftId
-     * @param category
-     */
-    void updateRecord(long leftId, String category, Map<Long, Object> update);
 
-    /**
-     * delete record by leftId
-     *
-     * @param leftId
-     * @param category
-     * @param leftIdColumnName
-     */
-    void deleteRecord(long leftId, String category);
 }

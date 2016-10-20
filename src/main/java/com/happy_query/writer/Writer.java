@@ -1,23 +1,19 @@
 package com.happy_query.writer;
 
 import com.alibaba.fastjson.JSON;
-import com.happy_query.parser.domain.DataDefinition;
-import com.happy_query.parser.domain.DataDefinitionDataType;
-import com.happy_query.query.domain.Row;
 import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;
-import com.happy_query.util.OpenCSVUtil;
-import com.happy_query.writer.domain.ImportParam;
-import com.happy_query.writer.domain.InsertResult;
-import com.happy_query.writer.domain.Record;
-import com.sun.tools.classfile.ConstantPool;
+import com.happy_query.util.ReflectionUtil;
+import com.happy_query.writer.domain.DataDefinitionValue;
+import com.happy_query.writer.domain.DbArg;
+import com.happy_query.writer.domain.PrmUserInfo;
+import com.mysql.jdbc.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,169 +28,104 @@ public class Writer implements IWriter {
     private static Logger LOG = LoggerFactory.getLogger(Writer.class);
     private DataSource dataSource;
 
-    public void importDataByCSV(ImportParam importParam) {
-        InsertResult insertResult
-                = OpenCSVUtil.readAllDefaultTemplate(importParam.getReader(), dataSource);
+    @Override
+    public long insertRecord(Map<String, Object> keyDatas, String source, String userKey, String empName) {
+        if(StringUtils.isNullOrEmpty(source) || StringUtils.isNullOrEmpty(userKey) || keyDatas == null){
+            throw new IllegalArgumentException("illegal argument");
+        }
+        DbArg dbArg = DbArg.createFromArgs(keyDatas, source, userKey);
+        PrmUserInfo prmUserInfo = dbArg.prmUserInfo;
+        Map<String, Object> prmUserInfoMap = ReflectionUtil.cloneBeanToMap(prmUserInfo);
+        long prmId = 0;
         try {
-            updateRows(insertResult);
+            prmId = JDBCUtils.insertToTable(dataSource, Constant.PRM_USER_INFO, prmUserInfoMap);
+            updateDataDefinitionValues(dbArg.dataDefinitionValues, prmId, empName, null);
         } catch (SQLException e) {
-            throw new HappyWriterException("import failed!", e);
+            throw new HappyQueryException("data written to user info failed", e);
+        }
+        return prmId;
+    }
+
+    @Override
+    public void updateRecord(Map<String, Object> keyDatas, long prmId, String empName) throws HappyQueryException {
+        if(StringUtils.isNullOrEmpty(empName) || keyDatas == null){
+            throw new IllegalArgumentException("illegal argument");
+        }
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
+            PrmUserInfo prmUserInfo = PrmUserInfo.getPrmUserInfo(dataSource, prmId);
+            if (null == prmUserInfo) {
+                throw new HappyQueryException("prmId:" + prmId + ", prmUserInfo not exists");
+            }
+            DbArg dbArg = DbArg.createFromArgs(keyDatas, prmUserInfo, connection);
+            updateDataDefinitionValues(dbArg.dataDefinitionValues, prmUserInfo.getId(), empName, null);
+        }catch(HappyQueryException e){
+            throw e;
+        }catch(Exception e){
+            LOG.error("keyDatas:{}, prmId:{}, empName:{}", JSON.toJSONString(keyDatas), prmId, empName, e);
+            try {
+                connection.rollback();
+            } catch (SQLException e1) {
+                LOG.error("rollback error", e);
+            }
+            throw new HappyQueryException(String.format("keyDatas:%s, prmId:%d, empName:%s", JSON.toJSONString(keyDatas), prmId, empName));
+        }finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                LOG.error("close error", e);
+            }
         }
     }
 
     /**
-     * new add record ids
-     *
-     * @param insertResult
-     * @return
+     * 更新纵向表的指标的数据
+     * @param dataDefinitionValues
+     * @param prmId
      * @throws SQLException
      */
-    private List<Object> updateRows(InsertResult insertResult) throws SQLException {
-        // use category type to decide which table to insert datas
-        String rightTable = Constant.RIGHT_TABLE_MAP.get(insertResult.getCategoryType());
-        String leftTable = Constant.LEFT_TABLE_MAP.get(insertResult.getCategoryType());
-        int subKey = Constant.SUB_KEY_MAP.get(insertResult.getCategoryType());
-        String leftIdColumn = Constant.LEFT_ID_COLUMNS.get(insertResult.getCategoryType());
-        //transaction use
-        Connection connection = null;
-        /**
-         * do dao update operation
-         * 1: update left table;
-         * 2: update right table;
-         */
-        List<Row> rows = insertResult.getRows();
-        List<Object> addIds = new ArrayList<Object>();
-        for (Row r : rows) {
+    private void updateDataDefinitionValues(List<DataDefinitionValue> dataDefinitionValues, long prmId, String empName, Connection connection) throws SQLException {
+        Map<String, List<List<Object>>> cachPrSqls = new HashMap<String, List<List<Object>>>();
+        for(DataDefinitionValue dataDefinitionValue : dataDefinitionValues){
+            String valueColumn = dataDefinitionValue.getValueColumn();
+            Object value = dataDefinitionValue.getNotNullValue();
+            StringBuilder execSql = new StringBuilder();
+            execSql.append("insert into ").append(Constant.DATA_DEFINITION_VALUE).append("(prm_id,dd_ref_id").append(valueColumn).append(")")
+                    .append("values").append("(?,?,?,?) on duplicate key update ").append(valueColumn).append("=?, emp_name=?, status=0");
+            List<Object> parameters = new ArrayList<Object>();
+            parameters.add(prmId);
+            parameters.add(dataDefinitionValue.getDdRefId());
+            parameters.add(value);
+            parameters.add(value);
+            parameters.add(empName);
+            if (cachPrSqls.get(execSql.toString()) != null) {
+                cachPrSqls.get(execSql.toString()).add(parameters);
+            } else {
+                List<List<Object>> list = new ArrayList<List<Object>>();
+                list.add(parameters);
+                cachPrSqls.put(execSql.toString(), list);
+            }
+        }
+        if(connection == null){
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
             try {
-                /**
-                 * update left datas information
-                 */
-                Map<String, Object> leftDatas = getLeftInsertDatas(leftIdColumn, r);
-                if (leftDatas.size() > 0) {
-                    try {
-                        if (r.getLeftId() != null) {
-                            JDBCUtils.executeUpdateById(connection, leftTable, leftDatas, leftIdColumn, r.getLeftId());
-                        }
-                    } catch (SQLException e) {
-                        LOG.error("execute left datas update failed, leftDatas:[{}], leftTable:[{}], leftId:[{}]", leftDatas, leftTable, r.getLeftId(), e);
-                        throw new HappyWriterException("execute left table update failed", e);
-                    }
+                for (String sql : cachPrSqls.keySet()) {
+                    JDBCUtils.batchExecuteUpdate(connection, sql, cachPrSqls.get(sql));
                 }
-                if (r.getLeftId() == null) {
-                    Long leftPrimaryId = JDBCUtils.insertToTable(connection, leftTable, leftDatas);
-                    r.setLeftId(leftPrimaryId);
-                }
-                /**
-                 * update right datas information
-                 */
-                Map<DataDefinition, Row.Value> m = r.getData();
-                Map<String, List<List<Object>>> cachPr = new HashMap<String, List<List<Object>>>();
-                for (DataDefinition d : m.keySet()) {
-                    Row.Value v = m.get(d);
-                    if (v == null || v.getValue() == null) {
-                        continue;
-                    }
-                    String valueColumn = DataDefinitionDataType.getColumnNameByDataDefinitionDataType(d.getDataType());
-                    StringBuilder sqlSB = new StringBuilder();
-                    sqlSB.append("insert into ").append(rightTable).append("(left_id,dd_ref_id,sub_key,").append(valueColumn).append(")")
-                            .append("values").append("(?,?,?,?) on duplicate key update ").append(valueColumn).append("=?");
-                    List<Object> parameters = new ArrayList<Object>();
-                    if (r.getLeftId() == null) {
-                        System.out.println();
-                    }
-                    parameters.add(r.getLeftId());
-                    parameters.add(d.getId());
-                    parameters.add(subKey);
-                    parameters.add(v.getValue());
-                    parameters.add(v.getValue());
-
-                    if (cachPr.get(sqlSB.toString()) != null) {
-                        cachPr.get(sqlSB.toString()).add(parameters);
-                    } else {
-                        List<List<Object>> list = new ArrayList<List<Object>>();
-                        list.add(parameters);
-                        cachPr.put(sqlSB.toString(), list);
-                    }
-                }
-                //batch insert
-                for (String sql : cachPr.keySet()) {
-                    List<Object> idSets = JDBCUtils.batchExecuteUpdate(connection, sql, cachPr.get(sql));
-                    addIds.addAll(idSets);
-                }
-            } catch (Exception e) {
-                connection.rollback();
-                throw new HappyWriterException("met a exception when doing roll insert", e);
-            } finally {
                 connection.commit();
-                JDBCUtils.close(connection);
+            }catch(Exception e){
+                connection.rollback();
+                throw new HappyQueryException("update data in data_definition_value failed", e);
+            }finally {
+                connection.close();
             }
-        }
-        return addIds;
-    }
-
-    private Map<String, Object> getLeftInsertDatas(String leftIdColumn, Row r) {
-        Map<String, Object> result = new HashMap<String, Object>();
-        for (Map.Entry<String, Row.Value> e : r.getLeftTableData().entrySet()) {
-            result.put(e.getKey(), e.getValue().getValue());
-        }
-        return result;
-    }
-
-    public Long writeRecord(InsertResult insertResult) {
-        try {
-            return (Long) updateRows(insertResult).get(0);
-        } catch (SQLException e) {
-            throw new HappyWriterException("write record failed", e);
-        }
-    }
-
-    public void updateRecord(InsertResult insertResult) {
-        try {
-            updateRows(insertResult);
-        } catch (SQLException e) {
-            throw new HappyWriterException("update record failed!");
-        }
-    }
-
-    public void updateRecord(long leftId, String category, Map<Long, Object> values) {
-        InsertResult insertResult = new InsertResult();
-        insertResult.setCategoryType(category);
-        List<Row> rows = new ArrayList<Row>();
-        Row r = Row.createFromFlatData(values, leftId);
-        rows.add(r);
-        insertResult.setRows(rows);
-        try {
-            updateRows(insertResult);
-        } catch (SQLException e) {
-            LOG.error("updateRows failed,leftId:[{}],category:[{}], values[{}]", leftId, category, JSON.toJSONString(values), e);
-            throw new HappyWriterException("update record failed!", e);
-        }
-    }
-
-    public void deleteRecord(long leftId, String category) {
-        String rightTable = Constant.RIGHT_TABLE_MAP.get(category);
-        String leftTable = Constant.LEFT_TABLE_MAP.get(category);
-        String leftIdColumnName = Constant.LEFT_ID_COLUMNS.get(category);
-
-        StringBuilder sb = new StringBuilder();
-        Connection connection = null;
-        try {
-            connection = dataSource.getConnection();
-            connection.setAutoCommit(false);
-            sb.append("delete from ").append(leftTable).append(" where ").append(leftIdColumnName).append("=?");
-            List<Object> parameters = new ArrayList<Object>();
-            parameters.add(leftId);
-            JDBCUtils.execute(connection, sb.toString(), parameters);
-            sb.setLength(0);
-            sb.append("delete from ").append(rightTable).append(" where left_id=?");
-            JDBCUtils.execute(connection, sb.toString(), parameters);
-            connection.commit();
-        } catch (Exception e) {
-            JDBCUtils.rollback(connection);
-        } finally {
-            JDBCUtils.close(connection);
+        }else{
+            for (String sql : cachPrSqls.keySet()) {
+                JDBCUtils.batchExecuteUpdate(connection, sql, cachPrSqls.get(sql));
+            }
         }
     }
 
