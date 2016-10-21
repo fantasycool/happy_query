@@ -132,4 +132,28 @@ public class JsonParserTest extends BaseTest {
         Pair<String, List<String>> p = jsonSqlParser.convertJsonToQuerySql(json);
         System.out.println(JSON.toJSONString(p.getValue1()));
     }
+
+    @Test
+    public void testConvertingLispExpression() throws Exception {
+        String json = "[\n" +
+                "  \"and\",\n" +
+                "  {\n" +
+                "    \"attr\": \"dd5\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"10\", \"\"]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"attr\": \"dd1\",\n" +
+                "    \"operator\":\"contains\",\n" +
+                "    \"value\": [\"dd2\",\"dd3\",\"dd4\"]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"attr\": \"dd2\",\n" +
+                "    \"operator\":\"equals\",\n" +
+                "    \"value\": \"abc\"\n" +
+                "  }\n" +
+                "]\n";
+        String listExpression = jsonSqlParser.convertJsonToLispExpression(json);
+        System.out.println("lispExpression:" + listExpression);
+    }
 }

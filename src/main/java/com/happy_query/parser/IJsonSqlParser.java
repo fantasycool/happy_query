@@ -22,4 +22,11 @@ public interface IJsonSqlParser {
      *  )
      */
     Pair<String, List<String>> convertJsonToQuerySql(String json);
+
+    /**
+     * 将筛选json转化为lisp条件
+     * @param json
+     * @return
+     */
+    String convertJsonToLispExpression(String json);
 }

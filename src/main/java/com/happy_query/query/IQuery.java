@@ -1,5 +1,7 @@
 package com.happy_query.query;
 
+import org.javatuples.Pair;
+
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +28,7 @@ public interface IQuery {
      * @param size
      * @return
      */
-    List<Map<String, Object>> queryPrmUserInfosByJson(String jsonQuery, int start, int size);
+    Pair<Integer, List<Map<String, Object>>> queryPrmUserInfosByJson(String jsonQuery, int start, int size);
 
     /**
      * Query Prm User Infos by list query
@@ -35,5 +37,5 @@ public interface IQuery {
      * @param size
      * @¬
      */
-    List<Map<String, Object>> queryPrmUserInfosByLisp(String queryByLisp, int start, int size);
+    Pair<Integer, List<Map<String, Object>>> queryPrmUserInfosByLisp(String queryByLisp, int start, int size);
 }

@@ -1,6 +1,10 @@
 <#if only_left ??>
   SELECT
-    a.*
+    <#if is_query ??>
+      a.*
+    <#else>
+      count(a.id) as countNum
+    </#if>
   FROM
     ${left_table} a
   <#if left_operation_str ??>
@@ -10,7 +14,11 @@
   limit ${start_index}, ${size}
 <#elseif only_right ??>
   SELECT
-    a.*
+    <#if is_query ??>
+      a.*
+    <#else>
+      count(a.id) as countNum
+    </#if>
   FROM
     ${left_table}
   right join
@@ -28,7 +36,11 @@
     a.id = b.prm_id
 <#else>
   SELECT
-    a.*
+    <#if is_query ??>
+      a.*
+    <#else>
+      count(a.id) as countNum
+    </#if>
   from
   (
     SELECT

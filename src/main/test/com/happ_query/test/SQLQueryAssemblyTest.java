@@ -32,6 +32,6 @@ public class SQLQueryAssemblyTest extends BaseTest {
                 "  }\n" +
                 "]\n";
         Pair<String, List<String>> p = jsonSqlParser.convertJsonToQuerySql(json);
-        System.out.println(SQLQueryAssembly.assemblyQuerySql(p, 0, 10));
+        System.out.println(SQLQueryAssembly.assemblyQuerySql(p, 0, 10, false));
     }
 }
