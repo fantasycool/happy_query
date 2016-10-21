@@ -167,8 +167,13 @@ public class JsonSqlParser implements IJsonSqlParser {
                     }
                 } else if (jsonObject.getString(Constant.OPERATOR).equals(Constant.EQUALS)) {
                     String value = jsonObject.getString(Constant.VALUE);
-                    String expression = String.format("(== %s %s)", keyName, value);
-                    result.append(BLANK).append(expression);
+                    if(dataDefinition.getDataTypeEnum() == DataDefinitionDataType.STRING){
+                        String expression = String.format("(== %s \"%s\")", keyName, value);
+                        result.append(BLANK).append(expression);
+                    }else{
+                        String expression = String.format("(== %s %s)", keyName, value);
+                        result.append(BLANK).append(expression);
+                    }
                 }
             }
             result.append(")");

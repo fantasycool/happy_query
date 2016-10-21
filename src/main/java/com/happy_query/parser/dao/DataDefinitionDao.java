@@ -6,7 +6,6 @@ import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;
 import com.happy_query.util.NullChecker;
 import com.happy_query.util.ReflectionUtil;
-import com.happy_query.writer.HappyWriterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +84,7 @@ public abstract class DataDefinitionDao {
             dataDefinition.setId(JDBCUtils.insertToTable(dataSource, TABLE_NAME, map));
         } catch (SQLException e) {
             LOG.error("insert datadefinition failed, datadefinition content is:[{}], t is:[{}]", dataDefinition.toString(), e);
-            throw new HappyWriterException("insert failed", e);
+            throw new HappyQueryException("insert failed", e);
         }
     }
 
@@ -97,7 +96,7 @@ public abstract class DataDefinitionDao {
             return JDBCUtils.executeUpdateById(dataSource, TABLE_NAME, map, "id", dataDefinition.getId());
         } catch (SQLException e) {
             LOG.error("update datadefinition failed, datadefinition content is:[{}], t is:[{}]", dataDefinition.toString(), e);
-            throw new HappyWriterException("update failed", e);
+            throw new HappyQueryException("update failed", e);
         }
     }
 

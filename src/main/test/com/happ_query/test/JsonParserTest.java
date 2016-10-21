@@ -21,7 +21,6 @@ public class JsonParserTest extends BaseTest {
                 "    \"value\": [\"dd2\",\"dd3\",\"dd4\"]\n" +
                 "  }\n" +
                 "]\n";
-
         jsonSqlParser.convertJsonToQuerySql(json);
     }
 

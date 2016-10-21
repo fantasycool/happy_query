@@ -24,7 +24,7 @@ public interface IWriter {
      * @param keyDatas
      * @param prmId
      * @param empName
-     * @throws HappyWriterException
+     * @throws HappyQueryException
      */
     void updateRecord(Map<String, Object> keyDatas, long prmId, String empName)throws HappyQueryException;
 
