@@ -119,56 +119,62 @@ public class DbArg {
         for(Map.Entry<String, Object> entry : args.entrySet()){
             String key = entry.getKey();
             Object value = entry.getValue();
-
             DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
+            if(dataDefinition.getChildComment() != null && !(dataDefinition.getChildComment() instanceof DataDefinitionCacheManager.NullDataDefinition)){
+                setLeftOrRightValue(prmDDs, prmDatas, dataDefinitionValues, value, dataDefinition.getChildComment());
+                continue;
+            }
             if(dataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition){
                 LOG.error("key {} does not exists", key);
                 throw new HappyQueryException("key:" + key + "not exists");
             }
+            setLeftOrRightValue(prmDDs, prmDatas, dataDefinitionValues, value, dataDefinition);
+        }
+    }
 
-            if(dataDefinition.getLeftData()){
-                prmDDs.add(dataDefinition);
-                prmDatas.put(dataDefinition.getLefColName(), value);
-            }else{
-                DataDefinitionValue dataDefinitionValue = new DataDefinitionValue();
-                dataDefinitionValue.setDdRefId(dataDefinition.getId());
-                switch (dataDefinition.getDataTypeEnum()){
-                    case BOOLEAN:
+    private static void setLeftOrRightValue(List<DataDefinition> prmDDs, Map<String, Object> prmDatas, List<DataDefinitionValue> dataDefinitionValues, Object value, DataDefinition dataDefinition) {
+        if(dataDefinition.getLeftData()){
+            prmDDs.add(dataDefinition);
+            prmDatas.put(dataDefinition.getLefColName(), value);
+        }else{
+            DataDefinitionValue dataDefinitionValue = new DataDefinitionValue();
+            dataDefinitionValue.setDdRefId(dataDefinition.getId());
+            switch (dataDefinition.getDataTypeEnum()){
+                case BOOLEAN:
+                    dataDefinitionValue.setIntValue(Long.valueOf(value.toString()));
+                    break;
+                case INT:
+                    dataDefinitionValue.setIntValue(Long.valueOf(value.toString()));
+                    break;
+                case STRING:
+                    dataDefinitionValue.setStrValue(value.toString());
+                    break;
+                case TEXT:
+                    dataDefinitionValue.setFeature(value.toString());
+                    break;
+                case DATETIME:
+                    if(value instanceof Long){
                         dataDefinitionValue.setIntValue(Long.valueOf(value.toString()));
-                        break;
-                    case INT:
-                        dataDefinitionValue.setIntValue(Long.valueOf(value.toString()));
-                        break;
-                    case STRING:
-                        dataDefinitionValue.setStrValue(value.toString());
-                        break;
-                    case TEXT:
-                        dataDefinitionValue.setFeature(value.toString());
-                        break;
-                    case DATETIME:
-                        if(value instanceof Long){
-                            dataDefinitionValue.setIntValue(Long.valueOf(value.toString()));
-                        }else if(value instanceof String){
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            try {
-                                Date date = simpleDateFormat.parse(value.toString());
-                                dataDefinitionValue.setIntValue(date.getTime());
-                            } catch (ParseException e) {
-                                throw new HappyQueryException("key:" + dataDefinition.getKey() + "is not a correct datetime type, value is:" + value.toString());
-                            }
-                        }else{
+                    }else if(value instanceof String){
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        try {
+                            Date date = simpleDateFormat.parse(value.toString());
+                            dataDefinitionValue.setIntValue(date.getTime());
+                        } catch (ParseException e) {
                             throw new HappyQueryException("key:" + dataDefinition.getKey() + "is not a correct datetime type, value is:" + value.toString());
                         }
-                        break;
-                    case DOUBLE:
-                        dataDefinitionValue.setDoubleValue(Double.valueOf(value.toString()));
-                        break;
-                    case FLOAT:
-                        dataDefinitionValue.setDoubleValue(Double.valueOf(value.toString()));
-                        break;
-                }
-                dataDefinitionValues.add(dataDefinitionValue);
+                    }else{
+                        throw new HappyQueryException("key:" + dataDefinition.getKey() + "is not a correct datetime type, value is:" + value.toString());
+                    }
+                    break;
+                case DOUBLE:
+                    dataDefinitionValue.setDoubleValue(Double.valueOf(value.toString()));
+                    break;
+                case FLOAT:
+                    dataDefinitionValue.setDoubleValue(Double.valueOf(value.toString()));
+                    break;
             }
+            dataDefinitionValues.add(dataDefinitionValue);
         }
     }
 

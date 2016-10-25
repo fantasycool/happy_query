@@ -29,13 +29,4 @@ public interface IQuery {
      * @return
      */
     Pair<Integer, List<Map<String, Object>>> queryPrmUserInfosByJson(String jsonQuery, int start, int size);
-
-    /**
-     * Query Prm User Infos by list query
-     * @param queryByLisp
-     * @param start
-     * @param size
-     * @¬
-     */
-    Pair<Integer, List<Map<String, Object>>> queryPrmUserInfosByLisp(String queryByLisp, int start, int size);
 }

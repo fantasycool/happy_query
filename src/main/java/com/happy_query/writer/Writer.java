@@ -1,6 +1,10 @@
 package com.happy_query.writer;
 
 import com.alibaba.fastjson.JSON;
+import com.happy_query.cache.DataDefinitionCacheManager;
+import com.happy_query.cache.RelationCacheManager;
+import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.query.Query;
 import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;
@@ -8,6 +12,8 @@ import com.happy_query.util.ReflectionUtil;
 import com.happy_query.writer.domain.DataDefinitionValue;
 import com.happy_query.writer.domain.DbArg;
 import com.happy_query.writer.domain.PrmUserInfo;
+import com.jkys.moye.MoyeComputeEngine;
+import com.jkys.moye.MoyeComputeEngineImpl;
 import com.mysql.jdbc.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +21,7 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * writer to import data
@@ -27,12 +30,19 @@ import java.util.Map;
 public class Writer implements IWriter {
     private static Logger LOG = LoggerFactory.getLogger(Writer.class);
     private DataSource dataSource;
+    /**
+     * 计算引擎,传入参数
+     */
+    private MoyeComputeEngine moyeComputeEngine = new MoyeComputeEngineImpl();
 
     @Override
     public long insertRecord(Map<String, Object> keyDatas, String source, String userKey, String empName) {
         if(StringUtils.isNullOrEmpty(source) || StringUtils.isNullOrEmpty(userKey) || keyDatas == null){
             throw new IllegalArgumentException("illegal argument");
         }
+        /**
+         * 注意对于备注的双写集成在DbArg.createFromArgs方法中
+         */
         DbArg dbArg = DbArg.createFromArgs(keyDatas, source, userKey);
         PrmUserInfo prmUserInfo = dbArg.prmUserInfo;
         Map<String, Object> prmUserInfoMap = ReflectionUtil.cloneBeanToMap(prmUserInfo);
@@ -59,8 +69,35 @@ public class Writer implements IWriter {
             if (null == prmUserInfo) {
                 throw new HappyQueryException("prmId:" + prmId + ", prmUserInfo not exists");
             }
+            /**
+             * 要更新的指标是否包含具有备注并且为可筛选的指标,如果有则进行同步更新
+             */
+            commentDatasFilling(keyDatas, connection, prmUserInfo);
             DbArg dbArg = DbArg.createFromArgs(keyDatas, prmUserInfo, connection);
             updateDataDefinitionValues(dbArg.dataDefinitionValues, prmUserInfo.getId(), empName, null);
+            /**
+             * relation update
+             * 场景描述:
+             * 1. eg:BMI指标,年龄的指标是随着身高,体重,出生日期的指标的变化而变化的.所以,当身高体重的指标产生变化时,同样的BMI根据
+             *  计算公式也应该重新计算生成.
+             * 2. 标签指标也是根据多个指标的条件组合拼装而成.当标签涉及的这些指标有一个或者多个产生变化时,标签的本身的值应该经过重新计算才行
+             */
+            Set<String> relatedKeys = new HashSet<>();
+            for(String key : keyDatas.keySet()){
+                relatedKeys.addAll(RelationCacheManager.getValue(key));
+            }
+            Map<String, Object> updatedDatas = new HashMap<>();
+            if(relatedKeys.size() > 0){
+                Query query = new Query(dataSource);
+                Map<String, Object> userInfoDatas = query.getPrmUserInfo(prmUserInfo.getId(), null, connection);
+                for(String key :relatedKeys){
+                    DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
+                    String expression = dataDefinition.getComputationRule();
+                    Object value = moyeComputeEngine.execute(expression, userInfoDatas);
+                    updatedDatas.put(dataDefinition.getKey(), value);
+                }
+            }
+            updateRecord(updatedDatas, prmId, empName);
         }catch(HappyQueryException e){
             throw e;
         }catch(Exception e){
@@ -78,6 +115,48 @@ public class Writer implements IWriter {
                 LOG.error("close error", e);
             }
         }
+    }
+
+    //TODO
+    //对于为筛选的指标不需要双写存储
+    /**
+     * 对于具有备注的指标进行填充数据的功能
+     * @param keyDatas
+     * @param connection
+     * @param prmUserInfo
+     */
+    private void commentDatasFilling(Map<String, Object> keyDatas, Connection connection, PrmUserInfo prmUserInfo) {
+        List<String> keys = getAllCommentKeys(keyDatas);
+        if(keys.size() > 0){
+            Query query = new Query(dataSource);
+            Map<String, Object> userInfoDatas = query.getPrmUserInfo(prmUserInfo.getId(), keys, connection);
+            for(String key : userInfoDatas.keySet()){
+                DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
+                if(!(dataDefinition.getChildComment() instanceof DataDefinitionCacheManager.NullDataDefinition) //有comment的指标
+                        && ((userInfoDatas.get(dataDefinition.getKey()) != null  //comment的值和原始的值都不为空的情况下, 取出的comment的值equals原始的值
+                                    && userInfoDatas.get(dataDefinition.getChildComment().getKey())!= null
+                                    && userInfoDatas.get(dataDefinition.getKey()).toString().equals(userInfoDatas.get(dataDefinition.getChildComment().getKey()).toString()))) ||
+                        (userInfoDatas.get(dataDefinition.getChildComment().getKey()) == null)){ //comment的值本身为空
+                    keyDatas.put(dataDefinition.getChildComment().getKey(), userInfoDatas.get(dataDefinition.getChildComment().getKey()));
+                }
+            }
+        }
+    }
+
+    /**
+     * TODO
+     * 返回所有comment key和原始key
+     * @param keyDatas
+     * @return
+     */
+    private List<String> getAllCommentKeys(Map<String, Object> keyDatas) {
+        for(String key : keyDatas.keySet()){
+            if(DataDefinitionCacheManager.getDataDefinition(key).getChildComment() != null
+                    && !(DataDefinitionCacheManager.getDataDefinition(key).getChildComment() instanceof DataDefinitionCacheManager.NullDataDefinition)){
+                return null;
+            }
+        }
+        return null;
     }
 
     /**

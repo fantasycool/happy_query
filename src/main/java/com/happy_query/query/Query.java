@@ -81,12 +81,6 @@ public class Query implements IQuery {
     }
 
     @Override
-    public Pair<Integer, List<Map<String, Object>>> queryPrmUserInfosByLisp(String queryByLisp, int start, int size) {
-        return null;
-    }
-
-
-    @Override
     public Map<String, Object> getPrmUserInfo(Long prmId, List<String> keys, Connection connection) {
         if(null == prmId || connection == null){
             throw new IllegalArgumentException();

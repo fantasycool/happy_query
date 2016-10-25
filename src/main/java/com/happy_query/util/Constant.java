@@ -66,4 +66,5 @@ public class Constant {
     public static String PRM_USER_INFO = "prm_user_info";
     public static String DATA_DEFINITION_VALUE = "data_definition_value";
     public static String COMMENT_PREFIX = "_comment";
+    public static String KEY_RELATION_TABLE_NAME = "prm_key_relation";
 }
