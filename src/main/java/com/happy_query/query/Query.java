@@ -5,8 +5,6 @@ import com.happy_query.parser.IJsonSqlParser;
 import com.happy_query.parser.JsonSqlParser;
 import com.happy_query.parser.SQLQueryAssembly;
 import com.happy_query.parser.domain.DataDefinition;
-import com.happy_query.parser.domain.JsonParseDataParam;
-import com.happy_query.query.domain.QueryResult;
 import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;
@@ -64,7 +62,7 @@ public class Query implements IQuery {
             for(Map<String, Object> m : datas){
                 Long prmId = Long.valueOf(m.get("id").toString());
                 Map<String, Object> keyDatas = new HashMap<>();
-                dataAssemble(prmId, null, keyDatas, m, false);
+                dataAssemble(prmId, null, keyDatas, m, false, null);
                 resultList.add(keyDatas);
             }
             List<Map<String, Object>> countDatas = JDBCUtils.executeQuery(connection,
@@ -92,7 +90,7 @@ public class Query implements IQuery {
         Map<String, Object> prmDatas = new HashMap<>();
         try {
             List<Map<String, Object>> list = JDBCUtils.executeQuery(connection, "select * from " + Constant.PRM_USER_INFO + " where id=?", args);
-            dataAssemble(prmId, connection, prmDatas, list.get(0), true);
+            dataAssemble(prmId, connection, prmDatas, list.get(0), true, keys);
         } catch (SQLException e) {
             LOG.error("getPrmUserInfo query failed, prmId:{}", prmId);
             throw new HappyQueryException(e);
@@ -113,8 +111,9 @@ public class Query implements IQuery {
      * @param connection
      * @param prmDatas
      * @param data
+     * @param keys
      */
-    private void dataAssemble(Long prmId, Connection connection, Map<String, Object> prmDatas, Map<String, Object> data, Boolean lazyLoadDataDefinitionValues) {
+    private void dataAssemble(Long prmId, Connection connection, Map<String, Object> prmDatas, Map<String, Object> data, Boolean lazyLoadDataDefinitionValues, List<String> keys) {
 
         for(Map.Entry<String, Object> entry : data.entrySet()){
             DataDefinition dd = DataDefinitionCacheManager.getDataDefinition(entry.getKey());
@@ -124,7 +123,7 @@ public class Query implements IQuery {
             prmDatas.put(entry.getKey(), entry.getValue());
         }
         if(lazyLoadDataDefinitionValues){
-            List<DataDefinitionValue> dataDefinitionValues = getDataDefinitionValues(prmId, connection);
+            List<DataDefinitionValue> dataDefinitionValues = getDataDefinitionValues(prmId, connection, keys);
             for(DataDefinitionValue ddv : dataDefinitionValues){
                 DataDefinition dd = DataDefinitionCacheManager.getDataDefinition(ddv.getDdRefId());
                 String keyName = dd.getKey();
@@ -138,7 +137,7 @@ public class Query implements IQuery {
         }
     }
 
-    private List<DataDefinitionValue> getDataDefinitionValues(Long prmId, Connection connection) {
+    private List<DataDefinitionValue> getDataDefinitionValues(Long prmId, Connection connection, List<String> keys) {
         if(null == prmId || connection == null || prmId <= 0){
             throw new IllegalArgumentException();
         }
@@ -146,9 +145,10 @@ public class Query implements IQuery {
         List<DataDefinitionValue> dataOptionValues = new ArrayList<>();
         List<Object> parameters = new ArrayList<>();
         parameters.add(prmId);
+        generateParameters(parameters, keys);
         try {
             List<Map<String, Object>> list = JDBCUtils.executeQuery(connection,
-                    "select * from " + Constant.DATA_DEFINITION_VALUE + " where prm_id=? and status=0", parameters);
+                    generateQuestionMark(keys), parameters);
             if(null == list || list.size() == 0){
                 return dataOptionValues;
             }
@@ -164,6 +164,45 @@ public class Query implements IQuery {
         }
     }
 
+    /**
+     * 生成List questions mark对应的parameters
+     * @param parameters
+     * @param keys
+     * @return
+     */
+    private void generateParameters(List<Object> parameters, List<String> keys) {
+        if(keys != null && keys.size() > 0){
+            for(String key : keys){
+                DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
+                parameters.add(dataDefinition.getId());
+            }
+        }
+    }
+
+    /**
+     * 生成Preparedstatement question mark
+     * @param keys
+     * @return
+     */
+    private String generateQuestionMark(List<String> keys) {
+        if(keys != null && keys.size() > 0){
+            return "select * from " + Constant.DATA_DEFINITION_VALUE + " where prm_id=? and status=0";
+        }else{
+            StringBuilder sb = new StringBuilder();
+            sb.append("select * from " + Constant.DATA_DEFINITION_VALUE);
+            sb.append(" where prm_id=? and status=0");
+            sb.append(" and dd_ref_id in (" );
+            for(int i = 0; i < keys.size(); i ++){
+                sb.append("?");
+                if(i < (keys.size() - 1) ){
+                    sb.append(",");
+                }
+            }
+            sb.append(")");
+            return sb.toString();
+        }
+    }
+
     private Connection getConnection(Connection connection) {
         if(connection == null){
             try {
@@ -175,68 +214,4 @@ public class Query implements IQuery {
         }
         return connection;
     }
-
-//    public QueryResult queryByJsonLogic(JsonParseDataParam jsonParseDataParam) {
-//        if (!jsonParseDataParam.check()) {
-//            throw new IllegalArgumentException("invalid jsonParseDataParam");
-//        }
-//
-//        String querySql = jsonSqlParser.convertJsonLogicToQuerySql(jsonParseDataParam);
-//        String countSql = jsonSqlParser.convertJsonLogicToCountSql(jsonParseDataParam);
-//        System.out.println(querySql);
-//        System.out.println(countSql);
-//        Connection connection = null;
-//        try {
-//            connection = dataSource.getConnection();
-//            JDBCUtils.execute(connection, "SET SESSION group_concat_max_len = 1000000", new ArrayList<Object>());
-//            long t1 = System.currentTimeMillis();
-//            List<Map<String, Row.Value>> originalQueryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList(0));
-//            System.out.println(String.format("query time is:%d" ,System.currentTimeMillis() - t1));
-//            List<Map<String, Row.Value>> countQueryResult = JDBCUtils.executeQuery(connection, countSql, new ArrayList(0));
-//            System.out.println(String.format("all time is:%d" ,System.currentTimeMillis() - t1));
-//            LOG.info("##############happy query executing time ############### time:[{}]", System.currentTimeMillis() - t1);
-//            System.out.println(String.format("##############happy query executing time ############### time:[%d]", System.currentTimeMillis() - t1));
-//            QueryResult queryResult = QueryResult.createFromOrinalData(jsonParseDataParam, originalQueryResult, countQueryResult);
-//            return queryResult;
-//        } catch (SQLException e) {
-//            LOG.error("querySqlIs:[{}], countSqlIs:[{}]", querySql, countSql);
-//            System.out.println(String.format("querySqlIs:%s, countSqlIs:%s", querySql, countSql));
-//            throw new HappyQueryException("query sql exception", e);
-//        } finally {
-//            JDBCUtils.close(connection);
-//        }
-//        return null;
-//    }
-//
-//    public QueryResult queryByLeftId(long leftId, String categoryType) {
-//        long t1 = System.currentTimeMillis();
-//        String rightTable = Constant.RIGHT_TABLE_MAP.get(categoryType);
-//        String leftTable = Constant.LEFT_TABLE_MAP.get(categoryType);
-//        String leftIdColumn = Constant.LEFT_ID_COLUMNS.get(categoryType);
-//
-//        JsonParseDataParam jsonParseDataParam = new JsonParseDataParam();
-//        jsonParseDataParam.setLeftTableName(leftTable);
-//        jsonParseDataParam.setRightTableName(rightTable);
-//        jsonParseDataParam.setLeftPrimaryId(leftIdColumn);
-//        jsonParseDataParam.setLimitStart(0);
-//        jsonParseDataParam.setSize(1);
-//        jsonParseDataParam.setLeftOperationStr(leftIdColumn + "=" + leftId);
-//        jsonParseDataParam.setConnectType("left");
-//
-//        String querySql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "bb.left_id=" + leftId, "query");
-//        String countSql = jsonSqlParser.getFreemarkerSql(jsonParseDataParam, "bb.left_id=" + leftId, "count");
-//        Connection connection = null;
-//        try {
-//            connection = dataSource.getConnection();
-//            JDBCUtils.execute(connection, "SET SESSION group_concat_max_len = 1000000", new ArrayList<Object>());
-//            List<Map<String, Row.Value>> queryResult = JDBCUtils.executeQuery(connection, querySql, new ArrayList(0));
-//            List<Map<String, Row.Value>> countResult = JDBCUtils.executeQuery(connection, countSql, new ArrayList(0));
-//            return QueryResult.createFromOrinalData(jsonParseDataParam, queryResult, countResult);
-//        } catch (SQLException e) {
-//            throw new HappyQueryException("query by leftId:" + leftId + "failed", e);
-//        } finally {
-//            LOG.info("queryByLeftId time is [{}]", System.currentTimeMillis() - t1);
-//            JDBCUtils.close(connection);
-//        }
-//    }
 }
