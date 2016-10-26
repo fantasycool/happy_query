@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.util.*;
 
 /**
- * writer to import data
  * Created by frio on 16/6/17.
  */
 public class Writer implements IWriter {
@@ -117,8 +116,6 @@ public class Writer implements IWriter {
         }
     }
 
-    //TODO
-    //对于为筛选的指标不需要双写存储
     /**
      * 对于具有备注的指标进行填充数据的功能
      * @param keyDatas
@@ -127,36 +124,43 @@ public class Writer implements IWriter {
      */
     private void commentDatasFilling(Map<String, Object> keyDatas, Connection connection, PrmUserInfo prmUserInfo) {
         List<String> keys = getAllCommentKeys(keyDatas);
-        if(keys.size() > 0){
+        if(keys != null && keys.size() > 0){
             Query query = new Query(dataSource);
             Map<String, Object> userInfoDatas = query.getPrmUserInfo(prmUserInfo.getId(), keys, connection);
             for(String key : userInfoDatas.keySet()){
                 DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
-                if(!(dataDefinition.getChildComment() instanceof DataDefinitionCacheManager.NullDataDefinition) //有comment的指标
-                        && ((userInfoDatas.get(dataDefinition.getKey()) != null  //comment的值和原始的值都不为空的情况下, 取出的comment的值equals原始的值
-                                    && userInfoDatas.get(dataDefinition.getChildComment().getKey())!= null
-                                    && userInfoDatas.get(dataDefinition.getKey()).toString().equals(userInfoDatas.get(dataDefinition.getChildComment().getKey()).toString()))) ||
-                        (userInfoDatas.get(dataDefinition.getChildComment().getKey()) == null)){ //comment的值本身为空
-                    keyDatas.put(dataDefinition.getChildComment().getKey(), userInfoDatas.get(dataDefinition.getChildComment().getKey()));
+                //能够筛选的指标才需要进行双写原始指标和备注的指标
+                if(dataDefinition.getQuery()) {
+                    if (dataDefinition.getChildComment() != null && !(dataDefinition.getChildComment() instanceof DataDefinitionCacheManager.NullDataDefinition)) {
+                        Object sourceValue = userInfoDatas.get(dataDefinition.getKey());
+                        Object commentValue = userInfoDatas.get(dataDefinition.getChildComment().getKey());
+                        if ((sourceValue != null && commentValue != null && sourceValue.toString().equals(commentValue.toString()))//comment的值和原始的值都不为空的情况下, 取出的comment的值equals原始的值
+                                || commentValue == null  //comment的值本身为空
+                                ) {
+                            keyDatas.put(dataDefinition.getChildComment().getKey(), userInfoDatas.get(dataDefinition.getChildComment().getKey()));
+                        }
+                    }
                 }
             }
         }
     }
 
     /**
-     * TODO
      * 返回所有comment key和原始key
      * @param keyDatas
      * @return
      */
     private List<String> getAllCommentKeys(Map<String, Object> keyDatas) {
+        List<String> result = new ArrayList<>();
         for(String key : keyDatas.keySet()){
-            if(DataDefinitionCacheManager.getDataDefinition(key).getChildComment() != null
-                    && !(DataDefinitionCacheManager.getDataDefinition(key).getChildComment() instanceof DataDefinitionCacheManager.NullDataDefinition)){
-                return null;
+            DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
+            if(dataDefinition.getChildComment() != null
+                    && !(dataDefinition.getChildComment() instanceof DataDefinitionCacheManager.NullDataDefinition)){
+                result.add(key);
+                result.add(dataDefinition.getChildComment().getKey());
             }
         }
-        return null;
+        return result;
     }
 
     /**
