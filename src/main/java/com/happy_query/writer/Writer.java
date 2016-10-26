@@ -88,11 +88,11 @@ public class Writer implements IWriter {
             Map<String, Object> updatedDatas = new HashMap<>();
             if(relatedKeys.size() > 0){
                 Query query = new Query(dataSource);
-                Map<String, Object> userInfoDatas = query.getPrmUserInfo(prmUserInfo.getId(), null, connection);
+                Map<String, Object> userDatas = query.getPrmUserInfo(prmUserInfo.getId(), null, connection);
                 for(String key :relatedKeys){
                     DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
                     String expression = dataDefinition.getComputationRule();
-                    Object value = moyeComputeEngine.execute(expression, userInfoDatas);
+                    Object value = moyeComputeEngine.execute(expression, userDatas);
                     updatedDatas.put(dataDefinition.getKey(), value);
                 }
             }

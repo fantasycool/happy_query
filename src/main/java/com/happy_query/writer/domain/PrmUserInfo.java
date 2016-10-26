@@ -119,7 +119,11 @@ public class PrmUserInfo {
         }
     }
 
-    public static PrmUserInfo updatePrmUserInfo(Connection connection, Map<String, Object> datas, long prmId){
-        return null;
+    public static int updatePrmUserInfo(Connection connection, Map<String, Object> datas, long prmId){
+        try {
+           return JDBCUtils.executeUpdateById(connection, Constant.PRM_USER_INFO, datas, "id", prmId);
+        } catch (SQLException e) {
+            throw new HappyQueryException("prmId is:" + prmId + " update prm user info by id failed", e);
+        }
     }
 }
