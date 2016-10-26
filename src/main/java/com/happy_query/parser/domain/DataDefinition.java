@@ -76,7 +76,7 @@ public class DataDefinition {
 
     private Boolean isLeftData;
 
-    private String lefColName;
+    private String leftColName;
 
     private Date gmtCreate;
 
@@ -140,12 +140,12 @@ public class DataDefinition {
         isLeftData = leftData;
     }
 
-    public String getLefColName() {
-        return lefColName;
+    public String getLeftColName() {
+        return leftColName;
     }
 
-    public void setLefColName(String lefColName) {
-        this.lefColName = lefColName;
+    public void setLeftColName(String leftColName) {
+        this.leftColName = leftColName;
     }
 
     public long getId() {

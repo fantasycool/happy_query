@@ -54,32 +54,36 @@ public class DataDefinitionCacheManager {
         }
     }
 
-    public static void putValue(Object k, Object v) throws ExecutionException {
-        cache.put(k, v);
-    }
-
     public static Object createDataDefinition(Object key) {
         if (key instanceof Long) {
             DataDefinition dataDefinition = DataDefinitionDao.getDataDefinition(dataSource, (long) key);
             if (null == dataDefinition) {
                 return new NullDataDefinition();
             }
-            if(dataDefinition.getParentId() != null){
-                DataDefinition parent = getDataDefinition(dataDefinition.getId());
-                dataDefinition.setParent(parent);
-            }
-            if(dataDefinition.getChildComment() != null){
-                DataDefinition childComment = getDataDefinition(dataDefinition.getChildComment());
-                dataDefinition.setChildComment(childComment);
-            }
-            dataDefinition.initEnum();
+            fillChildComment(dataDefinition);
             return dataDefinition;
         } else if (key instanceof String) {
             DataDefinition dataDefinition = DataDefinitionDao.getDataDefinitionByName(dataSource, key.toString());
+            if (null == dataDefinition) {
+                return new NullDataDefinition();
+            }
             dataDefinition.initEnum();
+            fillChildComment(dataDefinition);
             return dataDefinition;
         }
         return new NullDataDefinition();
+    }
+
+    private static void fillChildComment(DataDefinition dataDefinition) {
+        dataDefinition.initEnum();
+        if(dataDefinition.getParentId() != null){
+            DataDefinition parent = getDataDefinition(dataDefinition.getId());
+            dataDefinition.setParent(parent);
+        }
+        if(dataDefinition.getChildCommentName() != null){
+            DataDefinition childComment = getDataDefinition(dataDefinition.getChildCommentName());
+            dataDefinition.setChildComment(childComment);
+        }
     }
 
     public static class NullDataDefinition extends DataDefinition {

@@ -2,9 +2,8 @@ package com.happy_query.writer.domain;
 
 import com.happy_query.cache.DataDefinitionCacheManager;
 import com.happy_query.parser.domain.DataDefinition;
-import com.happy_query.query.Query;
-import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;
+import com.happy_query.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,14 +30,16 @@ public class DbArg {
      * @param args
      * @param source
      * @param userKey
+     * @param empName
      * @return
      */
-    public static DbArg createFromArgs(Map<String, Object> args, String source, String userKey){
+    public static DbArg createFromArgs(Map<String, Object> args, String source, String userKey, String empName){
         if(null == args || StringUtils.isBlank(source) || StringUtils.isBlank(userKey)){
             throw new IllegalArgumentException();
         }
         DbArg dbArg = new DbArg();
         dbArg.prmUserInfo = new PrmUserInfo();
+        dbArg.prmUserInfo.setEmpName(empName);
         dbArg.prmUserInfo.setSource(source);
         dbArg.prmUserInfo.setUserKey(userKey);
         List<DataDefinition> prmDDs = new ArrayList<>();
@@ -49,6 +50,7 @@ public class DbArg {
         List<DataDefinitionValue> dataDefinitionValues = new ArrayList<>();
         dbArg.dataDefinitionValues = dataDefinitionValues;
         assembleDataArgs(args, prmDDs, prmDatas, dataDefinitionValues);
+        prmDatas.putAll(ReflectionUtil.cloneBeanToMap(dbArg.prmUserInfo));
         return dbArg;
     }
 
@@ -113,7 +115,7 @@ public class DbArg {
     private static void setLeftOrRightValue(List<DataDefinition> prmDDs, Map<String, Object> prmDatas, List<DataDefinitionValue> dataDefinitionValues, Object value, DataDefinition dataDefinition) {
         if(dataDefinition.getLeftData()){
             prmDDs.add(dataDefinition);
-            prmDatas.put(dataDefinition.getLefColName(), value);
+            prmDatas.put(dataDefinition.getLeftColName(), value);
         }else{
             DataDefinitionValue dataDefinitionValue = new DataDefinitionValue();
             dataDefinitionValue.setDdRefId(dataDefinition.getId());

@@ -183,7 +183,7 @@ public class Query implements IQuery {
      * @return
      */
     private String generateQuestionMark(List<String> keys) {
-        if(keys != null && keys.size() > 0){
+        if(keys == null || keys.size() == 0){
             return "select * from " + Constant.DATA_DEFINITION_VALUE + " where prm_id=? and status=0";
         }else{
             StringBuilder sb = new StringBuilder();
@@ -199,17 +199,5 @@ public class Query implements IQuery {
             sb.append(")");
             return sb.toString();
         }
-    }
-
-    private Connection getConnection(Connection connection) {
-        if(connection == null){
-            try {
-                connection = dataSource.getConnection();
-            } catch (SQLException e) {
-                LOG.error("get connection failed", e);
-                throw new HappyQueryException(e);
-            }
-        }
-        return connection;
     }
 }

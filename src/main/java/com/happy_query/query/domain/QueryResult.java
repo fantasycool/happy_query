@@ -142,7 +142,7 @@ public class QueryResult {
 //                     * put data to left result
 //                     */
 //                    leftDefinitionDatas.put(definition, value);
-//                    leftDatas.put(definition.getLefColName(), value);
+//                    leftDatas.put(definition.getLeftColName(), value);
 //                }
 //                lr.put(definition, value);
 //            } catch (ExecutionException e) {

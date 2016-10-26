@@ -22,6 +22,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by frio on 16/6/17.
@@ -29,6 +30,15 @@ import java.util.*;
 public class Writer implements IWriter {
     private static Logger LOG = LoggerFactory.getLogger(Writer.class);
     private DataSource dataSource;
+
+    public Writer(DataSource dataSource){
+        this.dataSource = dataSource;
+    }
+
+    public Writer(){
+
+    }
+
     /**
      * 计算引擎,传入参数
      */
@@ -42,15 +52,21 @@ public class Writer implements IWriter {
         /**
          * 注意对于备注的双写集成在DbArg.createFromArgs方法中
          */
-        DbArg dbArg = DbArg.createFromArgs(keyDatas, source, userKey);
+        DbArg dbArg = DbArg.createFromArgs(keyDatas, source, userKey, empName);
         PrmUserInfo prmUserInfo = dbArg.prmUserInfo;
-        Map<String, Object> prmUserInfoMap = ReflectionUtil.cloneBeanToMap(prmUserInfo);
         long prmId = 0;
+        Connection connection = null;
         try {
-            prmId = JDBCUtils.insertToTable(dataSource, Constant.PRM_USER_INFO, prmUserInfoMap);
+            prmId = JDBCUtils.insertToTable(dataSource, Constant.PRM_USER_INFO, prmUserInfo.getDatas());
+            prmUserInfo.setId(prmId);
             updateDataDefinitionValues(dbArg.dataDefinitionValues, prmId, empName, null);
-        } catch (SQLException e) {
+            connection = dataSource.getConnection();
+
+            relationUpdate(keyDatas, empName, connection, prmUserInfo);
+        } catch (Exception e) {
             throw new HappyQueryException("data written to user info failed", e);
+        }finally {
+            JDBCUtils.close(connection);
         }
         return prmId;
     }
@@ -74,29 +90,7 @@ public class Writer implements IWriter {
             commentDatasFilling(keyDatas, connection, prmUserInfo);
             DbArg dbArg = DbArg.createFromArgs(keyDatas, prmUserInfo, connection);
             updateDataDefinitionValues(dbArg.dataDefinitionValues, prmUserInfo.getId(), empName, null);
-            /**
-             * relation update
-             * 场景描述:
-             * 1. eg:BMI指标,年龄的指标是随着身高,体重,出生日期的指标的变化而变化的.所以,当身高体重的指标产生变化时,同样的BMI根据
-             *  计算公式也应该重新计算生成.
-             * 2. 标签指标也是根据多个指标的条件组合拼装而成.当标签涉及的这些指标有一个或者多个产生变化时,标签的本身的值应该经过重新计算才行
-             */
-            Set<String> relatedKeys = new HashSet<>();
-            for(String key : keyDatas.keySet()){
-                relatedKeys.addAll(RelationCacheManager.getValue(key));
-            }
-            Map<String, Object> updatedDatas = new HashMap<>();
-            if(relatedKeys.size() > 0){
-                Query query = new Query(dataSource);
-                Map<String, Object> userDatas = query.getPrmUserInfo(prmUserInfo.getId(), null, connection);
-                for(String key :relatedKeys){
-                    DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
-                    String expression = dataDefinition.getComputationRule();
-                    Object value = moyeComputeEngine.execute(expression, userDatas);
-                    updatedDatas.put(dataDefinition.getKey(), value);
-                }
-            }
-            updateRecord(updatedDatas, prmUserInfo, empName, connection);
+            relationUpdate(keyDatas, empName, connection, prmUserInfo);
         }catch(HappyQueryException e){
             throw e;
         }catch(Exception e){
@@ -112,6 +106,39 @@ public class Writer implements IWriter {
         }
     }
 
+    /**
+     **
+     * relation update
+     * 场景描述:
+     * 1. eg:BMI指标,年龄的指标是随着身高,体重,出生日期的指标的变化而变化的.所以,当身高体重的指标产生变化时,同样的BMI根据
+     *  计算公式也应该重新计算生成.
+     * 2. 标签指标也是根据多个指标的条件组合拼装而成.当标签涉及的这些指标有一个或者多个产生变化时,标签的本身的值应该经过重新计算才行
+     *
+     * @param keyDatas
+     * @param empName
+     * @param connection
+     * @param prmUserInfo
+     * @throws ExecutionException
+     */
+    private void relationUpdate(Map<String, Object> keyDatas, String empName, Connection connection, PrmUserInfo prmUserInfo) throws ExecutionException {
+        Set<String> relatedKeys = new HashSet<>();
+        for(String key : keyDatas.keySet()){
+            relatedKeys.addAll(RelationCacheManager.getValue(key));
+        }
+        Map<String, Object> updatedDatas = new HashMap<>();
+        if(relatedKeys.size() > 0){
+            Query query = new Query(dataSource);
+            Map<String, Object> userDatas = query.getPrmUserInfo(prmUserInfo.getId(), null, connection);
+            for(String key :relatedKeys){
+                DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
+                String expression = dataDefinition.getComputationRule();
+                Object value = moyeComputeEngine.execute(expression, userDatas);
+                updatedDatas.put(dataDefinition.getKey(), value);
+            }
+        }
+        updateRecord(updatedDatas, prmUserInfo, empName, connection);
+    }
+
     private void updateRecord(Map<String, Object> keyDatas, PrmUserInfo prmUserInfo, String empName, Connection connection) throws HappyQueryException {
         try {
             if(connection == null){
@@ -119,7 +146,9 @@ public class Writer implements IWriter {
             }
             DbArg dbArg = DbArg.createFromArgs(keyDatas, prmUserInfo, connection);
             updateDataDefinitionValues(dbArg.dataDefinitionValues, prmUserInfo.getId(), empName, null);
-            PrmUserInfo.updatePrmUserInfo(connection, dbArg.prmUserInfo.getDatas(), prmUserInfo.getId());
+            if(prmUserInfo.getDatas() != null && prmUserInfo.getDatas().size() > 0){
+                PrmUserInfo.updatePrmUserInfo(connection, dbArg.prmUserInfo.getDatas(), prmUserInfo.getId());
+            }
         }catch(Exception e){
             throw new HappyQueryException(e);
         }
@@ -185,11 +214,12 @@ public class Writer implements IWriter {
             String valueColumn = dataDefinitionValue.getValueColumn();
             Object value = dataDefinitionValue.getNotNullValue();
             StringBuilder execSql = new StringBuilder();
-            execSql.append("insert into ").append(Constant.DATA_DEFINITION_VALUE).append("(prm_id,dd_ref_id").append(valueColumn).append(")")
+            execSql.append("insert into ").append(Constant.DATA_DEFINITION_VALUE).append("(prm_id,dd_ref_id,emp_name,").append(valueColumn).append(")")
                     .append("values").append("(?,?,?,?) on duplicate key update ").append(valueColumn).append("=?, emp_name=?, status=0");
             List<Object> parameters = new ArrayList<Object>();
             parameters.add(prmId);
             parameters.add(dataDefinitionValue.getDdRefId());
+            parameters.add(empName);
             parameters.add(value);
             parameters.add(value);
             parameters.add(empName);
@@ -210,6 +240,7 @@ public class Writer implements IWriter {
                 }
                 connection.commit();
             }catch(Exception e){
+                LOG.error("update data definition value failed", e);
                 connection.rollback();
                 throw new HappyQueryException("update data in data_definition_value failed", e);
             }finally {

@@ -2,7 +2,10 @@ package com.happ_query.test;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.happy_query.cache.DataDefinitionCacheManager;
+import com.happy_query.cache.RelationCacheManager;
 import com.happy_query.parser.JsonSqlParser;
+import com.happy_query.query.Query;
+import com.happy_query.writer.Writer;
 import org.junit.Before;
 
 import javax.sql.DataSource;
@@ -14,7 +17,8 @@ import java.sql.SQLException;
 public class BaseTest {
     protected DataSource dataSource;
     protected JsonSqlParser jsonSqlParser;
-
+    protected Query query;
+    protected Writer writer;
     @Before
     public void init() {
         DruidDataSource dd = new DruidDataSource();
@@ -30,5 +34,9 @@ public class BaseTest {
         dataSource = dd;
         DataDefinitionCacheManager.dataSource = dataSource;
         jsonSqlParser = new JsonSqlParser();
+        DataDefinitionCacheManager.dataSource = dataSource;
+        RelationCacheManager.dataSource = dataSource;
+        query = new Query(dataSource);
+        writer = new Writer(dataSource);
     }
 }
