@@ -118,4 +118,8 @@ public class PrmUserInfo {
             throw new HappyQueryException(e);
         }
     }
+
+    public static PrmUserInfo updatePrmUserInfo(Connection connection, Map<String, Object> datas, long prmId){
+        return null;
+    }
 }

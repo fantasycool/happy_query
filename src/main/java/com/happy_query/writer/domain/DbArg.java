@@ -56,6 +56,7 @@ public class DbArg {
 
     /**
      * 对用户已有数据进行更新
+     * 拆分Map中的数据到不同的应该更新的表中去
      * @param args
      * @param prmUserInfo
      * @param connection
@@ -67,25 +68,6 @@ public class DbArg {
             throw new IllegalArgumentException();
         }
         Map<String, Object> prmDatas = new HashMap<>();
-        /**
-         * 备注指标是否自动同步更新依赖下面的逻辑:
-         * 1: args中有筛选指标
-         * 2: 筛选指标有备注指标
-         *  2.1: 备注指标为空, 直接更新
-         *  2.2: 备注指标不为空, 上次更新为系统自动更新
-         * 查询args中筛选并且有备注的指标
-         */
-        List<String> keysHaveCommentAndCanBeQuery = getKeysHaveCommentAndCanBeQuery(args);
-        Query query = new Query();
-        Map<String, Object> datas = query.getPrmUserInfo(prmUserInfo.getId(), null, connection);
-        for(String key : keysHaveCommentAndCanBeQuery){
-            if(datas.get(key + Constant.COMMENT_PREFIX) == null && args.get(key) != null){
-                prmDatas.put(key + Constant.COMMENT_PREFIX, args.get(key));
-            }else if(args.get(key) != null && datas.get(key + Constant.COMMENT_PREFIX) != null
-                    && args.get(key).toString().equals(datas.get(key+ Constant.COMMENT_PREFIX).toString())){
-                prmDatas.put(key + Constant.COMMENT_PREFIX, args.get(key));
-            }
-        }
         DbArg dbArg = new DbArg();
         dbArg.prmUserInfo = prmUserInfo;
         List<DataDefinition> prmDDs = new ArrayList<>();
@@ -120,10 +102,6 @@ public class DbArg {
             String key = entry.getKey();
             Object value = entry.getValue();
             DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
-            if(dataDefinition.getChildComment() != null && !(dataDefinition.getChildComment() instanceof DataDefinitionCacheManager.NullDataDefinition)){
-                setLeftOrRightValue(prmDDs, prmDatas, dataDefinitionValues, value, dataDefinition.getChildComment());
-                continue;
-            }
             if(dataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition){
                 LOG.error("key {} does not exists", key);
                 throw new HappyQueryException("key:" + key + "not exists");

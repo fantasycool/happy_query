@@ -83,7 +83,6 @@ public class Query implements IQuery {
         if(null == prmId || connection == null){
             throw new IllegalArgumentException();
         }
-        connection = getConnection(connection);
         List<Object> args = new ArrayList<>();
         args.add(prmId);
         Map<String, Object> result = new HashMap<>();
@@ -141,7 +140,6 @@ public class Query implements IQuery {
         if(null == prmId || connection == null || prmId <= 0){
             throw new IllegalArgumentException();
         }
-        connection = getConnection(connection);
         List<DataDefinitionValue> dataOptionValues = new ArrayList<>();
         List<Object> parameters = new ArrayList<>();
         parameters.add(prmId);

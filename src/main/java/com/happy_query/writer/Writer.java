@@ -96,25 +96,35 @@ public class Writer implements IWriter {
                     updatedDatas.put(dataDefinition.getKey(), value);
                 }
             }
-            updateRecord(updatedDatas, prmId, empName);
+            updateRecord(updatedDatas, prmUserInfo, empName, connection);
         }catch(HappyQueryException e){
             throw e;
         }catch(Exception e){
             LOG.error("keyDatas:{}, prmId:{}, empName:{}", JSON.toJSONString(keyDatas), prmId, empName, e);
-            try {
-                connection.rollback();
-            } catch (SQLException e1) {
-                LOG.error("rollback error", e);
-            }
+            JDBCUtils.rollback(connection);
             throw new HappyQueryException(String.format("keyDatas:%s, prmId:%d, empName:%s", JSON.toJSONString(keyDatas), prmId, empName));
         }finally {
             try {
-                connection.close();
+                connection.setAutoCommit(true);
             } catch (SQLException e) {
-                LOG.error("close error", e);
             }
+            JDBCUtils.close(connection);
         }
     }
+
+    private void updateRecord(Map<String, Object> keyDatas, PrmUserInfo prmUserInfo, String empName, Connection connection) throws HappyQueryException {
+        try {
+            if(connection == null){
+                throw new HappyQueryException("connection must not be null");
+            }
+            DbArg dbArg = DbArg.createFromArgs(keyDatas, prmUserInfo, connection);
+            updateDataDefinitionValues(dbArg.dataDefinitionValues, prmUserInfo.getId(), empName, null);
+            PrmUserInfo.updatePrmUserInfo(connection, dbArg.prmUserInfo.getDatas(), prmUserInfo.getId());
+        }catch(Exception e){
+            throw new HappyQueryException(e);
+        }
+    }
+
 
     /**
      * 对于具有备注的指标进行填充数据的功能
