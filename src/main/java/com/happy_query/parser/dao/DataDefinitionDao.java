@@ -1,6 +1,6 @@
 package com.happy_query.parser.dao;
 
-import com.happy_query.cache.DataDefinitionCacheManager;
+import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;

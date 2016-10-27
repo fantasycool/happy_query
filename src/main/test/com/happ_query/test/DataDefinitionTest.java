@@ -1,6 +1,6 @@
 package com.happ_query.test;
 
-import com.happy_query.cache.DataDefinitionCacheManager;
+import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.parser.domain.DataDefinitionDataType;
 import junit.framework.Assert;

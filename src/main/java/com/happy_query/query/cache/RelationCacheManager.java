@@ -1,9 +1,9 @@
-package com.happy_query.cache;
+package com.happy_query.query.cache;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.happy_query.writer.domain.KeyRelation;
+import com.happy_query.domain.KeyRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

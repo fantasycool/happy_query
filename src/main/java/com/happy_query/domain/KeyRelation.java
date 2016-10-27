@@ -1,4 +1,4 @@
-package com.happy_query.writer.domain;
+package com.happy_query.domain;
 
 import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;

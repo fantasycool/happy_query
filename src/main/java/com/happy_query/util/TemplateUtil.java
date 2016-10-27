@@ -1,6 +1,6 @@
 package com.happy_query.util;
 
-import com.happy_query.cache.DataDefinitionCacheManager;
+import com.happy_query.query.cache.DataDefinitionCacheManager;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;

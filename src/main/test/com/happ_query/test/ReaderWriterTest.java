@@ -1,7 +1,7 @@
 package com.happ_query.test;
 
 import com.alibaba.fastjson.JSON;
-import com.happy_query.writer.domain.PrmUserInfo;
+import com.happy_query.domain.PrmUserInfo;
 import junit.framework.Assert;
 import org.javatuples.Pair;
 import org.junit.Test;

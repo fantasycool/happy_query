@@ -1,8 +1,8 @@
 package com.happ_query.test;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.happy_query.cache.DataDefinitionCacheManager;
-import com.happy_query.cache.RelationCacheManager;
+import com.happy_query.query.cache.DataDefinitionCacheManager;
+import com.happy_query.query.cache.RelationCacheManager;
 import com.happy_query.parser.JsonSqlParser;
 import com.happy_query.query.Query;
 import com.happy_query.writer.Writer;

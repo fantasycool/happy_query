@@ -3,7 +3,7 @@ package com.happy_query.parser;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.happy_query.cache.DataDefinitionCacheManager;
+import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.parser.domain.DataDefinitionDataType;
 import com.happy_query.util.Constant;

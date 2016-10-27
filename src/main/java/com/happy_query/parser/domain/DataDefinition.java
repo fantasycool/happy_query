@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by frio on 16/6/14.
@@ -49,10 +50,6 @@ public class DataDefinition {
      */
     private String rule;
     /**
-     * 字段选项
-     */
-    private String dataOptions;
-    /**
      * 模板,控制展示,freemarker脚本
      */
     private String template;
@@ -83,6 +80,8 @@ public class DataDefinition {
     private Date gmtModified;
 
     private String isRequired;
+
+    private List<DataOption> dataOptionList;
 
     public String getComputationRule() {
         return computationRule;
@@ -204,14 +203,6 @@ public class DataDefinition {
         this.rule = rule;
     }
 
-    public String getDataOptions() {
-        return dataOptions;
-    }
-
-    public void setDataOptions(String dataOptions) {
-        this.dataOptions = dataOptions;
-    }
-
     public String getTemplate() {
         return template;
     }
@@ -293,59 +284,6 @@ public class DataDefinition {
         this.status = status;
     }
 
-//    /**
-//     * format string value to Row.Value
-//     *
-//     * @return
-//     */
-//    public Row.Value formatStringValue(String value) {
-//        Row.Value rv = Row.Value.createValue(null, value);
-//        if (StringUtils.isBlank(value)) {
-//            rv.setDataDefinition(this);
-//            return rv;
-//        }
-//        try {
-//            switch (dataTypeEnum) {
-//                case BOOLEAN:
-//                    if (value.equals("是") || value.equals("1")) {
-//                        rv.setValue(Integer.valueOf("1"));
-//                    } else {
-//                        rv.setValue(Integer.valueOf("0"));
-//                    }
-//                    break;
-//                case INT:
-//                    rv.setValue(Long.valueOf(value));
-//                    break;
-//                case STRING:
-//                    rv.setValue(value);
-//                    break;
-//                case DATETIME:
-//                    rv.setValue(Long.valueOf(value));
-//                    break;
-//                case FLOAT:
-//                    rv.setValue(Float.valueOf(value));
-//                    break;
-//                case DOUBLE:
-//                    rv.setValue(Double.valueOf(value));
-//                    break;
-//                case TEXT:
-//                    rv.setValue(String.valueOf(value));
-//                    break;
-//                default:
-//                    break;
-//            }
-//        } catch (NumberFormatException e) {
-//            LOG.error("when we do number format operation,we have met an error,the type is [{}], value is [{}]",
-//                    this.definitionTypeEnum.toString(), value, e);
-//            rv.setValue("-1");
-//        }
-//        if (rv.getValue() != null) {
-//            rv.setDataDefinition(this);
-//            return rv;
-//        }
-//        throw new JsonLogicParseException("data definition is not valid!");
-//    }
-
     public String getDataType() {
         return dataType;
     }
@@ -414,6 +352,14 @@ public class DataDefinition {
         }else{
             throw new HappyQueryException("DataDefinitionValue ");
         }
+    }
+
+    public List<DataOption> getDataOptionList() {
+        return dataOptionList;
+    }
+
+    public void setDataOptionList(List<DataOption> dataOptionList) {
+        this.dataOptionList = dataOptionList;
     }
 
     public String toString() {

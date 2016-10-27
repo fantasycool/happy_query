@@ -1,17 +1,16 @@
 package com.happy_query.writer;
 
 import com.alibaba.fastjson.JSON;
-import com.happy_query.cache.DataDefinitionCacheManager;
-import com.happy_query.cache.RelationCacheManager;
+import com.happy_query.query.cache.DataDefinitionCacheManager;
+import com.happy_query.query.cache.RelationCacheManager;
 import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.query.Query;
 import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;
-import com.happy_query.util.ReflectionUtil;
-import com.happy_query.writer.domain.DataDefinitionValue;
-import com.happy_query.writer.domain.DbArg;
-import com.happy_query.writer.domain.PrmUserInfo;
+import com.happy_query.domain.DataDefinitionValue;
+import com.happy_query.domain.DbArg;
+import com.happy_query.domain.PrmUserInfo;
 import com.jkys.moye.MoyeComputeEngine;
 import com.jkys.moye.MoyeComputeEngineImpl;
 import com.mysql.jdbc.StringUtils;

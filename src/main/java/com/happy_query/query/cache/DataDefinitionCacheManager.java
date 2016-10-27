@@ -1,4 +1,4 @@
-package com.happy_query.cache;
+package com.happy_query.query.cache;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -61,6 +61,7 @@ public class DataDefinitionCacheManager {
                 return new NullDataDefinition();
             }
             fillChildComment(dataDefinition);
+            fillOptions(dataDefinition);
             return dataDefinition;
         } else if (key instanceof String) {
             DataDefinition dataDefinition = DataDefinitionDao.getDataDefinitionByName(dataSource, key.toString());
@@ -72,6 +73,14 @@ public class DataDefinitionCacheManager {
             return dataDefinition;
         }
         return new NullDataDefinition();
+    }
+
+    /**
+     * 填充DataOption选项
+     * @param dataDefinition
+     */
+    private static void fillOptions(DataDefinition dataDefinition) {
+
     }
 
     private static void fillChildComment(DataDefinition dataDefinition) {
