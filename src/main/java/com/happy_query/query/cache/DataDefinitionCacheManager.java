@@ -3,13 +3,16 @@ package com.happy_query.query.cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.happy_query.domain.DataOption;
 import com.happy_query.parser.dao.DataDefinitionDao;
 import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.parser.domain.DefinitionType;
 import com.happy_query.util.HappyQueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -80,7 +83,11 @@ public class DataDefinitionCacheManager {
      * @param dataDefinition
      */
     private static void fillOptions(DataDefinition dataDefinition) {
-
+        if(dataDefinition.getDefinitionTypeEnum() == DefinitionType.SELECT
+                || dataDefinition.getDefinitionTypeEnum() == DefinitionType.MULTISELECT){
+            List<DataOption> dataOptionList = DataOption.queryDataOptionsByDDId(dataSource, dataDefinition.getId());
+            dataDefinition.setDataOptionList(dataOptionList);
+        }
     }
 
     private static void fillChildComment(DataDefinition dataDefinition) {

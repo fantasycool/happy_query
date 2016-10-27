@@ -1,5 +1,6 @@
 package com.happy_query.parser.domain;
 
+import com.happy_query.domain.DataOption;
 import com.happy_query.util.HappyQueryException;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;

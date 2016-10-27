@@ -3,7 +3,6 @@ package com.happy_query.query.cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.happy_query.domain.KeyRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +10,7 @@ import javax.sql.DataSource;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
+import com.happy_query.domain.KeyRelation;
 /**
  * Created by frio on 16/10/21.
  */
