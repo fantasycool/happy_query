@@ -1,9 +1,16 @@
 package com.happ_query.test;
 
+import com.alibaba.fastjson.JSON;
 import com.happy_query.writer.domain.PrmUserInfo;
+import junit.framework.Assert;
+import org.javatuples.Pair;
 import org.junit.Test;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,5 +52,41 @@ public class ReaderWriterTest extends BaseTest {
         writer.updateRecord(datas, prmUserInfo.getId(), empName);
     }
 
+    @Test
+    public void testQueryById() throws SQLException {
+        Connection connection = dataSource.getConnection();
+        List<String> keys = new ArrayList<>();
+        keys.add("dd2");
+        keys.add("dd2_comment");
+        keys.add("BMI");
+        Map<String, Object> map = query.getPrmUserInfo(28l, keys, connection);
+        Assert.assertNotNull(map.get("dd2"));
+        Assert.assertNotNull(map.get("dd2_comment"));
+        Assert.assertNotNull(map.get("BMI"));
+        Assert.assertNull(map.get("weight"));
+    }
+
+    @Test
+    public void testQueryByJson() {
+        String json = "[\n" +
+                "  \"and\",\n" +
+                "  {\n" +
+                "    \"attr\": \"weight\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"10\", \"100\"]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"attr\": \"height\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"0\", \"20\"]\n" +
+                "  }" +
+                "]\n";
+        Pair<Integer, List<Map<String, Object>>> pair = query.queryPrmUserInfosByJson(json, 0, 10);
+        System.out.println(pair.getValue0());
+        System.out.println(JSON.toJSONString(pair.getValue1()));
+        Assert.assertTrue(pair.getValue0() > 0);
+        Assert.assertTrue(pair.getValue1() != null);
+        Assert.assertTrue(pair.getValue1().size() > 0);
+    }
 
 }

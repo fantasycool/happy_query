@@ -116,9 +116,9 @@ public class Query implements IQuery {
 
         for(Map.Entry<String, Object> entry : data.entrySet()){
             DataDefinition dd = DataDefinitionCacheManager.getDataDefinition(entry.getKey());
-            if(dd instanceof DataDefinitionCacheManager.NullDataDefinition){
-                continue;
-            }
+//            if(dd instanceof DataDefinitionCacheManager.NullDataDefinition){
+//                continue;
+//            }
             prmDatas.put(entry.getKey(), entry.getValue());
         }
         if(lazyLoadDataDefinitionValues){

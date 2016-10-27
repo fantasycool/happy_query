@@ -1,7 +1,9 @@
 package com.happy_query.writer;
 
+import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.util.HappyQueryException;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +29,4 @@ public interface IWriter {
      * @throws HappyQueryException
      */
     void updateRecord(Map<String, Object> keyDatas, long prmId, String empName)throws HappyQueryException;
-
-
 }
