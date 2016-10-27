@@ -1,7 +1,6 @@
 package com.happy_query.domain;
 
 import com.happy_query.query.cache.DataDefinitionCacheManager;
-import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.ReflectionUtil;
 import org.apache.commons.lang3.StringUtils;

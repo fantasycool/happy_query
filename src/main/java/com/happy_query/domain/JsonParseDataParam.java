@@ -1,4 +1,4 @@
-package com.happy_query.parser.domain;
+package com.happy_query.domain;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 

@@ -1,4 +1,4 @@
-package com.happy_query.parser.domain;
+package com.happy_query.domain;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;

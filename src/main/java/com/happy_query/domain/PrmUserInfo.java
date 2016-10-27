@@ -1,6 +1,5 @@
 package com.happy_query.domain;
 
-import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;

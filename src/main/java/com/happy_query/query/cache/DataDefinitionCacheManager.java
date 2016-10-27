@@ -4,9 +4,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.happy_query.domain.DataOption;
-import com.happy_query.parser.dao.DataDefinitionDao;
-import com.happy_query.parser.domain.DataDefinition;
-import com.happy_query.parser.domain.DefinitionType;
+import com.happy_query.domain.DataDefinition;
+import com.happy_query.domain.DefinitionType;
 import com.happy_query.util.HappyQueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +58,7 @@ public class DataDefinitionCacheManager {
 
     public static Object createDataDefinition(Object key) {
         if (key instanceof Long) {
-            DataDefinition dataDefinition = DataDefinitionDao.getDataDefinition(dataSource, (long) key);
+            DataDefinition dataDefinition = DataDefinition.getDataDefinition(dataSource, (long) key);
             if (null == dataDefinition) {
                 return new NullDataDefinition();
             }
@@ -67,7 +66,7 @@ public class DataDefinitionCacheManager {
             fillOptions(dataDefinition);
             return dataDefinition;
         } else if (key instanceof String) {
-            DataDefinition dataDefinition = DataDefinitionDao.getDataDefinitionByName(dataSource, key.toString());
+            DataDefinition dataDefinition = DataDefinition.getDataDefinitionByName(dataSource, key.toString());
             if (null == dataDefinition) {
                 return new NullDataDefinition();
             }

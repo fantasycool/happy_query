@@ -4,7 +4,7 @@ import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.parser.IJsonSqlParser;
 import com.happy_query.parser.JsonSqlParser;
 import com.happy_query.parser.SQLQueryAssembly;
-import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.domain.DataDefinition;
 import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;

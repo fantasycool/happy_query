@@ -3,7 +3,7 @@ package com.happy_query.writer;
 import com.alibaba.fastjson.JSON;
 import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.query.cache.RelationCacheManager;
-import com.happy_query.parser.domain.DataDefinition;
+import com.happy_query.domain.DataDefinition;
 import com.happy_query.query.Query;
 import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;

@@ -1,9 +1,7 @@
 package com.happy_query.writer;
 
-import com.happy_query.parser.domain.DataDefinition;
 import com.happy_query.util.HappyQueryException;
 
-import java.util.List;
 import java.util.Map;
 
 /**
