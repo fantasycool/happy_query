@@ -57,13 +57,19 @@ public class Writer implements IWriter {
         long prmId = 0;
         Connection connection = null;
         try {
-            prmId = JDBCUtils.insertToTable(dataSource, Constant.PRM_USER_INFO, prmUserInfo.getDatas());
-            prmUserInfo.setId(prmId);
-            updateDataDefinitionValues(dbArg.dataDefinitionValues, prmId, empName, null);
-            connection = dataSource.getConnection();
 
+            connection = dataSource.getConnection();
+            connection.setAutoCommit(false);
+            prmId = JDBCUtils.insertToTable(connection, Constant.PRM_USER_INFO, prmUserInfo.getDatas());
+            prmUserInfo.setId(prmId);
+            commentDatasFilling(keyDatas, connection, prmUserInfo);
+            //reset because keyDatas may be updated
+            dbArg = DbArg.createFromArgs(keyDatas, source, userKey, empName);
+            updateDataDefinitionValues(dbArg.dataDefinitionValues, prmId, empName, null);
             relationUpdate(keyDatas, empName, connection, prmUserInfo);
+            connection.commit();
         } catch (Exception e) {
+            JDBCUtils.rollback(connection);
             throw new HappyQueryException("data written to user info failed", e);
         }finally {
             JDBCUtils.close(connection);
@@ -84,9 +90,6 @@ public class Writer implements IWriter {
             if (null == prmUserInfo) {
                 throw new HappyQueryException("prmId:" + prmId + ", prmUserInfo not exists");
             }
-            /**
-             * 要更新的指标是否包含具有备注并且为可筛选的指标,如果有则进行同步更新
-             */
             commentDatasFilling(keyDatas, connection, prmUserInfo);
             DbArg dbArg = DbArg.createFromArgs(keyDatas, prmUserInfo, connection);
             if(prmUserInfo.getDatas() != null && prmUserInfo.getDatas().size() > 0){
@@ -180,7 +183,7 @@ public class Writer implements IWriter {
                         if ((sourceValue != null && commentValue != null && sourceValue.toString().equals(commentValue.toString()))//comment的值和原始的值都不为空的情况下, 取出的comment的值equals原始的值
                                 || commentValue == null  //comment的值本身为空
                                 ) {
-                            keyDatas.put(dataDefinition.getChildComment().getKey(), userInfoDatas.get(dataDefinition.getChildComment().getKey()));
+                            keyDatas.put(dataDefinition.getChildComment().getKey(), sourceValue);
                         }
                     }
                 }

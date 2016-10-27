@@ -22,7 +22,7 @@ public class ReaderWriterTest extends BaseTest {
     @Test
     public void testInsertData(){
         Map<String, Object> datas = new HashMap<>();
-        datas.put("dd2", "dd2_value");
+        datas.put("dd2", "dd2");
         datas.put("weight", 75);
         datas.put("height", 1.75);
         System.out.println(writer.insertRecord(datas, source, userKey, empName));
@@ -37,6 +37,7 @@ public class ReaderWriterTest extends BaseTest {
         PrmUserInfo prmUserInfo = PrmUserInfo.getPrmUserInfoBySourceAndUserKey(dataSource, "1", "zsty");
         //更新weight的值,查看BMI和weight的指標是否會同時變化
         datas.put("weight", 80);
+        datas.put("dd2", "dd2");
         writer.updateRecord(datas, prmUserInfo.getId(), empName);
         //同時更新寬表和縱向表的值
         datas.put("dd2", "dd2_value2");
