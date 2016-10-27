@@ -13,7 +13,7 @@ import java.util.Map;
 public interface IQuery {
 
     /**
-     * Get Prm User Info by prmId and keys
+     * 根据用户id和指标keys列表获取用户指标信息
      * @param prmId
      * @param keys
      * @param connection we use this to for transaction, if we don't need this, put it null
@@ -22,11 +22,11 @@ public interface IQuery {
     Map<String, Object> getPrmUserInfo(Long prmId, List<String> keys, Connection connection);
 
     /**
-     * Query Prm User Infos by json query
+     * 传入筛选json条件筛选
      * @param jsonQuery
      * @param start
      * @param size
-     * @return
+     * @return Pair[符合条件的总数; 指标列表(只有横向表的数据)]
      */
     Pair<Integer, List<Map<String, Object>>> queryPrmUserInfosByJson(String jsonQuery, int start, int size);
 }
