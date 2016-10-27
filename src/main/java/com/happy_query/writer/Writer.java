@@ -139,8 +139,12 @@ public class Writer implements IWriter {
             for(String key :relatedKeys){
                 DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
                 String expression = dataDefinition.getComputationRule();
-                Object value = moyeComputeEngine.execute(expression, userDatas);
-                updatedDatas.put(dataDefinition.getKey(), value);
+                try{
+                    Object value = moyeComputeEngine.execute(expression, userDatas);
+                    updatedDatas.put(dataDefinition.getKey(), value);
+                }catch(Exception e){
+                    LOG.error("compute new dd value failed,expression:{}, userDatas:{}", expression, JSON.toJSONString(userDatas), e);
+                }
             }
         }
         updateRecord(updatedDatas, prmUserInfo, empName, connection);
