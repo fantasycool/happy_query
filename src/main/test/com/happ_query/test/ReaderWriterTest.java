@@ -1,5 +1,6 @@
 package com.happ_query.test;
 
+import com.happy_query.writer.domain.PrmUserInfo;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -27,9 +28,20 @@ public class ReaderWriterTest extends BaseTest {
         System.out.println(writer.insertRecord(datas, source, userKey, empName));
     }
 
+    /**
+     * 更新weight的值的時候會同步更新BMI的值
+     */
     @Test
     public void testUpdateWeight(){
-
+        Map<String, Object> datas = new HashMap<>();
+        PrmUserInfo prmUserInfo = PrmUserInfo.getPrmUserInfoBySourceAndUserKey(dataSource, "1", "zsty");
+        //更新weight的值,查看BMI和weight的指標是否會同時變化
+        datas.put("weight", 80);
+        writer.updateRecord(datas, prmUserInfo.getId(), empName);
+        //同時更新寬表和縱向表的值
+        datas.put("dd2", "dd2_value2");
+        datas.put("height", 1.80);
+        writer.updateRecord(datas, prmUserInfo.getId(), empName);
     }
 
 

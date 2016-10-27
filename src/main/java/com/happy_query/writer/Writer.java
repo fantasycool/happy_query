@@ -89,11 +89,15 @@ public class Writer implements IWriter {
              */
             commentDatasFilling(keyDatas, connection, prmUserInfo);
             DbArg dbArg = DbArg.createFromArgs(keyDatas, prmUserInfo, connection);
+            if(prmUserInfo.getDatas() != null && prmUserInfo.getDatas().size() > 0){
+                PrmUserInfo.updatePrmUserInfo(connection, prmUserInfo.getDatas(), prmUserInfo.getId());
+            }
             updateDataDefinitionValues(dbArg.dataDefinitionValues, prmUserInfo.getId(), empName, null);
             relationUpdate(keyDatas, empName, connection, prmUserInfo);
         }catch(HappyQueryException e){
             throw e;
         }catch(Exception e){
+            e.printStackTrace();
             LOG.error("keyDatas:{}, prmId:{}, empName:{}", JSON.toJSONString(keyDatas), prmId, empName, e);
             JDBCUtils.rollback(connection);
             throw new HappyQueryException(String.format("keyDatas:%s, prmId:%d, empName:%s", JSON.toJSONString(keyDatas), prmId, empName));
@@ -171,7 +175,7 @@ public class Writer implements IWriter {
                 //能够筛选的指标才需要进行双写原始指标和备注的指标
                 if(dataDefinition.getQuery()) {
                     if (dataDefinition.getChildComment() != null && !(dataDefinition.getChildComment() instanceof DataDefinitionCacheManager.NullDataDefinition)) {
-                        Object sourceValue = userInfoDatas.get(dataDefinition.getKey());
+                        Object sourceValue = keyDatas.get(dataDefinition.getKey());
                         Object commentValue = userInfoDatas.get(dataDefinition.getChildComment().getKey());
                         if ((sourceValue != null && commentValue != null && sourceValue.toString().equals(commentValue.toString()))//comment的值和原始的值都不为空的情况下, 取出的comment的值equals原始的值
                                 || commentValue == null  //comment的值本身为空

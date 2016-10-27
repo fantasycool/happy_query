@@ -5,6 +5,7 @@ import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;
 import com.happy_query.util.ReflectionUtil;
+import com.mysql.jdbc.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,6 +117,33 @@ public class PrmUserInfo {
         } catch (SQLException e) {
             LOG.error("select prm user info by id failed, prmId:{}", prmId, e);
             throw new HappyQueryException(e);
+        }
+    }
+
+    public static PrmUserInfo getPrmUserInfoBySourceAndUserKey(DataSource dataSource, String userKey, String source){
+        if(StringUtils.isNullOrEmpty(userKey) || StringUtils.isNullOrEmpty(source) || dataSource == null){
+            throw new IllegalArgumentException();
+        }
+        PrmUserInfo prmUserInfo = new PrmUserInfo();
+        List<Object> parameters = new ArrayList<>();
+        parameters.add(userKey);
+        parameters.add(source);
+        Connection connection = null;
+        try {
+            connection = dataSource.getConnection();
+            List<Map<String, Object>> result = JDBCUtils.executeQuery(connection, "select * from " + Constant.PRM_USER_INFO + " where user_key=? and source=?", parameters);
+            if(result == null || result.size() == 0){
+                return null;
+            }else{
+                ReflectionUtil.cloneMapValueToBean(result.get(0), prmUserInfo);
+                prmUserInfo.setDatas(result.get(0));
+                return prmUserInfo;
+            }
+        } catch (SQLException e) {
+            LOG.error("select prm user info by source and user key failed, userKey:{}, source:{}", userKey, source , e);
+            throw new HappyQueryException(e);
+        } finally {
+            JDBCUtils.close(connection);
         }
     }
 

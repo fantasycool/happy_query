@@ -108,7 +108,9 @@ public class DbArg {
                 LOG.error("key {} does not exists", key);
                 throw new HappyQueryException("key:" + key + "not exists");
             }
-            setLeftOrRightValue(prmDDs, prmDatas, dataDefinitionValues, value, dataDefinition);
+            if(value != null){
+                setLeftOrRightValue(prmDDs, prmDatas, dataDefinitionValues, value, dataDefinition);
+            }
         }
     }
 
