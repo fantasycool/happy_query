@@ -3,6 +3,10 @@ package com.happy_query.domain;
 import com.happy_query.util.Constant;
 import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;
+import com.happy_query.util.NullChecker;
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -13,6 +17,7 @@ import java.util.*;
  * Created by frio on 16/10/21.
  */
 public class KeyRelation {
+    static Logger LOG = LoggerFactory.getLogger(KeyRelation.class);
     private Long id;
     private String sourceKey;
     private String key;
@@ -63,6 +68,28 @@ public class KeyRelation {
             return result;
         } catch (SQLException e) {
             throw new HappyQueryException("key:" + key + " get failed!", e);
+        }
+    }
+
+    /**
+     * insert key relation,表示指标之间的互相影响关系
+     * @param sourceKey
+     * @param targetKey
+     * @param dataSource
+     * @return
+     */
+    public static long insertKeyRelation(String sourceKey, String targetKey, DataSource dataSource){
+        NullChecker.checkNull(sourceKey, targetKey, dataSource);
+        Map<String, Object> params = new HashMap<>();
+        params.put("source_key", sourceKey);
+        params.put("target_key", targetKey);
+        try{
+            return JDBCUtils.insertToTable(dataSource, Constant.KEY_RELATION_TABLE_NAME, params);
+        }catch(MySQLIntegrityConstraintViolationException e){
+            LOG.error("have already inserted key relation record", e);
+            return 0l;
+        }catch(SQLException e){
+            throw new HappyQueryException("key relation insert failed, sourceKey:" + sourceKey + ";targetKey:" + targetKey, e);
         }
     }
 }

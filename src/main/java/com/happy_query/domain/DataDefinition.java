@@ -5,6 +5,11 @@ import com.happy_query.util.HappyQueryException;
 import com.happy_query.util.JDBCUtils;
 import com.happy_query.util.NullChecker;
 import com.happy_query.util.ReflectionUtil;
+import com.jkys.moye.DynamicVariable;
+import com.jkys.moye.MoyeParser;
+import com.jkys.moye.MoyeParserImpl;
+import com.jkys.moye.Word;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,7 +136,7 @@ public class DataDefinition {
         list.add(name);
         list.add(name);
         try {
-            String sql = String.format("select * from %s where (nick_name=? or name=?) and status=0 order by gmt_create desc limit 1", TABLE_NAME);
+            String sql = String.format("select * from %s where (nick_name=? or key=?) and status=0 order by gmt_create desc limit 1", TABLE_NAME);
             List<Map<String, Object>> data = JDBCUtils.executeQuery(dataSource, sql, list);
             return getDataDefinition(data);
         } catch (SQLException e) {
@@ -152,8 +157,7 @@ public class DataDefinition {
     }
 
     public static int updateDataDefinition(DataSource dataSource, DataDefinition dataDefinition) {
-        NullChecker.checkNull(dataDefinition);
-        NullChecker.checkNull(dataDefinition.getId());
+        NullChecker.checkNull(dataDefinition, dataDefinition.getId());
         Map<String, Object> map = ReflectionUtil.cloneBeanToMap(dataDefinition);
         try {
             return JDBCUtils.executeUpdateById(dataSource, TABLE_NAME, map, "id", dataDefinition.getId());
@@ -162,6 +166,33 @@ public class DataDefinition {
             throw new HappyQueryException("update failed", e);
         }
     }
+
+    /**
+     * 新增标签指标的时候调用,根据标签类型
+     *  1. 系统标签. 多个指标的组合生成,这些多个指标都和此标签为映射关系
+     *  2. 动态标签. 多个指标的组合生成,这些多个指标都和此标签为映射关系
+     * @param dataSource
+     * @param dataDefinition
+     */
+    public static void insertTagDataDefinition(DataSource dataSource, DataDefinition dataDefinition){
+        if(dataDefinition.getType() != 1){
+            throw new HappyQueryException("要创建的指标不为标签指标");
+        }
+        if(StringUtils.isNoneBlank(dataDefinition.getComputationRule())){
+            MoyeParser moyeParser = new MoyeParserImpl();
+            List<Word> words = moyeParser.parseExpression(dataDefinition.getComputationRule());
+            for(Word w : words){
+                if(w instanceof DynamicVariable){
+                    KeyRelation.insertKeyRelation(dataDefinition.getKey(), w.getName(), dataSource);
+                }
+            }
+        }
+        insertDataDefinition(dataSource, dataDefinition);
+    }
+
+
+
+
 
     public static void setDataDefinitionTableName(String ddName){
         TABLE_NAME = ddName;

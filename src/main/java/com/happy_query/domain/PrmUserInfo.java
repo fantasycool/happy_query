@@ -1,9 +1,6 @@
 package com.happy_query.domain;
 
-import com.happy_query.util.Constant;
-import com.happy_query.util.HappyQueryException;
-import com.happy_query.util.JDBCUtils;
-import com.happy_query.util.ReflectionUtil;
+import com.happy_query.util.*;
 import com.mysql.jdbc.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

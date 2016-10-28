@@ -27,4 +27,14 @@ public interface IWriter {
      * @throws HappyQueryException
      */
     void updateRecord(Map<String, Object> keyDatas, long prmId, String empName)throws HappyQueryException;
+
+    /**
+     * 新增或者更新指标数据
+     * @param keyDatas
+     * @param userKey
+     * @param source
+     * @param empName
+     * @throws HappyQueryException
+     */
+    void updateOrInsertRecord(Map<String, Object> keyDatas, String userKey, String source, String empName)throws HappyQueryException;
 }

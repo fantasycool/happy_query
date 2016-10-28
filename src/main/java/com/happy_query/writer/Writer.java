@@ -11,6 +11,7 @@ import com.happy_query.util.JDBCUtils;
 import com.happy_query.domain.DataDefinitionValue;
 import com.happy_query.domain.DbArg;
 import com.happy_query.domain.PrmUserInfo;
+import com.happy_query.util.NullChecker;
 import com.jkys.moye.MoyeComputeEngine;
 import com.jkys.moye.MoyeComputeEngineImpl;
 import com.mysql.jdbc.StringUtils;
@@ -109,6 +110,23 @@ public class Writer implements IWriter {
             } catch (SQLException e) {
             }
             JDBCUtils.close(connection);
+        }
+    }
+
+    @Override
+    public void updateOrInsertRecord(Map<String, Object> keyDatas, String userKey, String source, String empName) throws HappyQueryException {
+        NullChecker.checkNull(keyDatas, userKey, source, empName);
+        try {
+            PrmUserInfo prmUserInfo = PrmUserInfo.getPrmUserInfoBySourceAndUserKey(dataSource, userKey, source);
+            if(prmUserInfo == null){
+                insertRecord(keyDatas, source, userKey, empName);
+            }else{
+                updateRecord(keyDatas, prmUserInfo.getId(), empName);
+            }
+        }catch (HappyQueryException e){
+            throw e;
+        }catch(Exception e){
+            LOG.error("updateOrInsertRecord failed", e);
         }
     }
 
