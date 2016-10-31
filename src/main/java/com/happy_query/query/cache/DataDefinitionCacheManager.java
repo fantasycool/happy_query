@@ -55,7 +55,7 @@ public class DataDefinitionCacheManager {
      */
     public static void init(){
         try {
-            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select key from " + DataDefinition.TABLE_NAME + " where status=0", new ArrayList<>());
+            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select `key` from " + DataDefinition.TABLE_NAME + " where status=0", new ArrayList<>());
             for(Map<String, Object> m: list){
                 String key = m.get("key").toString();
                 getDataDefinition(key);
