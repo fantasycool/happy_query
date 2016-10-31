@@ -7,12 +7,14 @@ import com.happy_query.domain.DataDefinition;
 import com.happy_query.domain.DataOption;
 import com.happy_query.domain.DefinitionType;
 import com.happy_query.util.HappyQueryException;
+import com.happy_query.util.JDBCUtils;
 import com.jkys.moye.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +43,29 @@ public class DataDefinitionCacheManager {
 
     public static Object getValue(Object k) throws ExecutionException {
         return cache.get(k);
+    }
+
+    /**
+     * 初始化所有字典数据
+     */
+    public static void init(){
+        try {
+            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select key from " + DataDefinition.TABLE_NAME + " where status=0", new ArrayList<>());
+            for(Map<String, Object> m: list){
+                String key = m.get("key").toString();
+                getDataDefinition(key);
+            }
+        } catch (SQLException e) {
+            throw new HappyQueryException("dds init failed!", e);
+        }
+    }
+
+    /**
+     * 清除掉指标key的缓存
+     * @param key
+     */
+    public static void delByKey(String key){
+        cache.invalidate(key);
     }
 
     /**
