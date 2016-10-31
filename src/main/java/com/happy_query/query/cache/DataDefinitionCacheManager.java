@@ -43,6 +43,7 @@ public class DataDefinitionCacheManager {
 
     public DataDefinitionCacheManager(DataSource _dataSource){
         dataSource = _dataSource;
+        init();
     }
 
     public static Object getValue(Object k) throws ExecutionException {
