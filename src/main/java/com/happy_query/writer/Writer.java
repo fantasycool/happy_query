@@ -23,6 +23,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 /**
  * Created by frio on 16/6/17.
@@ -151,6 +152,21 @@ public class Writer implements IWriter {
         for(String key : keyDatas.keySet()){
             relatedKeys.addAll(RelationCacheManager.getValue(key));
         }
+        //add logic: 如果是系统标签或者组标签或者手动标签,我们不需要联动更新
+        relatedKeys.removeIf(new Predicate<String>() {
+            @Override
+            public boolean test(String s) {
+                DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(s);
+                if(dataDefinition.getType() == 1){
+                    if(dataDefinition.getTagType() == Constant.HAND_BIAO_QIAN
+                            || dataDefinition.getTagType() == Constant.GROUP_BIAO_QIAN
+                            || dataDefinition.getTagType() == Constant.XI_TONG_BIAO_QIAN){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
         Map<String, Object> updatedDatas = new HashMap<>();
         if(relatedKeys.size() > 0){
             Query query = new Query(dataSource);
