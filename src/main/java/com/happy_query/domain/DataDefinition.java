@@ -131,7 +131,7 @@ public class DataDefinition {
         NullChecker.checkNull(dataSource);
         List<Object> params = new ArrayList<>();
         try {
-            List<Map<String, Object>> datas = JDBCUtils.executeQuery(dataSource, "select * from " + TABLE_NAME + " where tag_type=3", params);
+            List<Map<String, Object>> datas = JDBCUtils.executeQuery(dataSource, "select * from " + TABLE_NAME + " where tag_type=3 and status=0", params);
             List<DataDefinition> result = new ArrayList<>();
             for(Map<String, Object> data : datas){
                 result.add(DataDefinitionCacheManager.getDataDefinition(data.get("key").toString()));
@@ -173,6 +173,8 @@ public class DataDefinition {
         NullChecker.checkNull(dataDefinition, dataDefinition.getId());
         Map<String, Object> map = ReflectionUtil.cloneBeanToMap(dataDefinition);
         try {
+            //清空掉缓存
+            DataDefinitionCacheManager.delByKey(dataDefinition.getKey());
             return JDBCUtils.executeUpdateById(dataSource, TABLE_NAME, map, "id", dataDefinition.getId());
         } catch (SQLException e) {
             LOG.error("update datadefinition failed, datadefinition content is:[{}], t is:[{}]", dataDefinition.toString(), e);
