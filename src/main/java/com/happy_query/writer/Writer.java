@@ -59,6 +59,7 @@ public class Writer implements IWriter {
         try {
 
             connection = dataSource.getConnection();
+            connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(false);
             prmId = JDBCUtils.insertToTable(connection, Constant.PRM_USER_INFO, prmUserInfo.getDatas());
             prmUserInfo.setId(prmId);
@@ -85,6 +86,7 @@ public class Writer implements IWriter {
         Connection connection = null;
         try {
             connection = dataSource.getConnection();
+            connection.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             connection.setAutoCommit(false);
             PrmUserInfo prmUserInfo = PrmUserInfo.getPrmUserInfo(dataSource, prmId);
             if (null == prmUserInfo) {
