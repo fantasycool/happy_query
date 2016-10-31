@@ -1,10 +1,7 @@
 package com.happy_query.domain;
 
 import com.happy_query.query.cache.DataDefinitionCacheManager;
-import com.happy_query.util.HappyQueryException;
-import com.happy_query.util.JDBCUtils;
-import com.happy_query.util.NullChecker;
-import com.happy_query.util.ReflectionUtil;
+import com.happy_query.util.*;
 import com.jkys.moye.DynamicVariable;
 import com.jkys.moye.MoyeParser;
 import com.jkys.moye.MoyeParserImpl;
@@ -127,6 +124,22 @@ public class DataDefinition {
         } catch (SQLException e) {
             LOG.error("getDataDefinitionByName failed!param name is [{}]", name, e);
             throw new HappyQueryException("getDataDefinitionByName failed!param name is " + name, e);
+        }
+    }
+
+    public static List<DataDefinition> queryGroupDataDefinitions(DataSource dataSource){
+        NullChecker.checkNull(dataSource);
+        List<Object> params = new ArrayList<>();
+        try {
+            List<Map<String, Object>> datas = JDBCUtils.executeQuery(dataSource, "select * from " + TABLE_NAME + " where tag_type=3", params);
+            List<DataDefinition> result = new ArrayList<>();
+            for(Map<String, Object> data : datas){
+                result.add(DataDefinitionCacheManager.getDataDefinition(data.get("key").toString()));
+            }
+            return result;
+        } catch (SQLException e) {
+            LOG.error("queryGroupDataDefinitions failed", e);
+            throw new HappyQueryException(e);
         }
     }
 
