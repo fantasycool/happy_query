@@ -87,7 +87,7 @@ public class DataDefinitionCacheManager {
                 continue;
             }
             Object value = moyeComputeEngine.execute(dataDefinition.getComputationRule(), context);
-            if(value != null && value.toString().equals("1")){
+            if(value != null && value.toString().equals("0")){
                 resultGroupKeys.add(dataDefinition.getKey());
             }
         }

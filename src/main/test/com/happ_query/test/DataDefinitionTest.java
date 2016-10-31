@@ -6,6 +6,9 @@ import com.happy_query.domain.DataDefinitionDataType;
 import junit.framework.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by frio on 16/10/26.
  */
@@ -24,4 +27,13 @@ public class DataDefinitionTest extends BaseTest {
         Assert.assertTrue(dataDefinition.getLeftData());
     }
 
+    @Test
+    public void testTagGroup(){
+        List<String> tagsKeys = new ArrayList<>();
+        tagsKeys.add("tag1");
+        tagsKeys.add("tag2");
+        List<String> result = DataDefinitionCacheManager.groupDdTriggered(tagsKeys);
+        Assert.assertTrue(result.size() > 0 && result.size() == 1);
+        Assert.assertTrue(result.get(0).equals("tag_group"));
+    }
 }
