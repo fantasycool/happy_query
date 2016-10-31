@@ -41,6 +41,10 @@ public class DataDefinitionCacheManager {
                         }
                     });
 
+    public DataDefinitionCacheManager(DataSource _dataSource){
+        dataSource = _dataSource;
+    }
+
     public static Object getValue(Object k) throws ExecutionException {
         return cache.get(k);
     }

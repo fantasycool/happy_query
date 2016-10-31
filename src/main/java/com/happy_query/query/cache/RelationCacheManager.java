@@ -17,6 +17,11 @@ import com.happy_query.domain.KeyRelation;
 public class RelationCacheManager {
     static Logger LOG = LoggerFactory.getLogger(RelationCacheManager.class);
     public static DataSource dataSource;
+
+    public RelationCacheManager(DataSource _dataSource){
+        dataSource = _dataSource;
+    }
+
     public static LoadingCache<String, Set<String>> cache = CacheBuilder.newBuilder()
             .maximumSize(2000)
             .expireAfterWrite(60, TimeUnit.MINUTES)
