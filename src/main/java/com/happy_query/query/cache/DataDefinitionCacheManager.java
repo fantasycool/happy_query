@@ -6,8 +6,7 @@ import com.google.common.cache.LoadingCache;
 import com.happy_query.domain.DataDefinition;
 import com.happy_query.domain.DataOption;
 import com.happy_query.domain.DefinitionType;
-import com.happy_query.util.HappyQueryException;
-import com.happy_query.util.JDBCUtils;
+import com.happy_query.util.*;
 import com.jkys.moye.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -55,7 +54,7 @@ public class DataDefinitionCacheManager {
      */
     public static void init(){
         try {
-            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select `key` from " + DataDefinition.TABLE_NAME + " where status=0", new ArrayList<>());
+            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select `key` from " + com.happy_query.util.Constant.TABLE_NAME + " where status=0", new ArrayList<>());
             for(Map<String, Object> m: list){
                 String key = m.get("key").toString();
                 getDataDefinition(key);

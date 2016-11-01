@@ -1,5 +1,9 @@
 package com.happy_query.domain;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.happy_query.parser.JsonSqlParser;
 import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.util.*;
 import com.jkys.moye.DynamicVariable;
@@ -19,7 +23,6 @@ import java.util.*;
  * Created by frio on 16/6/14.
  */
 public class DataDefinition {
-    public static String TABLE_NAME = "statistic_keys";
     static Logger LOG = LoggerFactory.getLogger(DataDefinition.class);
     private long id;
     private Long parentId;
@@ -33,6 +36,7 @@ public class DataDefinition {
     private String dataType;
     private DataDefinition parent;
     private DataDefinition childComment;
+    private String computationJson;
 
     /**
      * 字典名称
@@ -95,7 +99,7 @@ public class DataDefinition {
         NullChecker.checkNull(id);
         List<Object> list = Arrays.asList((Object) id);
         try {
-            String sql = String.format("select * from %s where id=? and status=0 order by gmt_create desc limit 1", TABLE_NAME);
+            String sql = String.format("select * from %s where id=? and status=0 order by gmt_create desc limit 1", Constant.TABLE_NAME);
             List<Map<String, Object>> data = JDBCUtils.executeQuery(dataSource, sql, list);
             return getDataDefinition(data);
         } catch (SQLException e) {
@@ -118,7 +122,7 @@ public class DataDefinition {
         NullChecker.checkNull(name);
         List<Object> list = Arrays.asList((Object) name);
         try {
-            String sql = String.format("select * from %s where `key`=? and status=0 order by gmt_create desc limit 1", TABLE_NAME);
+            String sql = String.format("select * from %s where `key`=? and status=0 order by gmt_create desc limit 1", Constant.TABLE_NAME);
             List<Map<String, Object>> data = JDBCUtils.executeQuery(dataSource, sql, list);
             return getDataDefinition(data);
         } catch (SQLException e) {
@@ -131,7 +135,7 @@ public class DataDefinition {
         NullChecker.checkNull(dataSource);
         List<Object> params = new ArrayList<>();
         try {
-            List<Map<String, Object>> datas = JDBCUtils.executeQuery(dataSource, "select * from " + TABLE_NAME + " where tag_type=3 and status=0", params);
+            List<Map<String, Object>> datas = JDBCUtils.executeQuery(dataSource, "select * from " + Constant.TABLE_NAME + " where tag_type=3 and status=0", params);
             List<DataDefinition> result = new ArrayList<>();
             for(Map<String, Object> data : datas){
                 result.add(DataDefinitionCacheManager.getDataDefinition(data.get("key").toString()));
@@ -149,7 +153,7 @@ public class DataDefinition {
         list.add(name);
         list.add(name);
         try {
-            String sql = String.format("select * from %s where (nick_name=? or key=?) and status=0 order by gmt_create desc limit 1", TABLE_NAME);
+            String sql = String.format("select * from %s where (nick_name=? or key=?) and status=0 order by gmt_create desc limit 1", Constant.TABLE_NAME);
             List<Map<String, Object>> data = JDBCUtils.executeQuery(dataSource, sql, list);
             return getDataDefinition(data);
         } catch (SQLException e) {
@@ -162,7 +166,7 @@ public class DataDefinition {
         NullChecker.checkNull(dataDefinition);
         Map<String, Object> map = ReflectionUtil.cloneBeanToMap(dataDefinition);
         try {
-            dataDefinition.setId(JDBCUtils.insertToTable(dataSource, TABLE_NAME, map));
+            dataDefinition.setId(JDBCUtils.insertToTable(dataSource, Constant.TABLE_NAME, map));
         } catch (SQLException e) {
             LOG.error("insert datadefinition failed, datadefinition content is:[{}], t is:[{}]", dataDefinition.toString(), e);
             throw new HappyQueryException("insert failed", e);
@@ -175,7 +179,7 @@ public class DataDefinition {
         try {
             //清空掉缓存
             DataDefinitionCacheManager.delByKey(dataDefinition.getKey());
-            return JDBCUtils.executeUpdateById(dataSource, TABLE_NAME, map, "id", dataDefinition.getId());
+            return JDBCUtils.executeUpdateById(dataSource, Constant.TABLE_NAME, map, "id", dataDefinition.getId());
         } catch (SQLException e) {
             LOG.error("update datadefinition failed, datadefinition content is:[{}], t is:[{}]", dataDefinition.toString(), e);
             throw new HappyQueryException("update failed", e);
@@ -205,12 +209,83 @@ public class DataDefinition {
         insertDataDefinition(dataSource, dataDefinition);
     }
 
+    /**
+     * 创建组标签,组标签的子标签, 组标签子标签连带关系
+     * @param dataSource
+     * @param groupTag nick_name, description, computationJson
+     * @param childsTag nick_name, computationJson, description
+     * @param tagType 1:系统标签;2:动态标签
+     * @return 要进行异步任务打标的子标签列表
+     */
+    public static List<DataDefinition> insertGroupTagDataDefinition(DataSource dataSource, DataDefinition groupTag,
+                                                                    List<DataDefinition> childsTag, int tagType){
+        NullChecker.checkNull(groupTag, childsTag, groupTag.getNickName(), groupTag.getDescription(), groupTag.getComputationJson());
+        for(DataDefinition dataDefinition : childsTag){
+            NullChecker.checkNull(dataDefinition.getNickName(), dataDefinition.getComputationJson(), dataDefinition.getDescription());
+        }
+        List<DataDefinition> result = new ArrayList<>();
+        //create group tag
+        JsonSqlParser jsonSqlParser = new JsonSqlParser();
+        if(StringUtils.isNoneBlank(groupTag.getComputationJson())){
+            groupTag.setComputationRule(jsonSqlParser.convertJsonToLispExpression(groupTag.getComputationJson()));
+        }
+        groupTag.setType(Constant.TAG_TYPE);
+        groupTag.setTagType(Constant.GROUP_BIAO_QIAN);
+        groupTag.setKey(String.valueOf(System.currentTimeMillis()));
+        groupTag.setDefinitionType("input");
+        groupTag.setDataType("int");
+        insertDataDefinition(dataSource, groupTag);
+        //create childs tags
+        int i = 0;
+        for(DataDefinition dataDefinition : childsTag){
+            dataDefinition.setKey(String.valueOf(System.currentTimeMillis()) + i);
+            dataDefinition.setComputationRule(jsonSqlParser.convertJsonToLispExpression(mergeJson(groupTag.getComputationJson(), dataDefinition.getComputationJson())));
+            dataDefinition.setType(Constant.TAG_TYPE);
+            dataDefinition.setTagType(tagType);
+            dataDefinition.setDefinitionType("input");
+            dataDefinition.setDataType("int");
+            insertDataDefinition(dataSource, dataDefinition);
 
+            PrmTagKeyRelation prmTagKeyRelation = new PrmTagKeyRelation();
+            prmTagKeyRelation.setGroupKey(groupTag.getKey());
+            prmTagKeyRelation.setSubKey(dataDefinition.getKey());
+            PrmTagKeyRelation.insert(dataSource, prmTagKeyRelation);
+            result.add(dataDefinition);
+            i ++;
+        }
+        //end
+        return result;
+    }
 
+    /**
+     * 合并组标签和子标签的json生成一个合并结果的json
+     * @param computationJson
+     * @param computationJson1
+     * @return
+     */
+    private static String mergeJson(String computationJson, String computationJson1) {
+        JSONArray groupJSONArray = (JSONArray)JSON.parse(computationJson);
+        JSONObject childJsonObject = (JSONObject)JSON.parse(computationJson1);
+        List<Object> params = new ArrayList<>();
+        String connector = "and";
+        params.add(connector);
+        fillJsonArrayList(groupJSONArray, params);
+        params.add(childJsonObject);
+        JSONArray jsonArray = new JSONArray(params);
+        return jsonArray.toJSONString();
+    }
+
+    private static void fillJsonArrayList(JSONArray groupJSONArray, List<Object> params) {
+        for(Object object : groupJSONArray){
+            if(!(object instanceof String)){
+                params.add(object);
+            }
+        }
+    }
 
 
     public static void setDataDefinitionTableName(String ddName){
-        TABLE_NAME = ddName;
+        Constant.TABLE_NAME = ddName;
     }
 
     public String getComputationRule() {
@@ -496,4 +571,11 @@ public class DataDefinition {
         return ReflectionToStringBuilder.toString(this);
     }
 
+    public String getComputationJson() {
+        return computationJson;
+    }
+
+    public void setComputationJson(String computationJson) {
+        this.computationJson = computationJson;
+    }
 }

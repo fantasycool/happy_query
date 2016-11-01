@@ -3,6 +3,7 @@ package com.happ_query.test;
 import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.domain.DataDefinition;
 import com.happy_query.domain.DataDefinitionDataType;
+import com.happy_query.util.Constant;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -35,5 +36,49 @@ public class DataDefinitionTest extends BaseTest {
         List<String> result = DataDefinitionCacheManager.groupDdTriggered(tagsKeys);
         Assert.assertTrue(result.size() > 0 && result.size() == 1);
         Assert.assertTrue(result.get(0).equals("tag_group"));
+    }
+
+    /**
+     * 测试创建组标签
+     */
+    @Test
+    public void testCreateGroupDataDefinition(){
+        DataDefinition groupTag = new DataDefinition();
+        groupTag.setNickName("groupTag");
+        groupTag.setDescription("groupTagDescription");
+        String computationJson = "[\n" +
+                "  \"and\",\n" +
+                "  {\n" +
+                "    \"attr\": \"dd1\",\n" +
+                "    \"operator\":\"contains\",\n" +
+                "    \"value\": [\"dd2\",\"dd3\",\"dd4\"]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"attr\": \"dd2\",\n" +
+                "    \"operator\":\"equals\",\n" +
+                "    \"value\": \"abc\"\n" +
+                "  }\n" +
+                "]\n";
+        groupTag.setComputationJson(computationJson);
+        List<DataDefinition> childsTag = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setNickName("childTag1");
+        childTag1.setComputationJson(
+                "{\"attr\": \"dd5\",\n" +
+                        "    \"operator\":\"range\",\n" +
+                        "    \"value\": [\"0\", \"10\"]\n" +
+                        "  }");
+        childTag1.setDescription("childTag1");
+        childsTag.add(childTag1);
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setNickName("childTag1");
+        childTag2.setComputationJson(
+                "{\"attr\": \"dd5\",\n" +
+                        "    \"operator\":\"range\",\n" +
+                        "    \"value\": [\"10\", \"20\"]\n" +
+                        "  }");
+        childTag2.setDescription("childTag2");
+        childsTag.add(childTag2);
+        DataDefinition.insertGroupTagDataDefinition(dataSource, groupTag, childsTag, Constant.DYNAMIC_BIAO_QIAN);
     }
 }

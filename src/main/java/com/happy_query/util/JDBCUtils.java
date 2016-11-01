@@ -371,7 +371,7 @@ public abstract class JDBCUtils {
             if (nameCount > 0) {
                 sql.append(",");
             }
-            sql.append(name);
+            sql.append("`" + name + "`");
             nameCount++;
         }
         sql.append(") values (");

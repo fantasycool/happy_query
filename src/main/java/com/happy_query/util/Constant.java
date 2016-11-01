@@ -24,6 +24,7 @@ public class Constant {
     public static String USER_CATEGORY_TYPE = "user";
     public static String FUWU_CATEGORY_TYPE = "service";
     public static String MOCK_CATEGORY_TYPE = "mock";
+    public static String TABLE_NAME = "statistic_keys";
 
     static {
         SUB_KEY_MAP.put("user", 0);
@@ -67,6 +68,7 @@ public class Constant {
 
     public static String PRM_USER_INFO = "prm_user_info";
     public static String DATA_DEFINITION_VALUE = "data_definition_value";
+    public static String PRM_TAG_KEY_RELATION = "prm_tag_key_relation";
     public static String COMMENT_PREFIX = "_comment";
     public static String KEY_RELATION_TABLE_NAME = "prm_key_relation";
     public static String PRM_DATA_OPTIONS = "prm_data_options";
