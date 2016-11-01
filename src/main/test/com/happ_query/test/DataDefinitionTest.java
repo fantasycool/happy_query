@@ -1,5 +1,7 @@
 package com.happ_query.test;
 
+import com.alibaba.fastjson.JSON;
+import com.happy_query.domain.PrmTagKeyRelation;
 import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.domain.DataDefinition;
 import com.happy_query.domain.DataDefinitionDataType;
@@ -10,6 +12,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by frio on 16/10/26.
@@ -353,5 +356,20 @@ public class DataDefinitionTest extends BaseTest {
     @Test
     public void testDescribeFunction(){
         System.out.println(DataDefinition.describeExpression("(&&  (>= dd5 10) (<= dd5 2147483647) (== dd2 \"1\") (== dd3 \"1\") (== dd4 \"1\") (== dd2 \"abc\"))"));
+    }
+
+    @Test
+    public void testQuerySubKeys(){
+        for(String s : PrmTagKeyRelation.querySubKeysByGroupKey(dataSource, "1477968764441")){
+            System.out.println(s);
+        }
+    }
+
+    @Test
+    public void queryAllTagDataDefinitions(){
+        List<Map<String, Object>> list = DataDefinition.queryAllTagMapDefinitions(dataSource);
+        for(Map<String, Object> m : list){
+            System.out.println(JSON.toJSONString(m));
+        }
     }
 }

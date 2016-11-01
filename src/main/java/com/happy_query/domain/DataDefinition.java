@@ -147,6 +147,74 @@ public class DataDefinition {
         }
     }
 
+    public static List<DataDefinition> queryAllTagDefinitions(DataSource dataSource){
+        NullChecker.checkNull(dataSource);
+        List<Object> params = new ArrayList<>();
+        try {
+            List<Map<String, Object>> datas = JDBCUtils.executeQuery(dataSource, "select * from " + Constant.TABLE_NAME + " where type=1 and status=0", params);
+            List<DataDefinition> result = new ArrayList<>();
+            for(Map<String, Object> data : datas){
+                result.add(DataDefinitionCacheManager.getDataDefinition(data.get("key").toString()));
+            }
+            return result;
+        } catch (SQLException e) {
+            LOG.error("queryGroupDataDefinitions failed", e);
+            throw new HappyQueryException(e);
+        }
+    }
+
+    /**
+     * 查询获取所有字典
+     * @param dataSource
+     * @return
+     */
+    public static List<Map<String, Object>> queryAllTagMapDefinitions(DataSource dataSource){
+        NullChecker.checkNull(dataSource);
+        List<DataDefinition> dataDefinitions = queryAllTagDefinitions(dataSource);
+        List<DataDefinition> groupDataDefinition = queryGroupDataDefinitions(dataSource);
+        List<Map<String, Object>> result = new ArrayList<>();
+        Set<String> addedKeys = new HashSet<>();
+        /**
+         * add group datadefinitions
+         */
+        for(DataDefinition dataDefinition : groupDataDefinition){
+            if(dataDefinition.getType() == Constant.TAG_TYPE && dataDefinition.getTagType() == Constant.GROUP_BIAO_QIAN){
+                List<String> keys = PrmTagKeyRelation.querySubKeysByGroupKey(dataSource, dataDefinition.getKey());
+                for(String key : keys){
+                    Map<String, Object> map = new HashMap<>();
+                    addedKeys.add(key);
+                    DataDefinition childDataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
+                    map.put("tagType", "组标签");
+                    map.put("tagParentName", dataDefinition.getNickName());
+                    fillMapFromDataDefinition(map, childDataDefinition);
+                    result.add(map);
+                }
+            }
+        }
+        /**
+         * add normal tag data definitions
+         */
+        for(DataDefinition dataDefinition : dataDefinitions){
+            if(addedKeys.contains(dataDefinition.getKey())){
+                continue;
+            }
+            Map<String, Object> map = new HashMap<>();
+            fillMapFromDataDefinition(map, dataDefinition);
+            result.add(map);
+        }
+        return result;
+    }
+
+    private static void fillMapFromDataDefinition(Map<String, Object> map, DataDefinition childDataDefinition) {
+        map.put("tagId", childDataDefinition.getId());
+        map.put("tagName", childDataDefinition.getNickName());
+        map.put("tagWay", childDataDefinition.getTagType() == 1 ? "系统标签": "动态标签");
+        if(!StringUtils.isBlank(childDataDefinition.getComputationJson())){
+            map.put("tagRule", DataDefinition.describeExpression(childDataDefinition.getComputationRule()));
+        }
+        map.put("tagComment", childDataDefinition.getDescription());
+    }
+
     public static DataDefinition getDataDefinitionByNickName(DataSource dataSource, String name) {
         NullChecker.checkNull(name);
         List<Object> list = new ArrayList();
