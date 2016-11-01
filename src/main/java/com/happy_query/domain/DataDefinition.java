@@ -310,6 +310,82 @@ public class DataDefinition {
         }
     }
 
+
+    /**
+     * 生成expression的自然语言展示
+     * @param expression
+     * @return
+     */
+    public static String describeExpression(String expression) {
+        MoyeParser moyeParser = new MoyeParserImpl();
+        List<Word> words = moyeParser.parseExpression(expression);
+        return describe(words);
+    }
+
+    public static String describe(List<Word> words) {
+        boolean isLeft = false;
+        Operator operator = null;
+        List<Object> args = new ArrayList<Object>();
+        for (int i = 0; i < words.size() - 1; i++) {
+            if (i == 0 && !(words.get(i) instanceof LeftBracket)) {
+                throw new ParseException("expression must be started with (");
+            } else if (words.get(i) instanceof Operator) {
+                operator = (Operator) words.get(i);
+            } else if (words.get(i) instanceof BaseTypeValue || words.get(i) instanceof DynamicVariable) {
+                if(words.get(i) instanceof DynamicVariable){
+                    String key = words.get(i).getName();
+                    DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(key);
+                    if(dataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition){
+                        args.add(words.get(i));
+                    }else{
+                        args.add(StringUtils.isBlank(dataDefinition.getNickName())?words.get(i): dataDefinition.getNickName());
+                    }
+                }else{
+                    args.add(words.get(i));
+                }
+            } else if (words.get(i) instanceof LeftBracket && isLeft) {
+                List<Word> groupWords = MoyeComputeEngineImpl.cutoutGroupWords(words, i);
+                args.add(" (" + describe(groupWords) + ") ");
+                i = i + groupWords.size() - 1;
+            } else if (words.get(i) instanceof LeftBracket) {
+                isLeft = true;
+            }
+        }
+        if (operator == null) {
+            throw new ParseException("no operator found in expression");
+        }
+        if (operator.getOperatorEnum() == OperatorEnum.PLUS) {
+            return Operator.sumDesc(args.toArray());
+        } else if (operator.getOperatorEnum() == OperatorEnum.AND) {
+            return Operator.andDesc(args.toArray());
+        } else if (operator.getOperatorEnum() == OperatorEnum.OR) {
+            return Operator.orDesc(args.toArray());
+        } else if (operator.getOperatorEnum() == OperatorEnum.MULTIPLICATION) {
+            return Operator.multiDesc(args.toArray());
+        } else if (operator.getOperatorEnum() == OperatorEnum.DIVISION) {
+            return Operator.divisionDesc(args.toArray());
+        } else if (operator.getOperatorEnum() == OperatorEnum.MINUS) {
+            return Operator.minusDesc(args.toArray());
+        } else if (operator.getOperatorEnum() == OperatorEnum.XOR) {
+            return Operator.xorDesc(args.toArray());
+        } else if( operator.getOperatorEnum() == OperatorEnum.EQUAL_EQUAL){
+            return Operator.equalDesc(args.toArray());
+        } else if( operator.getOperatorEnum() == OperatorEnum.GREATER_THAN){
+            return Operator.greaterDesc(args.toArray());
+        } else if( operator.getOperatorEnum() == OperatorEnum.GREATER_THAN_OR_EQUAL){
+            return Operator.greaterEqualDesc( args.toArray());
+        } else if( operator.getOperatorEnum() == OperatorEnum.LESS_THAN){
+            return Operator.lessDesc(args.toArray());
+        } else if( operator.getOperatorEnum() == OperatorEnum.LESS_THAN_OR_EQUAL){
+            return Operator.lessEqualDesc(args.toArray());
+        } else if( operator.getOperatorEnum() == OperatorEnum.IN){
+            return Operator.inDesc(args.toArray());
+        } else if( operator.getOperatorEnum() == OperatorEnum.AGE){
+            return Operator.ageDesc(args.toArray());
+        }
+        return null;
+    }
+
     /**
      * 根据Range产生StringRange
      * @param value
@@ -370,7 +446,6 @@ public class DataDefinition {
             }
         }
     }
-
 
     public static void setDataDefinitionTableName(String ddName){
         Constant.TABLE_NAME = ddName;

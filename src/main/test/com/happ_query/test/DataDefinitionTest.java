@@ -321,7 +321,7 @@ public class DataDefinitionTest extends BaseTest {
         DataDefinition childTag1 = new DataDefinition();
         childTag1.setComputationJson("{\"attr\": \"dd4\",\n" +
                 "    \"operator\":\"contains\",\n" +
-                "    \"value\": [\"200\", \"310\"]\n" +
+                "    \"value\": \"900\"\n" +
                 "  }");
         childTag1.setDataType("string");
         childsTags.add(childTag1);
@@ -337,7 +337,7 @@ public class DataDefinitionTest extends BaseTest {
         DataDefinition childTag3 = new DataDefinition();
         childTag3.setComputationJson("{\"attr\": \"dd4\",\n" +
                 "    \"operator\":\"range\",\n" +
-                "    \"value\": [\"100\", \"500\"]\n" +
+                "    \"value\": [\"400\", \"500\"]\n" +
                 "  }");
         childTag3.setDataType("string");
         childsTags.add(childTag3);
@@ -350,4 +350,8 @@ public class DataDefinitionTest extends BaseTest {
         throw new RuntimeException();
     }
 
+    @Test
+    public void testDescribeFunction(){
+        System.out.println(DataDefinition.describeExpression("(&&  (>= dd5 10) (<= dd5 2147483647) (== dd2 \"1\") (== dd3 \"1\") (== dd4 \"1\") (== dd2 \"abc\"))"));
+    }
 }
