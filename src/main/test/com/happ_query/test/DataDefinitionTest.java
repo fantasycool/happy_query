@@ -4,6 +4,7 @@ import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.domain.DataDefinition;
 import com.happy_query.domain.DataDefinitionDataType;
 import com.happy_query.util.Constant;
+import com.happy_query.util.HappyQueryException;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -81,4 +82,272 @@ public class DataDefinitionTest extends BaseTest {
         childsTag.add(childTag2);
         DataDefinition.insertGroupTagDataDefinition(dataSource, groupTag, childsTag, Constant.DYNAMIC_BIAO_QIAN);
     }
+
+    @Test
+    public void testStringRangeOverride(){
+        List<DataDefinition> childsTags = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"010\", \"060\"]\n" +
+                "  }");
+        childTag1.setDataType("string");
+        childsTags.add(childTag1);
+
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"050\", \"080\"]\n" +
+                "  }");
+        childTag2.setDataType("string");
+        childsTags.add(childTag2);
+
+        DataDefinition childTag3 = new DataDefinition();
+        childTag3.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"090\", \"095\"]\n" +
+                "  }");
+        childTag3.setDataType("string");
+        childsTags.add(childTag3);
+
+        try{
+            DataDefinition.validateRange(childsTags);
+        }catch(HappyQueryException e){
+            Assert.assertEquals(e.getMessage(), Constant.HAPPY_QUERY_ERROR_RULE_OVERRIDE);
+        }
+    }
+
+    @Test
+    public void testStringRangeNotOverride(){
+        List<DataDefinition> childsTags = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"010\", \"060\"]\n" +
+                "  }");
+        childTag1.setDataType("string");
+        childsTags.add(childTag1);
+
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"070\", \"080\"]\n" +
+                "  }");
+        childTag2.setDataType("string");
+        childsTags.add(childTag2);
+
+        DataDefinition childTag3 = new DataDefinition();
+        childTag3.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"090\", \"095\"]\n" +
+                "  }");
+        childTag3.setDataType("string");
+        childsTags.add(childTag3);
+
+        try{
+            DataDefinition.validateRange(childsTags);
+        }catch(HappyQueryException e){
+            Assert.assertEquals(e.getMessage(), Constant.HAPPY_QUERY_ERROR_RULE_OVERRIDE);
+        }
+    }
+
+
+    @Test
+    public void testIntRangeNotOverride(){
+        List<DataDefinition> childsTags = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"010\", \"060\"]\n" +
+                "  }");
+        childTag1.setDataType("string");
+        childsTags.add(childTag1);
+
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"070\", \"080\"]\n" +
+                "  }");
+        childTag2.setDataType("string");
+        childsTags.add(childTag2);
+
+        DataDefinition childTag3 = new DataDefinition();
+        childTag3.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"090\", \"095\"]\n" +
+                "  }");
+        childTag3.setDataType("string");
+        childsTags.add(childTag3);
+        DataDefinition.validateRange(childsTags);
+    }
+
+    @Test
+    public void testIntRangeNumberNotOverride(){
+        List<DataDefinition> childsTags = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"10\", \"100\"]\n" +
+                "  }");
+        childTag1.setDataType("int");
+        childsTags.add(childTag1);
+
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"110\", \"120\"]\n" +
+                "  }");
+        childTag2.setDataType("int");
+        childsTags.add(childTag2);
+
+        DataDefinition childTag3 = new DataDefinition();
+        childTag3.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"130\", \"150\"]\n" +
+                "  }");
+        childTag3.setDataType("int");
+        childsTags.add(childTag3);
+        DataDefinition.validateRange(childsTags);
+    }
+
+    @Test
+    public void testIntRangeNumberOverride(){
+        List<DataDefinition> childsTags = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"10\", \"100\"]\n" +
+                "  }");
+        childTag1.setDataType("int");
+        childsTags.add(childTag1);
+
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"110\", \"120\"]\n" +
+                "  }");
+        childTag2.setDataType("int");
+        childsTags.add(childTag2);
+
+        DataDefinition childTag3 = new DataDefinition();
+        childTag3.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"10\", \"150\"]\n" +
+                "  }");
+        childTag3.setDataType("int");
+        childsTags.add(childTag3);
+        try {
+            DataDefinition.validateRange(childsTags);
+        }catch(HappyQueryException e){
+            Assert.assertEquals(Constant.HAPPY_QUERY_ERROR_RULE_OVERRIDE, e.getMessage());
+            return;
+        }
+        throw new RuntimeException();
+    }
+
+    @Test
+    public void testDoubleRangeNumberOverride(){
+        List<DataDefinition> childsTags = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"10\", \"100\"]\n" +
+                "  }");
+        childTag1.setDataType("double");
+        childsTags.add(childTag1);
+
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"110\", \"120\"]\n" +
+                "  }");
+        childTag2.setDataType("double");
+        childsTags.add(childTag2);
+
+        DataDefinition childTag3 = new DataDefinition();
+        childTag3.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"10\", \"150\"]\n" +
+                "  }");
+        childTag3.setDataType("double");
+        childsTags.add(childTag3);
+        try {
+            DataDefinition.validateRange(childsTags);
+        }catch(HappyQueryException e){
+            Assert.assertEquals(Constant.HAPPY_QUERY_ERROR_RULE_OVERRIDE, e.getMessage());
+            return;
+        }
+        throw new RuntimeException();
+    }
+
+    @Test
+    public void testContainsOverride(){
+        List<DataDefinition> childsTags = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"contains\",\n" +
+                "    \"value\": [\"200\", \"310\"]\n" +
+                "  }");
+        childTag1.setDataType("string");
+        childsTags.add(childTag1);
+
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"contains\",\n" +
+                "    \"value\": [\"310\", \"320\"]\n" +
+                "  }");
+        childTag2.setDataType("string");
+        childsTags.add(childTag2);
+
+        DataDefinition childTag3 = new DataDefinition();
+        childTag3.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"10\", \"150\"]\n" +
+                "  }");
+        childTag3.setDataType("string");
+        childsTags.add(childTag3);
+        try {
+            DataDefinition.validateRange(childsTags);
+        }catch(HappyQueryException e){
+            Assert.assertEquals(Constant.HAPPY_QUERY_ERROR_RULE_OVERRIDE, e.getMessage());
+            return;
+        }
+        throw new RuntimeException();
+    }
+
+    @Test
+    public void testContainsOverride1(){
+        List<DataDefinition> childsTags = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"contains\",\n" +
+                "    \"value\": [\"200\", \"310\"]\n" +
+                "  }");
+        childTag1.setDataType("string");
+        childsTags.add(childTag1);
+
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"contains\",\n" +
+                "    \"value\": [\"330\", \"320\"]\n" +
+                "  }");
+        childTag2.setDataType("string");
+        childsTags.add(childTag2);
+
+        DataDefinition childTag3 = new DataDefinition();
+        childTag3.setComputationJson("{\"attr\": \"dd4\",\n" +
+                "    \"operator\":\"range\",\n" +
+                "    \"value\": [\"100\", \"500\"]\n" +
+                "  }");
+        childTag3.setDataType("string");
+        childsTags.add(childTag3);
+        try {
+            DataDefinition.validateRange(childsTags);
+        }catch(HappyQueryException e){
+            Assert.assertEquals(Constant.HAPPY_QUERY_ERROR_RULE_OVERRIDE, e.getMessage());
+            return;
+        }
+        throw new RuntimeException();
+    }
+
 }

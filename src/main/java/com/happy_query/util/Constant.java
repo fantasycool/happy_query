@@ -9,7 +9,6 @@ import java.util.Map;
  * Created by frio on 16/6/20.
  */
 public class Constant {
-    public static final String OPERATOR = "operator";
     public static final String AND = "and";
     public static final String OR = "or";
     public static final String RANGE = "range";
@@ -17,6 +16,10 @@ public class Constant {
     public static final String EQUALS = "equals";
     public static final String VALUE = "value";
     public static final String MULTISELECT = "multiselect";
+    public static final String OPERATOR_VALUE_RANGE = "range";
+    public static final String OPERATOR_VALUE_CONTAINS = "contains";
+    public static final String OPERATOR_VALUE_EQUALS = "equals";
+    public static final String OPERATOR = "operator";
     /**
      * table data_definition_value category->sub_key values
      */
@@ -81,4 +84,5 @@ public class Constant {
     public static int HAND_BIAO_QIAN = 0;
     public static int GROUP_BIAO_QIAN = 3;
     public static int DYNAMIC_BIAO_QIAN = 2;
+    public static String HAPPY_QUERY_ERROR_RULE_OVERRIDE = "HAPPY_QUERY_ERROR_RULE_OVERRIDE";
 }

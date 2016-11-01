@@ -6,10 +6,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.happy_query.parser.JsonSqlParser;
 import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.util.*;
-import com.jkys.moye.DynamicVariable;
-import com.jkys.moye.MoyeParser;
-import com.jkys.moye.MoyeParserImpl;
-import com.jkys.moye.Word;
+import com.happy_query.util.Constant;
+import com.jkys.moye.*;
+import org.apache.commons.lang.math.DoubleRange;
+import org.apache.commons.lang.math.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
@@ -235,6 +235,7 @@ public class DataDefinition {
         groupTag.setDefinitionType("input");
         groupTag.setDataType("int");
         insertDataDefinition(dataSource, groupTag);
+        validateRange(childsTag);
         //create childs tags
         int i = 0;
         for(DataDefinition dataDefinition : childsTag){
@@ -255,6 +256,93 @@ public class DataDefinition {
         }
         //end
         return result;
+    }
+
+    /**
+     * 判断组标签下面的子标签是否互相重叠
+     * @param childsTag
+     */
+    public static void validateRange(List<DataDefinition> childsTag) {
+        NullChecker.checkNull(childsTag);
+        List<Object> ranges = new ArrayList<>();
+        for(DataDefinition dataDefinition : childsTag){
+            NullChecker.checkNull(dataDefinition.getComputationJson());
+            String json = dataDefinition.getComputationJson();
+            JSONObject jsonObject = (JSONObject) JSON.parse(json);
+            if(jsonObject.getString(Constant.OPERATOR).equals(Constant.OPERATOR_VALUE_RANGE)){
+                if(!dataDefinition.getDataType().equals(DataDefinitionDataType.STRING.toString())){
+                    String value = jsonObject.getString(Constant.VALUE);
+                    DoubleRange doubleRange = generateDoubleRangeFromValue(value);
+                    ranges.add(doubleRange);
+                }else{
+                    String value = jsonObject.getString(Constant.VALUE);
+                    StringRange stringRange = generateStringRangeFromValue(value);
+                    ranges.add(stringRange);
+                }
+            }else if(jsonObject.getString(Constant.OPERATOR).equals(Constant.OPERATOR_VALUE_CONTAINS)){
+                String value = jsonObject.getString(Constant.VALUE);
+                for(String v : value.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "").replaceAll("\"", "").split(",")){
+                    ranges.add(new StringRange(v.trim(), v.trim()));
+                }
+            }else if(jsonObject.getString(Constant.OPERATOR).equals(Constant.OPERATOR_VALUE_EQUALS)){
+                String value = jsonObject.getString(Constant.VALUE);
+                ranges.add(new StringRange(value.trim(), value.trim()));
+            }
+        }
+        //排列组合校验Ranges之间是否互相包含
+        for(int i = 0; i < ranges.size(); i ++){
+            for(int j = i+1; i < ranges.size(); j ++){
+                if(j == ranges.size()){
+                    break;
+                }
+                Object sourceRange = ranges.get(i);
+                Object targetRange = ranges.get(j);
+                if(sourceRange instanceof DoubleRange){
+                    if(((DoubleRange) sourceRange).overlapsRange((Range) targetRange)){
+                        throw new HappyQueryException(Constant.HAPPY_QUERY_ERROR_RULE_OVERRIDE);
+                    }
+                }else if(sourceRange instanceof StringRange){
+                    if(((StringRange) sourceRange).overlapsRange((StringRange) targetRange)){
+                        throw new HappyQueryException(Constant.HAPPY_QUERY_ERROR_RULE_OVERRIDE);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 根据Range产生StringRange
+     * @param value
+     * @return
+     */
+    private static StringRange generateStringRangeFromValue(String value) {
+        value = value.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "").replaceAll("\"", "");
+        String[] array = value.split(",");
+        return new StringRange(array[0], array[1]);
+    }
+
+    /**
+     * 根据Range值产生DoubleRange
+     * @return
+     * @param value
+     */
+    private static DoubleRange generateDoubleRangeFromValue(String value) {
+        value = value.replaceAll("\\[", "").replaceAll("\\]", "").replaceAll("\"", "").replaceAll("\"", "");
+        String[] array = value.split(",");
+        double start = 0d;
+        double end = 0d;
+        for(int i = 0; i < array.length; i ++){
+            if(StringUtils.isBlank(array[i]) && i > 0){
+                end = Double.MAX_VALUE;
+            }else if(StringUtils.isBlank(array[i]) && i == 0){
+                start = Double.MIN_VALUE;
+            }else if(i == 0){
+                start = Double.valueOf(array[i].trim());
+            }else if(i == 1){
+                end = Double.valueOf(array[i].trim());
+            }
+        }
+        return new DoubleRange(start, end);
     }
 
     /**
