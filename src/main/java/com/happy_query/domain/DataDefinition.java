@@ -253,6 +253,23 @@ public class DataDefinition {
         }
     }
 
+    public static int updateDataDefinitionByKey(DataSource dataSource, DataDefinition dataDefinition){
+        NullChecker.checkNull(dataDefinition.getKey());
+        Map<String, Object> map = ReflectionUtil.cloneBeanToMap(dataDefinition);
+        try{
+            DataDefinition oldDataDefinition = DataDefinitionCacheManager.getDataDefinition(dataDefinition.getKey());
+            if(oldDataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition){
+                throw new HappyQueryException("dataDefinition:" + JSON.toJSONString(dataDefinition) + " not exists!");
+            }
+            dataDefinition.setId(dataDefinition.getId());
+            DataDefinitionCacheManager.delByKey(dataDefinition.getKey());
+            return JDBCUtils.executeUpdateById(dataSource, Constant.TABLE_NAME, map, "id", dataDefinition.getId());
+        } catch(SQLException e){
+            LOG.error("updateDataDefinitionByKey failed, dataDefintion:" + JSON.toJSONString(dataDefinition), e);
+            throw new HappyQueryException(e);
+        }
+    }
+
     /**
      * 新增标签指标的时候调用,根据标签类型
      *  1. 系统标签. 多个指标的组合生成,这些多个指标都和此标签为映射关系
@@ -276,6 +293,30 @@ public class DataDefinition {
         insertDataDefinition(dataSource, dataDefinition);
     }
 
+
+    /**
+     * 修改组标签,修改子标签
+     * @param dataSource
+     * @param groupTag key, nick_name, description, computationJson
+     * @param childsTag key, nick_name, computationJson, description
+     * @param tagType
+     * @return
+     */
+    public static void updateGroupTagDataDefinition(DataSource dataSource, DataDefinition groupTag,
+                                                                    List<DataDefinition> childsTag){
+        NullChecker.checkNull(dataSource, groupTag, childsTag);
+        JsonSqlParser jsonSqlParser = new JsonSqlParser();
+        if(StringUtils.isNotBlank(groupTag.getComputationJson())){
+            groupTag.setComputationRule(jsonSqlParser.convertJsonToLispExpression(groupTag.getComputationJson()));
+        }
+        //update组标签
+        updateDataDefinitionByKey(dataSource, groupTag);
+        for(DataDefinition dataDefinition : childsTag){
+            dataDefinition.setComputationRule(jsonSqlParser.convertJsonToLispExpression(mergeJson(groupTag.getComputationJson(), dataDefinition.getComputationJson())));
+            updateDataDefinition(dataSource, dataDefinition);
+        }
+    }
+
     /**
      * 创建组标签,组标签的子标签, 组标签子标签连带关系
      * @param dataSource
@@ -293,7 +334,7 @@ public class DataDefinition {
         List<DataDefinition> result = new ArrayList<>();
         //create group tag
         JsonSqlParser jsonSqlParser = new JsonSqlParser();
-        if(StringUtils.isNoneBlank(groupTag.getComputationJson())){
+        if(StringUtils.isNotBlank(groupTag.getComputationJson())){
             groupTag.setComputationRule(jsonSqlParser.convertJsonToLispExpression(groupTag.getComputationJson()));
         }
         groupTag.setType(Constant.TAG_TYPE);
