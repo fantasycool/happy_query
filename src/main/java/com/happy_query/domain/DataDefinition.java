@@ -224,21 +224,6 @@ public class DataDefinition {
         map.put("tagComment", childDataDefinition.getDescription());
     }
 
-    public static DataDefinition getDataDefinitionByNickName(DataSource dataSource, String name) {
-        NullChecker.checkNull(name);
-        List<Object> list = new ArrayList();
-        list.add(name);
-        list.add(name);
-        try {
-            String sql = String.format("select * from %s where (nick_name=? or key=?) and status=0 order by gmt_create desc limit 1", Constant.TABLE_NAME);
-            List<Map<String, Object>> data = JDBCUtils.executeQuery(dataSource, sql, list);
-            return getDataDefinition(data);
-        } catch (SQLException e) {
-            LOG.error("getDataDefinitionByNickName failed!param name is [{}]", name, e);
-            throw new HappyQueryException("getDataDefinitionByName failed!param name is " + name, e);
-        }
-    }
-
     public static void insertDataDefinition(DataSource dataSource, DataDefinition dataDefinition) {
         NullChecker.checkNull(dataDefinition);
         Map<String, Object> map = ReflectionUtil.cloneBeanToMap(dataDefinition);
@@ -247,19 +232,6 @@ public class DataDefinition {
         } catch (SQLException e) {
             LOG.error("insert datadefinition failed, datadefinition content is:[{}], t is:[{}]", dataDefinition.toString(), e);
             throw new HappyQueryException("insert failed", e);
-        }
-    }
-
-    public static int updateDataDefinition(DataSource dataSource, DataDefinition dataDefinition) {
-        NullChecker.checkNull(dataDefinition, dataDefinition.getId());
-        Map<String, Object> map = ReflectionUtil.cloneBeanToMap(dataDefinition);
-        try {
-            //清空掉缓存
-            DataDefinitionCacheManager.delByKey(dataDefinition.getKey());
-            return JDBCUtils.executeUpdateById(dataSource, Constant.TABLE_NAME, map, "id", dataDefinition.getId());
-        } catch (SQLException e) {
-            LOG.error("update datadefinition failed, datadefinition content is:[{}], t is:[{}]", dataDefinition.toString(), e);
-            throw new HappyQueryException("update failed", e);
         }
     }
 
