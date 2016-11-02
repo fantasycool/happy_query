@@ -91,7 +91,7 @@ public class DataDefinitionTest extends BaseTest {
         //groupTag Key:1477968764441
         //child tag Key: 14779687644480 14779687645011
         DataDefinition groupTag = new DataDefinition();
-        groupTag.setKey("1477968764441");
+        groupTag.setKey("1477987314608");
         groupTag.setNickName("groupTag");
         groupTag.setDescription("groupTagDescription");
         groupTag.setDataType(DataDefinitionCacheManager.getDataDefinition(groupTag.getKey()).getDataType());
@@ -100,7 +100,7 @@ public class DataDefinitionTest extends BaseTest {
                 "  {\n" +
                 "    \"attr\": \"dd1\",\n" +
                 "    \"operator\":\"contains\",\n" +
-                "    \"value\": [\"dd2\",\"dd5\",\"dd4\"]\n" +
+                "    \"value\": [\"dd3\",\"dd5\",\"dd4\"]\n" +
                 "  },\n" +
                 "  {\n" +
                 "    \"attr\": \"dd2\",\n" +

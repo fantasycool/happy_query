@@ -24,7 +24,7 @@ import java.util.*;
  */
 public class DataDefinition {
     static Logger LOG = LoggerFactory.getLogger(DataDefinition.class);
-    private long id;
+    private Long id;
     private Long parentId;
     private Integer type;
     private String childCommentName;
@@ -204,8 +204,18 @@ public class DataDefinition {
         return result;
     }
 
+    //TODO
+
+    /**
+     * 获取TagInfo的详细信息
+     * @return
+     */
+    public static Map<String, Object> getTagInfo(){
+        return null;
+    }
+
     private static void fillMapFromDataDefinition(Map<String, Object> map, DataDefinition childDataDefinition) {
-        map.put("tagId", childDataDefinition.getId());
+        map.put("tagKey", childDataDefinition.getId());
         map.put("tagName", childDataDefinition.getNickName());
         map.put("tagWay", childDataDefinition.getTagType() == 1 ? "系统标签": "动态标签");
         if(!StringUtils.isBlank(childDataDefinition.getComputationJson())){
@@ -314,7 +324,7 @@ public class DataDefinition {
         updateDataDefinitionByKey(dataSource, groupTag);
         for(DataDefinition dataDefinition : childsTag){
             dataDefinition.setComputationRule(jsonSqlParser.convertJsonToLispExpression(mergeJson(groupTag.getComputationJson(), dataDefinition.getComputationJson())));
-            updateDataDefinition(dataSource, dataDefinition);
+            updateDataDefinitionByKey(dataSource, dataDefinition);
         }
     }
 
@@ -628,7 +638,7 @@ public class DataDefinition {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
