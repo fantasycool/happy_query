@@ -219,7 +219,7 @@ public class DataDefinition {
     }
 
     private static void fillMapFromDataDefinition(Map<String, Object> map, DataDefinition childDataDefinition) {
-        map.put("tagKey", childDataDefinition.getId());
+        map.put("tagKey", childDataDefinition.getKey());
         map.put("tagName", childDataDefinition.getNickName());
         map.put("tagWay", childDataDefinition.getTagType() == 1 ? "系统标签": "动态标签");
         if(!StringUtils.isBlank(childDataDefinition.getComputationJson())){
