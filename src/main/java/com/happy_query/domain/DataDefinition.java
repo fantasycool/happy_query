@@ -187,7 +187,6 @@ public class DataDefinition {
                     map.put("tagType", "组标签");
                     map.put("tagParentName", dataDefinition.getNickName());
                     fillMapFromDataDefinition(map, childDataDefinition);
-                    result.add(map);
                 }
             }
         }
