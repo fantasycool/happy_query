@@ -204,13 +204,17 @@ public class DataDefinition {
         return result;
     }
 
-    //TODO
-
     /**
-     * 获取TagInfo的详细信息
+     * 获取TagInfo的详细信息,组标签和普通标签都走这个接口
      * @return
      */
-    public static Map<String, Object> getTagInfo(){
+    public static Map<String, Object> getTagInfo(DataSource dataSource, String tagKey){
+        NullChecker.checkNull(dataSource, tagKey);
+        DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(tagKey);
+        if(dataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition){
+            throw new IllegalArgumentException("tagKey:" + tagKey + " cannnot be found");
+        }
+
         return null;
     }
 
