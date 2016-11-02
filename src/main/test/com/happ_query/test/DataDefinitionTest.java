@@ -87,6 +87,55 @@ public class DataDefinitionTest extends BaseTest {
     }
 
     @Test
+    public void testUpdateGroupTagDataDefinition(){
+        //groupTag Key:1477968764441
+        //child tag Key: 14779687644480 14779687645011
+        DataDefinition groupTag = new DataDefinition();
+        groupTag.setKey("1477968764441");
+        groupTag.setNickName("groupTag");
+        groupTag.setDescription("groupTagDescription");
+        groupTag.setDataType(DataDefinitionCacheManager.getDataDefinition(groupTag.getKey()).getDataType());
+        String computationJson = "[\n" +
+                "  \"and\",\n" +
+                "  {\n" +
+                "    \"attr\": \"dd1\",\n" +
+                "    \"operator\":\"contains\",\n" +
+                "    \"value\": [\"dd2\",\"dd5\",\"dd4\"]\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"attr\": \"dd2\",\n" +
+                "    \"operator\":\"equals\",\n" +
+                "    \"value\": \"abcd\"\n" +
+                "  }\n" +
+                "]\n";
+        groupTag.setComputationJson(computationJson);
+        List<DataDefinition> childsTag = new ArrayList<>();
+        DataDefinition childTag1 = new DataDefinition();
+        childTag1.setNickName("childTag1");
+        childTag1.setComputationJson(
+                "{\"attr\": \"dd5\",\n" +
+                        "    \"operator\":\"range\",\n" +
+                        "    \"value\": [\"0\", \"10\"]\n" +
+                        "  }");
+        childTag1.setDescription("childTag1");
+        childTag1.setKey("14779687644480");
+        childTag1.setDataType(DataDefinitionCacheManager.getDataDefinition(childTag1.getKey()).getDataType());
+        childsTag.add(childTag1);
+        DataDefinition childTag2 = new DataDefinition();
+        childTag2.setNickName("childTag1");
+        childTag2.setComputationJson(
+                "{\"attr\": \"dd5\",\n" +
+                        "    \"operator\":\"range\",\n" +
+                        "    \"value\": [\"10\", \"20\"]\n" +
+                        "  }");
+        childTag2.setDescription("childTag2");
+        childTag2.setKey("14779687645011");
+        childTag2.setDataType(DataDefinitionCacheManager.getDataDefinition(childTag2.getKey()).getDataType());
+        childsTag.add(childTag2);
+        DataDefinition.updateGroupTagDataDefinition(dataSource, groupTag, childsTag);
+    }
+
+    @Test
     public void testStringRangeOverride(){
         List<DataDefinition> childsTags = new ArrayList<>();
         DataDefinition childTag1 = new DataDefinition();

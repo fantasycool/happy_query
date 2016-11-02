@@ -261,7 +261,8 @@ public class DataDefinition {
             if(oldDataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition){
                 throw new HappyQueryException("dataDefinition:" + JSON.toJSONString(dataDefinition) + " not exists!");
             }
-            dataDefinition.setId(dataDefinition.getId());
+            dataDefinition.setId(oldDataDefinition.getId());
+            dataDefinition.setDataType(oldDataDefinition.getDataType());
             DataDefinitionCacheManager.delByKey(dataDefinition.getKey());
             return JDBCUtils.executeUpdateById(dataSource, Constant.TABLE_NAME, map, "id", dataDefinition.getId());
         } catch(SQLException e){
@@ -766,6 +767,7 @@ public class DataDefinition {
 
     public void setDataType(String dataType) {
         this.dataType = dataType;
+        this.dataTypeEnum = DataDefinitionDataType.getByValue(dataType);
     }
 
     public Integer getTagType() {

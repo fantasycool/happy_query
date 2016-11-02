@@ -141,7 +141,7 @@ public abstract class JDBCUtils {
         for (int i = 0; i < parameters.keySet().size(); i++) {
             Object v = parameters.get(parameters.keySet().toArray()[i]);
             if (v != null) {
-                sb.append(parameters.keySet().toArray()[i]).append("=").append("?");
+                sb.append("`" + parameters.keySet().toArray()[i] + "`").append("=").append("?");
                 args.add(v);
                 if (i < (parameters.keySet().size() - 1)) {
                     sb.append(",");
