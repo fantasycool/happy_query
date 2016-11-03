@@ -1,5 +1,6 @@
 package com.happy_query.query;
 
+import com.happy_query.domain.DataDefinitionDataType;
 import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.parser.IJsonSqlParser;
 import com.happy_query.parser.JsonSqlParser;
@@ -16,12 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Query to get result
@@ -67,6 +66,8 @@ public class Query implements IQuery {
             }
             List<Map<String, Object>> countDatas = JDBCUtils.executeQuery(connection,
                     countSql, new ArrayList<>());
+            //remove null datas
+            removeNullDatasFromDataMap(countDatas);
             count = Integer.valueOf(countDatas.get(0).get(COUNT_NUM).toString());
         }catch(SQLException e){
             LOG.error("query met db exception, jsonQuery:{}, start:{}, size:{}", jsonQuery, start, size, e);
@@ -76,6 +77,35 @@ public class Query implements IQuery {
         }
         Pair<Integer, List<Map<String, Object>>> result = new Pair<>(count, resultList);
         return result;
+    }
+
+    /**
+     * remove null datas
+     * @param countDatas
+     */
+    private void removeNullDatasFromDataMap(List<Map<String, Object>> countDatas) {
+        for(Map<String, Object> m : countDatas){
+            for(Iterator<Map.Entry<String, Object>> it = m.entrySet().iterator(); it.hasNext(); ){
+                Map.Entry<String, Object> entry = it.next();
+                DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(entry.getKey());
+                if(!(dataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition)){
+                    if(dataDefinition.getDataTypeEnum() == DataDefinitionDataType.STRING
+                            && (entry.getValue() == null || StringUtils.isEmptyOrWhitespaceOnly(entry.getValue().toString()))){
+                        m.remove(entry.getKey());
+                    }else if(dataDefinition.getDataTypeEnum() == DataDefinitionDataType.BOOLEAN
+                            || dataDefinition.getDataTypeEnum() == DataDefinitionDataType.INT
+                            || dataDefinition.getDataTypeEnum() == DataDefinitionDataType.DOUBLE){
+                        if(entry.getValue() == null){
+                            continue;
+                        }
+                        BigDecimal bigDecimal = new BigDecimal(entry.getValue().toString());
+                        if(bigDecimal.compareTo(new BigDecimal(-1)) == 0){
+                            m.remove(entry.getKey());
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -89,6 +119,7 @@ public class Query implements IQuery {
         Map<String, Object> prmDatas = new HashMap<>();
         try {
             List<Map<String, Object>> list = JDBCUtils.executeQuery(connection, "select * from " + Constant.PRM_USER_INFO + " where id=?", args);
+            removeNullDatasFromDataMap(list);
             dataAssemble(prmId, connection, prmDatas, list.get(0), true, keys);
         } catch (SQLException e) {
             LOG.error("getPrmUserInfo query failed, prmId:{}", prmId);
@@ -130,6 +161,7 @@ public class Query implements IQuery {
                     Object value = ddv.getNotNullValue();
                     prmDatas.put(keyName, value);
                 }catch(HappyQueryException e){
+                    LOG.error("dataAssemble failed", e);
                     prmDatas.put(keyName, null);
                 }
             }
