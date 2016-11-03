@@ -344,10 +344,22 @@ public class DataDefinition {
      * @param dataSource
      * @param dataDefinition
      */
-    public static void insertTagDataDefinition(DataSource dataSource, DataDefinition dataDefinition){
+    public static DataDefinition insertTagDataDefinition(DataSource dataSource, DataDefinition dataDefinition){
         if(dataDefinition.getType() != 1){
             throw new HappyQueryException("要创建的指标不为标签指标");
         }
+        if(StringUtils.isBlank(dataDefinition.getKey())){
+            dataDefinition.setKey(System.currentTimeMillis() + "-" + (new Random(System.currentTimeMillis())).nextInt(10));
+        }
+        JsonSqlParser jsonSqlParser = new JsonSqlParser();
+        dataDefinition.setDataType(DataDefinitionDataType.INT.toString());
+        dataDefinition.setComputationRule(jsonSqlParser.convertJsonToLispExpression(dataDefinition.getComputationJson()));
+        dataDefinition.setDefinitionType(DefinitionType.INPUT.toString());
+        dataDefinition.setEditable(true);
+        dataDefinition.setQuery(true);
+        dataDefinition.setType(Constant.TAG_TYPE);
+        dataDefinition.setTagQuery(false);
+        dataDefinition.setStatus(0);
         if(StringUtils.isNoneBlank(dataDefinition.getComputationRule())){
             MoyeParser moyeParser = new MoyeParserImpl();
             List<Word> words = moyeParser.parseExpression(dataDefinition.getComputationRule());
@@ -358,6 +370,7 @@ public class DataDefinition {
             }
         }
         insertDataDefinition(dataSource, dataDefinition);
+        return dataDefinition;
     }
 
 
@@ -407,8 +420,8 @@ public class DataDefinition {
         groupTag.setType(Constant.TAG_TYPE);
         groupTag.setTagType(Constant.GROUP_BIAO_QIAN);
         groupTag.setKey(String.valueOf(System.currentTimeMillis()));
-        groupTag.setDefinitionType("input");
-        groupTag.setDataType("int");
+        groupTag.setDefinitionType(DefinitionType.INPUT.toString());
+        groupTag.setDataType(DataDefinitionDataType.INT.toString());
         insertDataDefinition(dataSource, groupTag);
         validateRange(childsTag);
         //create childs tags
@@ -418,8 +431,11 @@ public class DataDefinition {
             dataDefinition.setComputationRule(jsonSqlParser.convertJsonToLispExpression(mergeJson(groupTag.getComputationJson(), dataDefinition.getComputationJson())));
             dataDefinition.setType(Constant.TAG_TYPE);
             dataDefinition.setTagType(tagType);
-            dataDefinition.setDefinitionType("input");
-            dataDefinition.setDataType("int");
+            dataDefinition.setDefinitionType(DefinitionType.INPUT.toString());
+            dataDefinition.setDataType(DataDefinitionDataType.INT.toString());
+            dataDefinition.setQuery(true);
+            dataDefinition.setTagQuery(false);
+            dataDefinition.setEditable(false);
             insertDataDefinition(dataSource, dataDefinition);
 
             PrmTagKeyRelation prmTagKeyRelation = new PrmTagKeyRelation();
