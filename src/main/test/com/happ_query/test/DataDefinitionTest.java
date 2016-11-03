@@ -170,6 +170,11 @@ public class DataDefinitionTest extends BaseTest {
     }
 
     @Test
+    public void getTagInfo(){
+        System.out.println(JSON.toJSONString(DataDefinition.getTagInfo(dataSource, "1477987314608")));
+    }
+
+    @Test
     public void testStringRangeNotOverride(){
         List<DataDefinition> childsTags = new ArrayList<>();
         DataDefinition childTag1 = new DataDefinition();

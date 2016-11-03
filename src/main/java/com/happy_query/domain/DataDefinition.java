@@ -53,6 +53,9 @@ public class DataDefinition {
      * 是否支持筛选
      */
     private Boolean isQuery;
+
+    private Boolean isTagQuery;
+
     /**
      * 字段描述
      */
@@ -206,6 +209,26 @@ public class DataDefinition {
 
     /**
      * 获取TagInfo的详细信息,组标签和普通标签都走这个接口
+     * {
+     tagType:"1",--1：独立标签,2:组标签
+     tagWay:"1",1:系统标签，2:动态标签,3:手动标签
+     tagName:""--标签名称（非组标签）
+     childTags:[
+     {
+     tagKey:"123",
+     nickname:"fafa",
+     childTagJson:""
+     }，
+     {
+     tagKey:"123",
+     nickname:"fafa",
+     childTagJson:""
+     }
+     ]--组标签才有
+     groupName:"fasdf"--组名（组标签才有）
+     conditionJson:"",
+     tagComment:""
+     }
      * @return
      */
     public static Map<String, Object> getTagInfo(DataSource dataSource, String tagKey){
@@ -214,8 +237,45 @@ public class DataDefinition {
         if(dataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition){
             throw new IllegalArgumentException("tagKey:" + tagKey + " cannnot be found");
         }
-
-        return null;
+        Map<String, Object> result = new HashMap<>();
+        result.put("conditionJson", dataDefinition.getComputationJson());
+        result.put("tagComment", dataDefinition.getDescription());
+        if(dataDefinition.getType() == Constant.TAG_TYPE){
+            if(dataDefinition.getTagType() == Constant.GROUP_BIAO_QIAN){
+                result.put("tagType", 2);
+                result.put("groupName", dataDefinition.getNickName());
+                List<String> keys = PrmTagKeyRelation.querySubKeysByGroupKey(dataSource, dataDefinition.getKey());
+                List<Map<String, Object>> childTags = new ArrayList<>();
+                for(String key : keys){
+                    DataDefinition child = DataDefinitionCacheManager.getDataDefinition(key);
+                    Map<String, Object> childMap = new HashMap<>();
+                    childMap.put("tagKey", child.getKey());
+                    childMap.put("nickname", child.getNickName());
+                    childMap.put("childTagJson", child.getComputationJson());
+                    childTags.add(childMap);
+                }
+                result.put("childTags", childTags);
+            }else{
+                result.put("tagType", 1);
+                result.put("tagName", dataDefinition.getNickName());
+                switch(dataDefinition.getTagType().intValue()){
+                    case Constant.XI_TONG_BIAO_QIAN:
+                        result.put("tagWay", 1);
+                        break;
+                    case Constant.HAND_BIAO_QIAN:
+                        result.put("tagWay", 3);
+                        break;
+                    case Constant.DYNAMIC_BIAO_QIAN:
+                        result.put("tagWay", 2);
+                        break;
+                    default:
+                        throw new HappyQueryException("invalid tag datadefinition:" + JSON.toJSONString(dataDefinition));
+                }
+            }
+        }else{
+            throw new IllegalArgumentException("tagKey:" + tagKey + " is not tag datadefinition");
+        }
+        return result;
     }
 
     private static void fillMapFromDataDefinition(Map<String, Object> map, DataDefinition childDataDefinition) {
@@ -836,5 +896,13 @@ public class DataDefinition {
 
     public void setComputationJson(String computationJson) {
         this.computationJson = computationJson;
+    }
+
+    public Boolean getTagQuery() {
+        return isTagQuery;
+    }
+
+    public void setTagQuery(Boolean tagQuery) {
+        isTagQuery = tagQuery;
     }
 }

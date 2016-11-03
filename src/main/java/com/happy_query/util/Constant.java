@@ -76,13 +76,13 @@ public class Constant {
     public static String KEY_RELATION_TABLE_NAME = "prm_key_relation";
     public static String PRM_DATA_OPTIONS = "prm_data_options";
 
-    public static int TAG_TYPE = 1;
-    public static int COMMENT_TYPE = 2;
-    public static int NORMAL_TYPE = 0;
+    public static final int TAG_TYPE = 1;
+    public static final int COMMENT_TYPE = 2;
+    public static final int NORMAL_TYPE = 0;
 
-    public static int XI_TONG_BIAO_QIAN = 1;
-    public static int HAND_BIAO_QIAN = 0;
-    public static int GROUP_BIAO_QIAN = 3;
-    public static int DYNAMIC_BIAO_QIAN = 2;
+    public static final int XI_TONG_BIAO_QIAN = 1;
+    public static final int HAND_BIAO_QIAN = 0;
+    public static final int GROUP_BIAO_QIAN = 3;
+    public static final int DYNAMIC_BIAO_QIAN = 2;
     public static String HAPPY_QUERY_ERROR_RULE_OVERRIDE = "HAPPY_QUERY_ERROR_RULE_OVERRIDE";
 }
