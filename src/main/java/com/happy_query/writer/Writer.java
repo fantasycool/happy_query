@@ -176,6 +176,10 @@ public class Writer implements IWriter {
                 String expression = dataDefinition.getComputationRule();
                 try{
                     Object value = moyeComputeEngine.execute(expression, userDatas);
+                    //为了保持和数字类型为空一致,未打标签的值统一设置为-1
+                    if(dataDefinition.getType() == Constant.TAG_TYPE && Integer.valueOf(value.toString()) == 0){
+                        value = -1;
+                    }
                     updatedDatas.put(dataDefinition.getKey(), value);
                 }catch(Exception e){
                     LOG.error("compute new dd value failed,expression:{}, userDatas:{}", expression, JSON.toJSONString(userDatas), e);

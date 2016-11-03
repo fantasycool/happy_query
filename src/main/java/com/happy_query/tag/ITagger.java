@@ -11,4 +11,5 @@ public interface ITagger {
      * @param queryExpression
      */
     void tagDatas(String tagKey, String queryExpression);
+
 }
