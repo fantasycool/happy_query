@@ -85,4 +85,12 @@ public class Constant {
     public static final int GROUP_BIAO_QIAN = 3;
     public static final int DYNAMIC_BIAO_QIAN = 2;
     public static String HAPPY_QUERY_ERROR_RULE_OVERRIDE = "HAPPY_QUERY_ERROR_RULE_OVERRIDE";
+
+    /**
+     * tag task status
+     */
+    public static final int TAG_TASK_STATUS_CREATED = 0;
+    public static final int TAG_TASK_STATUS_STARTED = 1;
+    public static final int TAG_TASK_STATUS_SUCCESS = 2;
+    public static final int TAG_TASK_STATUS_FAILED = -1;
 }

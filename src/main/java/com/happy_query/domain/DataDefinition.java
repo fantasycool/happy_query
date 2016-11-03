@@ -80,7 +80,7 @@ public class DataDefinition {
 
     private String sourceData;
 
-    private int status;
+    private Integer status;
 
     private String nickName;
 
@@ -97,6 +97,8 @@ public class DataDefinition {
     private String isRequired;
 
     private List<DataOption> dataOptionList;
+
+    private Integer progress;
 
     public static DataDefinition getDataDefinition(DataSource dataSource, Long id) {
         NullChecker.checkNull(id);
@@ -276,6 +278,24 @@ public class DataDefinition {
             throw new IllegalArgumentException("tagKey:" + tagKey + " is not tag datadefinition");
         }
         return result;
+    }
+
+    /**
+     * 0: 创建
+     * 1: 启动
+     * 2: 完成
+     * -1: 失败
+     * 更新指标的打标状态
+     * @param dataSource
+     */
+    public static void updateTaskProgressStatus(DataSource dataSource, String tagKey, int status){
+        NullChecker.checkNull(dataSource, tagKey);
+        DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(tagKey);
+        if(dataDefinition.getType() != Constant.TAG_TYPE){
+            throw new IllegalArgumentException("tagKey:" + tagKey + " is not tag type");
+        }
+        dataDefinition.setProgress(status);
+        updateDataDefinitionByKey(dataSource, dataDefinition);
     }
 
     private static void fillMapFromDataDefinition(Map<String, Object> map, DataDefinition childDataDefinition) {
@@ -803,7 +823,7 @@ public class DataDefinition {
         this.dataTypeEnum = DataDefinitionDataType.getByValue(dataType);
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -904,5 +924,13 @@ public class DataDefinition {
 
     public void setTagQuery(Boolean tagQuery) {
         isTagQuery = tagQuery;
+    }
+
+    public Integer getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Integer progress) {
+        this.progress = progress;
     }
 }
