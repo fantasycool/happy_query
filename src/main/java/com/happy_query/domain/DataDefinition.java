@@ -602,7 +602,7 @@ public class DataDefinition {
      * @param computationJson1
      * @return
      */
-    private static String mergeJson(String computationJson, String computationJson1) {
+    public static String mergeJson(String computationJson, String computationJson1) {
         JSONArray groupJSONArray = (JSONArray)JSON.parse(computationJson);
         JSONObject childJsonObject = (JSONObject)JSON.parse(computationJson1);
         List<Object> params = new ArrayList<>();
