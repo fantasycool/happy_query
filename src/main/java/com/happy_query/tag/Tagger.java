@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 public class Tagger implements ITagger {
     static Logger LOG = LoggerFactory.getLogger(Tagger.class);
     private static ThreadPoolExecutor threadPoolExecutor
-            = new ThreadPoolExecutor(2, 2, -1, TimeUnit.MINUTES, new ArrayBlockingQueue<>(100));
+            = new ThreadPoolExecutor(2, 2, 10, TimeUnit.MINUTES, new ArrayBlockingQueue<>(100));
 
     @Override
     public void tagDatas(String tagKey, String queryExpression) {
