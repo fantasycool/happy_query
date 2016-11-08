@@ -79,15 +79,16 @@ public class JsonSqlParser implements IJsonSqlParser {
                     }
                 } else if (jsonObject.getString(Constant.OPERATOR).equals(Constant.CONTAINS)) {
                     JSONArray value = jsonObject.getJSONArray(Constant.VALUE);
-                    if(!dataDefinition.getDefinitionType().equals(Constant.MULTISELECT)){
-                        throw new HappyQueryException("keyName:" + keyName + " have to be a multiselelct dd to support contains");
-                    }
                     for(Object k : value){
-                        DataDefinition childMultiSelect = DataDefinitionCacheManager.getDataDefinition(k);
-                        if(childMultiSelect instanceof DataDefinitionCacheManager.NullDataDefinition){
-                            throw new HappyQueryException("keyName:" + keyName + " arg option:" + k + " is not a dd");
+                        if(dataDefinition.getDefinitionType().equals(Constant.CHECKBOX)) {
+                            DataDefinition childMultiSelect = DataDefinitionCacheManager.getDataDefinition(k);
+                            if(childMultiSelect instanceof DataDefinitionCacheManager.NullDataDefinition){
+                                throw new HappyQueryException("keyName:" + keyName + " arg option:" + k + " is not a dd");
+                            }
+                            appendDataDefinitionValueQueryStrMultiSelect(dataDefinitionValueQueryStr, childMultiSelect);
+                        }else if(dataDefinition.getDataTypeEnum() == DataDefinitionDataType.INT){
+                            appendDataDefinitionValueQueryStrContains(dataDefinitionValueQueryStr, dataDefinition, k);
                         }
-                        appendDataDefinitionValueQueryStrMultiSelect(dataDefinitionValueQueryStr, childMultiSelect);
                     }
                 } else if (jsonObject.getString(Constant.OPERATOR).equals(Constant.EQUALS)) {
                     String value = jsonObject.getString(Constant.VALUE);
@@ -149,7 +150,7 @@ public class JsonSqlParser implements IJsonSqlParser {
                     }
                 } else if (jsonObject.getString(Constant.OPERATOR).equals(Constant.CONTAINS)) {
                     JSONArray value = jsonObject.getJSONArray(Constant.VALUE);
-                    if(!dataDefinition.getDefinitionType().equals(Constant.MULTISELECT)){
+                    if(!dataDefinition.getDefinitionType().equals(Constant.CHECKBOX)){
                         throw new HappyQueryException("keyName:" + keyName + " have to be a multiselelct dd to support contains");
                     }
                     for(Object k : value){
@@ -205,6 +206,11 @@ public class JsonSqlParser implements IJsonSqlParser {
     private void appendDataDefinitionValueQueryStrMultiSelect(List<String> dataDefinitionValueQueryStr, DataDefinition childMultiSelect) {
         String columeName = childMultiSelect.getValueColumnName();
         dataDefinitionValueQueryStr.add(String.format("(#{prefix}dd_ref_id=%d and #{prefix}%s=\"1\")", childMultiSelect.getId(), columeName));
+    }
+
+    private void appendDataDefinitionValueQueryStrContains(List<String> dataDefinitionValueQueryStr, DataDefinition dataDefinition, Object value){
+        String columeName = dataDefinition.getValueColumnName();
+        dataDefinitionValueQueryStr.add(String.format("(#{prefix}dd_ref_id=%d and #{prefix}%s=\"%s\")", dataDefinition.getId(), columeName, value.toString()));
     }
 
     /**

@@ -15,7 +15,7 @@ public class Constant {
     public static final String CONTAINS = "contains";
     public static final String EQUALS = "equals";
     public static final String VALUE = "value";
-    public static final String MULTISELECT = "multiselect";
+    public static final String CHECKBOX = "checkbox";
     public static final String OPERATOR_VALUE_RANGE = "range";
     public static final String OPERATOR_VALUE_CONTAINS = "contains";
     public static final String OPERATOR_VALUE_EQUALS = "equals";

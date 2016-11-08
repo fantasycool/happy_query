@@ -50,22 +50,28 @@ public class Query implements IQuery {
         Pair<String, List<String>> p = jsonSqlParser.convertJsonToQuerySql(jsonQuery);
         String querySql = SQLQueryAssembly.assemblyQuerySql(p, start, size, true);
         String countSql = SQLQueryAssembly.assemblyQuerySql(p, start, size, false);
+        LOG.info("HAPPY QUERY: query sql is:{}", querySql);
+        LOG.info("HAPPY QUERY: count sql is:{}", countSql);
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         Integer count = 0;
         Connection connection = null;
         try{
             connection = dataSource.getConnection();
+            long t1 = System.currentTimeMillis();
             List<Map<String, Object>> datas = JDBCUtils.executeQuery(connection,
                     querySql, new ArrayList<>());
+            LOG.info("HAPPY QUERY: query time is:{}", System.currentTimeMillis() - t1);
             for(Map<String, Object> m : datas){
                 Long prmId = Long.valueOf(m.get("id").toString());
                 Map<String, Object> keyDatas = new HashMap<>();
                 dataAssemble(prmId, null, keyDatas, m, false, null);
                 resultList.add(keyDatas);
             }
+            t1 = System.currentTimeMillis();
             List<Map<String, Object>> countDatas = JDBCUtils.executeQuery(connection,
                     countSql, new ArrayList<>());
+            LOG.info("HAPPY QUERY: count time is:{}", System.currentTimeMillis() - t1);
             //remove null datas
             removeNullDatasFromDataMap(resultList);
             count = countDatas != null && countDatas.size() > 0 ? Integer.valueOf(countDatas.get(0).get(COUNT_NUM).toString()) : 0;
