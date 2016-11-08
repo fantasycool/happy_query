@@ -152,6 +152,7 @@ public class JsonParserTest extends BaseTest {
                 "    \"value\": \"abc\"\n" +
                 "  }\n" +
                 "]\n";
+        System.out.println(json.replaceAll("\n","").replace("\t",""));
         String listExpression = jsonSqlParser.convertJsonToLispExpression(json);
         System.out.println("lispExpression:" + listExpression);
     }

@@ -67,8 +67,8 @@ public class Query implements IQuery {
             List<Map<String, Object>> countDatas = JDBCUtils.executeQuery(connection,
                     countSql, new ArrayList<>());
             //remove null datas
-            removeNullDatasFromDataMap(countDatas);
-            count = Integer.valueOf(countDatas.get(0).get(COUNT_NUM).toString());
+            removeNullDatasFromDataMap(resultList);
+            count = countDatas != null && countDatas.size() > 0 ? Integer.valueOf(countDatas.get(0).get(COUNT_NUM).toString()) : 0;
         }catch(SQLException e){
             LOG.error("query met db exception, jsonQuery:{}, start:{}, size:{}", jsonQuery, start, size, e);
             throw new HappyQueryException("query met db exception", e);
