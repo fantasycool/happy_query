@@ -53,7 +53,7 @@ public class BaseTest {
         m.put("c", 3);
         for(Iterator<Map.Entry<String, Object>> it = m.entrySet().iterator(); it.hasNext() ;){
             Map.Entry<String, Object> entry = it.next();
-            it.remove();
+                    it.remove();
         }
     }
 }

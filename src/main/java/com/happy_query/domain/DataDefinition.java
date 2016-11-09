@@ -255,6 +255,7 @@ public class DataDefinition {
                     childMap.put("tagKey", child.getKey());
                     childMap.put("nickname", child.getNickName());
                     childMap.put("childTagJson", child.getComputationJson());
+                    childMap.put("tagWay", child.getTagType());
                     childTags.add(childMap);
                 }
                 result.put("childTags", childTags);
