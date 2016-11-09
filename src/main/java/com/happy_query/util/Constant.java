@@ -21,6 +21,10 @@ public class Constant {
     public static final String OPERATOR_VALUE_EQUALS = "equals";
     public static final String OPERATOR = "operator";
     /**
+     * 页面展示使用
+     */
+    public static final int VIEW_GROUP_TYPE = 2;
+    /**
      * table data_definition_value category->sub_key values
      */
     public static Map<String, Integer> SUB_KEY_MAP = new HashMap<String, Integer>();

@@ -23,6 +23,7 @@ import java.util.*;
  * Created by frio on 16/6/14.
  */
 public class DataDefinition {
+    public static final int VIEW_DULI_TYPE = 1;
     static Logger LOG = LoggerFactory.getLogger(DataDefinition.class);
     private Long id;
     private Long parentId;
@@ -244,7 +245,7 @@ public class DataDefinition {
         result.put("tagComment", dataDefinition.getDescription());
         if(dataDefinition.getType() == Constant.TAG_TYPE){
             if(dataDefinition.getTagType() == Constant.GROUP_BIAO_QIAN){
-                result.put("tagType", 2);
+                result.put("tagType", Constant.VIEW_GROUP_TYPE);
                 result.put("groupName", dataDefinition.getNickName());
                 List<String> keys = PrmTagKeyRelation.querySubKeysByGroupKey(dataSource, dataDefinition.getKey());
                 List<Map<String, Object>> childTags = new ArrayList<>();
@@ -258,21 +259,10 @@ public class DataDefinition {
                 }
                 result.put("childTags", childTags);
             }else{
-                result.put("tagType", 1);
+                result.put("tagType", VIEW_DULI_TYPE);
                 result.put("tagName", dataDefinition.getNickName());
-                switch(dataDefinition.getTagType().intValue()){
-                    case Constant.XI_TONG_BIAO_QIAN:
-                        result.put("tagWay", 1);
-                        break;
-                    case Constant.HAND_BIAO_QIAN:
-                        result.put("tagWay", 3);
-                        break;
-                    case Constant.DYNAMIC_BIAO_QIAN:
-                        result.put("tagWay", 2);
-                        break;
-                    default:
-                        throw new HappyQueryException("invalid tag datadefinition:" + JSON.toJSONString(dataDefinition));
-                }
+                result.put("tagState", dataDefinition.getProgress());
+                result.put("tagWay", dataDefinition.getTagType());
             }
         }else{
             throw new IllegalArgumentException("tagKey:" + tagKey + " is not tag datadefinition");
