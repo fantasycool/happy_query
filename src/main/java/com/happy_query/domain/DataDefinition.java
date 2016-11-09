@@ -623,12 +623,17 @@ public class DataDefinition {
      */
     public static String mergeJson(String groupNameJson, String childComputationJson) {
         if(StringUtils.isBlank(groupNameJson)){
-            return childComputationJson;
+            List<Object> params = new ArrayList<>();
+            params.add("and");
+            JSONObject childJsonObject = (JSONObject)JSON.parse(childComputationJson);
+            params.add(childJsonObject);
+            JSONArray jsonArray = new JSONArray(params);
+            return jsonArray.toJSONString();
         }
         JSONArray groupJSONArray = (JSONArray)JSON.parse(groupNameJson);
         JSONObject childJsonObject = (JSONObject)JSON.parse(childComputationJson);
         List<Object> params = new ArrayList<>();
-        String connector = "and";
+        String connector = groupJSONArray.getString(0);
         params.add(connector);
         fillJsonArrayList(groupJSONArray, params);
         params.add(childJsonObject);

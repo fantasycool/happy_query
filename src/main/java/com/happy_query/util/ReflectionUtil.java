@@ -88,6 +88,12 @@ public class ReflectionUtil {
                 LOG.error("clone bean to Map failed", e);
             }
         }
+        for(Iterator<Map.Entry<String, Object>> it = result.entrySet().iterator(); it.hasNext();){
+            Map.Entry<String, Object> entry = it.next();
+            if(entry.getValue() == null){
+                result.remove(entry.getKey());
+            }
+        }
         return result;
     }
 

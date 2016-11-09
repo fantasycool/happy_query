@@ -44,7 +44,7 @@ public class BaseTest {
 
     @Test
     public void test(){
-        DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition("1478655695378-8");
+        DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition("1478674759465");
         System.out.println();
     }
 }
