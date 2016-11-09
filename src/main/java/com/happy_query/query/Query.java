@@ -106,7 +106,7 @@ public class Query implements IQuery {
                         }
                         BigDecimal bigDecimal = new BigDecimal(entry.getValue().toString());
                         if(bigDecimal.compareTo(new BigDecimal(-1)) == 0){
-                            m.remove(entry.getKey());
+                            it.remove();
                         }
                     }
                 }

@@ -12,6 +12,9 @@ import org.junit.Test;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by frio on 16/10/19.
@@ -44,7 +47,13 @@ public class BaseTest {
 
     @Test
     public void test(){
-        DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition("1478674759465");
-        System.out.println();
+        Map<String, Object> m = new HashMap<>();
+        m.put("a", 1);
+        m.put("b", 2);
+        m.put("c", 3);
+        for(Iterator<Map.Entry<String, Object>> it = m.entrySet().iterator(); it.hasNext() ;){
+            Map.Entry<String, Object> entry = it.next();
+            it.remove();
+        }
     }
 }
