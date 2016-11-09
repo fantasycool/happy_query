@@ -406,9 +406,9 @@ public class DataDefinition {
      */
     public static List<DataDefinition> insertGroupTagDataDefinition(DataSource dataSource, DataDefinition groupTag,
                                                                     List<DataDefinition> childsTag, int tagType){
-        NullChecker.checkNull(groupTag, childsTag, groupTag.getNickName(), groupTag.getDescription());
+        NullChecker.checkNull(groupTag, childsTag, groupTag.getNickName());
         for(DataDefinition dataDefinition : childsTag){
-            NullChecker.checkNull(dataDefinition.getNickName(), dataDefinition.getComputationJson(), dataDefinition.getDescription());
+            NullChecker.checkNull(dataDefinition.getNickName(), dataDefinition.getComputationJson());
         }
         List<DataDefinition> result = new ArrayList<>();
         //create group tag
