@@ -32,7 +32,7 @@ public class DataDefinitionCacheManager {
     public static DataSource dataSource;
     public static LoadingCache<Object, Object> cache = CacheBuilder.newBuilder()
             .maximumSize(2000)
-            .expireAfterWrite(60, TimeUnit.MINUTES)
+            .expireAfterWrite(5, TimeUnit.MINUTES)
             .build(
                     new CacheLoader<Object, Object>() {
                         public Object load(Object key) throws Exception {

@@ -24,7 +24,7 @@ public class RelationCacheManager {
 
     public static LoadingCache<String, Set<String>> cache = CacheBuilder.newBuilder()
             .maximumSize(2000)
-            .expireAfterWrite(60, TimeUnit.MINUTES)
+            .expireAfterWrite(5, TimeUnit.MINUTES)
             .build(
                     new CacheLoader<String, Set<String>>() {
                         public Set<String> load(String key) throws Exception {
