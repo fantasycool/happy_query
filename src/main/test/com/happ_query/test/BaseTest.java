@@ -1,12 +1,14 @@
 package com.happ_query.test;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.happy_query.domain.DataDefinition;
 import com.happy_query.query.cache.DataDefinitionCacheManager;
 import com.happy_query.query.cache.RelationCacheManager;
 import com.happy_query.parser.JsonSqlParser;
 import com.happy_query.query.Query;
 import com.happy_query.writer.Writer;
 import org.junit.Before;
+import org.junit.Test;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -22,9 +24,9 @@ public class BaseTest {
     @Before
     public void init() {
         DruidDataSource dd = new DruidDataSource();
-        dd.setUrl("jdbc:mysql://localhost/crucial");
-        dd.setUsername("frio");
-        dd.setPassword("frio");
+        dd.setUrl("jdbc:mysql://120.27.234.146:3306/prm?characterEncoding=utf8&allowMultiQueries=true");
+        dd.setUsername("qa");
+        dd.setPassword("qa");
         dd.setMaxActive(5);
         try {
             dd.init();
@@ -38,5 +40,11 @@ public class BaseTest {
         RelationCacheManager.dataSource = dataSource;
         query = new Query(dataSource);
         writer = new Writer(dataSource);
+    }
+
+    @Test
+    public void test(){
+        DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition("1478655695378-8");
+        System.out.println();
     }
 }

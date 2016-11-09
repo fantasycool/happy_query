@@ -96,6 +96,9 @@ public class DataDefinitionCacheManager {
             if(!(object instanceof DataDefinition)){
                 throw new HappyQueryException("return object is not DD type");
             }
+            if(object instanceof NullDataDefinition){
+                cache.invalidate(k);
+            }
             return (DataDefinition)object;
         } catch (ExecutionException e) {
             LOG.error("DataDefinitionCacheManager get dd error");
