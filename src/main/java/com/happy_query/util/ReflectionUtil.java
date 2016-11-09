@@ -62,15 +62,17 @@ public class ReflectionUtil {
             try {
                 if (field.getType().equals(Date.class)) {
                     Date date = (Date) field.get(bean);
-                    result.put(getColumnNameByField(field.getName()), date.getTime());
+                    if(date != null){
+                        result.put(getColumnNameByField(field.getName()), date.getTime());
+                    }
                 }else if(field.getType().equals(Boolean.class)) {
-                    if (field.getBoolean(bean)) {
-                        result.put(getColumnNameByField(field.getName()), 1);
-                    } else {
+                    if (field.get(bean) != null && Boolean.valueOf(field.get(bean).toString())) {
                         result.put(getColumnNameByField(field.getName()), 0);
                     }
                 }else if(field.getType().equals(String.class)){
-                    result.put(getColumnNameByField(field.getName()), field.get(bean).toString());
+                    if (field.get(bean)!=null){
+                        result.put(getColumnNameByField(field.getName()), field.get(bean).toString());
+                    }
                 } else if (field.getType().equals(Long.class) || field.getType().equals(long.class)) {
                     result.put(getColumnNameByField(field.getName()), field.get(bean));
                 } else if (field.getType().equals(Integer.class)) {

@@ -360,17 +360,21 @@ public class DataDefinition {
         dataDefinition.setType(Constant.TAG_TYPE);
         dataDefinition.setTagQuery(false);
         dataDefinition.setStatus(0);
+        insertTagKeyRelations(dataSource, dataDefinition);
+        insertDataDefinition(dataSource, dataDefinition);
+        return dataDefinition;
+    }
+
+    private static void insertTagKeyRelations(DataSource dataSource, DataDefinition dataDefinition) {
         if(StringUtils.isNoneBlank(dataDefinition.getComputationRule())){
             MoyeParser moyeParser = new MoyeParserImpl();
             List<Word> words = moyeParser.parseExpression(dataDefinition.getComputationRule());
             for(Word w : words){
                 if(w instanceof DynamicVariable){
-                    KeyRelation.insertKeyRelation(dataDefinition.getKey(), w.getName(), dataSource);
+                    KeyRelation.insertKeyRelation(w.getName(), dataDefinition.getKey(), dataSource);
                 }
             }
         }
-        insertDataDefinition(dataSource, dataDefinition);
-        return dataDefinition;
     }
 
 
@@ -407,7 +411,7 @@ public class DataDefinition {
      */
     public static List<DataDefinition> insertGroupTagDataDefinition(DataSource dataSource, DataDefinition groupTag,
                                                                     List<DataDefinition> childsTag, int tagType){
-        NullChecker.checkNull(groupTag, childsTag, groupTag.getNickName(), groupTag.getDescription(), groupTag.getComputationJson());
+        NullChecker.checkNull(groupTag, childsTag, groupTag.getNickName(), groupTag.getDescription());
         for(DataDefinition dataDefinition : childsTag){
             NullChecker.checkNull(dataDefinition.getNickName(), dataDefinition.getComputationJson(), dataDefinition.getDescription());
         }
@@ -429,6 +433,7 @@ public class DataDefinition {
         for(DataDefinition dataDefinition : childsTag){
             dataDefinition.setKey(String.valueOf(System.currentTimeMillis()) + i);
             dataDefinition.setComputationRule(jsonSqlParser.convertJsonToLispExpression(mergeJson(groupTag.getComputationJson(), dataDefinition.getComputationJson())));
+            insertTagKeyRelations(dataSource, dataDefinition);
             dataDefinition.setType(Constant.TAG_TYPE);
             dataDefinition.setTagType(tagType);
             dataDefinition.setDefinitionType(DefinitionType.INPUT.toString());
@@ -614,13 +619,16 @@ public class DataDefinition {
 
     /**
      * 合并组标签和子标签的json生成一个合并结果的json
-     * @param computationJson
-     * @param computationJson1
+     * @param groupNameJson
+     * @param childComputationJson
      * @return
      */
-    public static String mergeJson(String computationJson, String computationJson1) {
-        JSONArray groupJSONArray = (JSONArray)JSON.parse(computationJson);
-        JSONObject childJsonObject = (JSONObject)JSON.parse(computationJson1);
+    public static String mergeJson(String groupNameJson, String childComputationJson) {
+        if(StringUtils.isBlank(groupNameJson)){
+            return childComputationJson;
+        }
+        JSONArray groupJSONArray = (JSONArray)JSON.parse(groupNameJson);
+        JSONObject childJsonObject = (JSONObject)JSON.parse(childComputationJson);
         List<Object> params = new ArrayList<>();
         String connector = "and";
         params.add(connector);

@@ -82,7 +82,7 @@ public class KeyRelation {
         NullChecker.checkNull(sourceKey, targetKey, dataSource);
         Map<String, Object> params = new HashMap<>();
         params.put("source_key", sourceKey);
-        params.put("target_key", targetKey);
+        params.put("key", targetKey);
         try{
             return JDBCUtils.insertToTable(dataSource, Constant.KEY_RELATION_TABLE_NAME, params);
         }catch(MySQLIntegrityConstraintViolationException e){
