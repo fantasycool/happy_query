@@ -32,6 +32,13 @@ public class RelationCacheManager {
                         }
                     });
 
+    /**
+     * 全部invalid
+     */
+    public static void refreshAll(){
+        cache.invalidateAll();
+    }
+
     private static Set<String> createRelationKeys(String key) {
         return KeyRelation.getAffectedRelationKeys(key, dataSource);
     }

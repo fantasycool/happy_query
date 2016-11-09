@@ -321,7 +321,6 @@ public class DataDefinition {
 
     public static int updateDataDefinitionByKey(DataSource dataSource, DataDefinition dataDefinition){
         NullChecker.checkNull(dataDefinition.getKey());
-        Map<String, Object> map = ReflectionUtil.cloneBeanToMap(dataDefinition);
         try{
             DataDefinition oldDataDefinition = DataDefinitionCacheManager.getDataDefinition(dataDefinition.getKey());
             if(oldDataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition){
@@ -330,6 +329,10 @@ public class DataDefinition {
             dataDefinition.setId(oldDataDefinition.getId());
             dataDefinition.setDataType(oldDataDefinition.getDataType());
             DataDefinitionCacheManager.delByKey(dataDefinition.getKey());
+            if(dataDefinition.getType() == Constant.TAG_TYPE && dataDefinition.getTagType() == Constant.DYNAMIC_BIAO_QIAN){
+                insertKeyRelation(dataSource, dataDefinition);
+            }
+            Map<String, Object> map = ReflectionUtil.cloneBeanToMap(dataDefinition);
             return JDBCUtils.executeUpdateById(dataSource, Constant.TABLE_NAME, map, "id", dataDefinition.getId());
         } catch(SQLException e){
             LOG.error("updateDataDefinitionByKey failed, dataDefintion:" + JSON.toJSONString(dataDefinition), e);
@@ -360,12 +363,14 @@ public class DataDefinition {
         dataDefinition.setType(Constant.TAG_TYPE);
         dataDefinition.setTagQuery(false);
         dataDefinition.setStatus(0);
-        insertTagKeyRelations(dataSource, dataDefinition);
+        if(dataDefinition.getType() == Constant.TAG_TYPE && dataDefinition.getTagType() == Constant.DYNAMIC_BIAO_QIAN){
+            insertKeyRelation(dataSource, dataDefinition);
+        }
         insertDataDefinition(dataSource, dataDefinition);
         return dataDefinition;
     }
 
-    private static void insertTagKeyRelations(DataSource dataSource, DataDefinition dataDefinition) {
+    private static void insertKeyRelation(DataSource dataSource, DataDefinition dataDefinition) {
         if(StringUtils.isNoneBlank(dataDefinition.getComputationRule())){
             MoyeParser moyeParser = new MoyeParserImpl();
             List<Word> words = moyeParser.parseExpression(dataDefinition.getComputationRule());
@@ -433,7 +438,7 @@ public class DataDefinition {
         for(DataDefinition dataDefinition : childsTag){
             dataDefinition.setKey(String.valueOf(System.currentTimeMillis()) + i);
             dataDefinition.setComputationRule(jsonSqlParser.convertJsonToLispExpression(mergeJson(groupTag.getComputationJson(), dataDefinition.getComputationJson())));
-            insertTagKeyRelations(dataSource, dataDefinition);
+            insertKeyRelation(dataSource, dataDefinition);
             dataDefinition.setType(Constant.TAG_TYPE);
             dataDefinition.setTagType(tagType);
             dataDefinition.setDefinitionType(DefinitionType.INPUT.toString());

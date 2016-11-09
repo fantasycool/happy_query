@@ -72,6 +72,29 @@ public class KeyRelation {
     }
 
     /**
+     * 获取影响到key指标的首长指标
+     * @param key
+     * @param dataSource
+     * @return
+     */
+    public static Set<String> getShouZhangKeys(String key, DataSource dataSource){
+        NullChecker.checkNull(key);
+        List<Object> params = new ArrayList<>();
+        params.add(key);
+        try{
+            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select distinct source_key from "
+                    + Constant.KEY_RELATION_TABLE_NAME + " where `key`=?", params);
+            Set<String> set = new HashSet<>();
+            for(Map<String, Object> m : list){
+                set.add(m.get("source_key").toString());
+            }
+            return set;
+        }catch(SQLException e){
+            throw new HappyQueryException("key get shou zhang keys failed!", e);
+        }
+    }
+
+    /**
      * insert key relation,表示指标之间的互相影响关系
      * @param sourceKey
      * @param targetKey
