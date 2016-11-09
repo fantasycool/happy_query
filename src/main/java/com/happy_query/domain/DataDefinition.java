@@ -329,7 +329,7 @@ public class DataDefinition {
             dataDefinition.setId(oldDataDefinition.getId());
             dataDefinition.setDataType(oldDataDefinition.getDataType());
             DataDefinitionCacheManager.delByKey(dataDefinition.getKey());
-            if(dataDefinition.getType() == Constant.TAG_TYPE && dataDefinition.getTagType() == Constant.DYNAMIC_BIAO_QIAN){
+            if(oldDataDefinition.getType() == Constant.TAG_TYPE && oldDataDefinition.getTagType() == Constant.DYNAMIC_BIAO_QIAN){
                 insertKeyRelation(dataSource, dataDefinition);
             }
             Map<String, Object> map = ReflectionUtil.cloneBeanToMap(dataDefinition);
