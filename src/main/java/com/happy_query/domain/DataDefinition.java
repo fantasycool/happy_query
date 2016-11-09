@@ -438,7 +438,6 @@ public class DataDefinition {
         for(DataDefinition dataDefinition : childsTag){
             dataDefinition.setKey(String.valueOf(System.currentTimeMillis()) + i);
             dataDefinition.setComputationRule(jsonSqlParser.convertJsonToLispExpression(mergeJson(groupTag.getComputationJson(), dataDefinition.getComputationJson())));
-            insertKeyRelation(dataSource, dataDefinition);
             dataDefinition.setType(Constant.TAG_TYPE);
             dataDefinition.setTagType(tagType);
             dataDefinition.setDefinitionType(DefinitionType.INPUT.toString());
@@ -447,7 +446,9 @@ public class DataDefinition {
             dataDefinition.setTagQuery(false);
             dataDefinition.setEditable(false);
             insertDataDefinition(dataSource, dataDefinition);
-
+            if(dataDefinition.getTagType() == Constant.DYNAMIC_BIAO_QIAN){
+                insertKeyRelation(dataSource, dataDefinition);
+            }
             PrmTagKeyRelation prmTagKeyRelation = new PrmTagKeyRelation();
             prmTagKeyRelation.setGroupKey(groupTag.getKey());
             prmTagKeyRelation.setSubKey(dataDefinition.getKey());
@@ -470,8 +471,10 @@ public class DataDefinition {
             NullChecker.checkNull(dataDefinition.getComputationJson());
             String json = dataDefinition.getComputationJson();
             JSONObject jsonObject = (JSONObject) JSON.parse(json);
+            //子标签实际对应的数据指标
+            DataDefinition operatorDD = DataDefinitionCacheManager.getDataDefinition(jsonObject.getString("attr").trim());
             if(jsonObject.getString(Constant.OPERATOR).equals(Constant.OPERATOR_VALUE_RANGE)){
-                if(!dataDefinition.getDataType().equals(DataDefinitionDataType.STRING.toString())){
+                if(!operatorDD.getDataType().equals(DataDefinitionDataType.STRING.toString())){
                     String value = jsonObject.getString(Constant.VALUE);
                     DoubleRange doubleRange = generateDoubleRangeFromValue(value);
                     ranges.add(doubleRange);

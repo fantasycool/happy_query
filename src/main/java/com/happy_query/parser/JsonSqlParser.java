@@ -150,9 +150,6 @@ public class JsonSqlParser implements IJsonSqlParser {
                     }
                 } else if (jsonObject.getString(Constant.OPERATOR).equals(Constant.CONTAINS)) {
                     JSONArray value = jsonObject.getJSONArray(Constant.VALUE);
-                    if(!dataDefinition.getDefinitionType().equals(Constant.CHECKBOX)){
-                        throw new HappyQueryException("keyName:" + keyName + " have to be a multiselelct dd to support contains");
-                    }
                     for(Object k : value){
                         DataDefinition childMultiSelect = DataDefinitionCacheManager.getDataDefinition(k);
                         if(childMultiSelect instanceof DataDefinitionCacheManager.NullDataDefinition){
