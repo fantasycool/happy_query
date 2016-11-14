@@ -27,9 +27,9 @@ public class BaseTest {
     @Before
     public void init() {
         DruidDataSource dd = new DruidDataSource();
-        dd.setUrl("jdbc:mysql://120.27.234.146:3306/prm?characterEncoding=utf8&allowMultiQueries=true");
+        dd.setUrl("jdbc:mysql://192.168.10.11:3306/prm?characterEncoding=utf8&allowMultiQueries=true");
         dd.setUsername("qa");
-        dd.setPassword("qa");
+        dd.setPassword("qa@123");
         dd.setMaxActive(5);
         try {
             dd.init();

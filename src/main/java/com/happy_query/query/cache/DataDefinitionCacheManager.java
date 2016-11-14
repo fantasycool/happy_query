@@ -54,10 +54,11 @@ public class DataDefinitionCacheManager {
      */
     public static void init(){
         try {
-            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select `key` from " + com.happy_query.util.Constant.TABLE_NAME + " where status=0", new ArrayList<>());
+            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select `key`,id from " + com.happy_query.util.Constant.TABLE_NAME + " where status=0", new ArrayList<>());
             for(Map<String, Object> m: list){
                 String key = m.get("key").toString();
                 getDataDefinition(key);
+                getDataDefinition(Long.valueOf(m.get("id").toString()));
             }
         } catch (SQLException e) {
             throw new HappyQueryException("dds init failed!", e);
@@ -66,7 +67,7 @@ public class DataDefinitionCacheManager {
 
     public static void refreshAll(){
         try {
-            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select `key` from " + com.happy_query.util.Constant.TABLE_NAME + " where status=0", new ArrayList<>());
+            List<Map<String, Object>> list = JDBCUtils.executeQuery(dataSource, "select `key`,id from " + com.happy_query.util.Constant.TABLE_NAME + " where status=0", new ArrayList<>());
             for(Map<String, Object> m: list){
                 String key = m.get("key").toString();
                 delByKey(key);

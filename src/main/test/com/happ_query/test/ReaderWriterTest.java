@@ -2,6 +2,7 @@ package com.happ_query.test;
 
 import com.alibaba.fastjson.JSON;
 import com.happy_query.domain.PrmUserInfo;
+import com.happy_query.query.cache.DataDefinitionCacheManager;
 import junit.framework.Assert;
 import org.javatuples.Pair;
 import org.junit.Test;
@@ -54,16 +55,11 @@ public class ReaderWriterTest extends BaseTest {
 
     @Test
     public void testQueryById() throws SQLException {
+        DataDefinitionCacheManager.init();
         Connection connection = dataSource.getConnection();
         List<String> keys = new ArrayList<>();
-        keys.add("dd2");
-        keys.add("dd2_comment");
-        keys.add("BMI");
-        Map<String, Object> map = query.getPrmUserInfo(28l, keys, connection);
-        Assert.assertNotNull(map.get("dd2"));
-        Assert.assertNotNull(map.get("dd2_comment"));
-        Assert.assertNotNull(map.get("BMI"));
-        Assert.assertNull(map.get("weight"));
+        Map<String, Object> map = query.getPrmUserInfo(1212l, keys, connection);
+        System.out.println();
     }
 
     @Test

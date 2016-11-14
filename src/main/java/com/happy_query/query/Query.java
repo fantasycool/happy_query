@@ -90,6 +90,7 @@ public class Query implements IQuery {
      * @param countDatas
      */
     private void removeNullDatasFromDataMap(List<Map<String, Object>> countDatas) {
+        long t1 = System.currentTimeMillis();
         for(Map<String, Object> m : countDatas){
             for(Iterator<Map.Entry<String, Object>> it = m.entrySet().iterator(); it.hasNext(); ){
                 Map.Entry<String, Object> entry = it.next();
@@ -119,14 +120,19 @@ public class Query implements IQuery {
         if(null == prmId || connection == null){
             throw new IllegalArgumentException();
         }
+        long t1 = System.currentTimeMillis();
         List<Object> args = new ArrayList<>();
         args.add(prmId);
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> prmDatas = new HashMap<>();
         try {
             List<Map<String, Object>> list = JDBCUtils.executeQuery(connection, "select * from " + Constant.PRM_USER_INFO + " where id=?", args);
+            System.out.println(System.currentTimeMillis() - t1);
+            t1 = System.currentTimeMillis();
             removeNullDatasFromDataMap(list);
+            System.out.println(System.currentTimeMillis() - t1);
             dataAssemble(prmId, connection, prmDatas, list.get(0), true, keys);
+
         } catch (SQLException e) {
             LOG.error("getPrmUserInfo query failed, prmId:{}", prmId);
             throw new HappyQueryException(e);
@@ -162,6 +168,9 @@ public class Query implements IQuery {
             List<DataDefinitionValue> dataDefinitionValues = getDataDefinitionValues(prmId, connection, keys);
             for(DataDefinitionValue ddv : dataDefinitionValues){
                 DataDefinition dd = DataDefinitionCacheManager.getDataDefinition(ddv.getDdRefId());
+                if(dd instanceof DataDefinitionCacheManager.NullDataDefinition){
+                    continue;
+                }
                 String keyName = dd.getKey();
                 try{
                     Object value = ddv.getNotNullValue();
