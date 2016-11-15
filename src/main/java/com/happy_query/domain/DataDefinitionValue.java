@@ -89,18 +89,17 @@ public class DataDefinitionValue {
         this.empName = empName;
     }
 
-    public Object getNotNullValue() {
-        if(this.getDoubleValue() != null){
-            return this.getDoubleValue();
-        }else if(this.getFeature() != null){
-            return this.getFeature();
-        }else if(this.getIntValue() != null){
-            return this.getIntValue();
-        }else if(this.getStrValue() != null){
+    public Object getValue(DataDefinitionDataType dataDefinitionDataType) {
+        if(dataDefinitionDataType == DataDefinitionDataType.STRING){
             return this.getStrValue();
-        }else{
-            throw new HappyQueryException("DataDefinitionValue ");
+        }else if(dataDefinitionDataType == DataDefinitionDataType.TEXT){
+            return this.getFeature();
+        }else if(dataDefinitionDataType == DataDefinitionDataType.DOUBLE){
+            return this.getDoubleValue();
+        }else if(dataDefinitionDataType == DataDefinitionDataType.INT){
+            return this.getIntValue();
         }
+        return null;
     }
 
     public String getValueColumn() {

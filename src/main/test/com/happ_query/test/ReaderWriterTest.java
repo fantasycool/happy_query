@@ -58,8 +58,8 @@ public class ReaderWriterTest extends BaseTest {
         DataDefinitionCacheManager.init();
         Connection connection = dataSource.getConnection();
         List<String> keys = new ArrayList<>();
-        Map<String, Object> map = query.getPrmUserInfo(1212l, keys, connection);
-        System.out.println();
+        Map<String, Object> map = query.getPrmUserInfo(1250l, null, connection);
+        System.out.println(JSON.toJSONString(map));
     }
 
     @Test

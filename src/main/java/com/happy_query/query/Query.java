@@ -131,8 +131,10 @@ public class Query implements IQuery {
             t1 = System.currentTimeMillis();
             removeNullDatasFromDataMap(list);
             System.out.println(System.currentTimeMillis() - t1);
+            if(list == null || list.size() == 0){
+                return new HashMap<>();
+            }
             dataAssemble(prmId, connection, prmDatas, list.get(0), true, keys);
-
         } catch (SQLException e) {
             LOG.error("getPrmUserInfo query failed, prmId:{}", prmId);
             throw new HappyQueryException(e);
@@ -173,7 +175,7 @@ public class Query implements IQuery {
                 }
                 String keyName = dd.getKey();
                 try{
-                    Object value = ddv.getNotNullValue();
+                    Object value = ddv.getValue(dd.getDataTypeEnum());
                     prmDatas.put(keyName, value);
                 }catch(HappyQueryException e){
                     LOG.error("dataAssemble failed", e);

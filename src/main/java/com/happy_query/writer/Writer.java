@@ -261,8 +261,13 @@ public class Writer implements IWriter {
     private void updateDataDefinitionValues(List<DataDefinitionValue> dataDefinitionValues, long prmId, String empName, Connection connection) throws SQLException {
         Map<String, List<List<Object>>> cachPrSqls = new HashMap<String, List<List<Object>>>();
         for(DataDefinitionValue dataDefinitionValue : dataDefinitionValues){
+            DataDefinition dataDefinition = DataDefinitionCacheManager.getDataDefinition(dataDefinitionValue.getDdRefId());
+            if(dataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition){
+                LOG.info("could not find datadefinition, key:{}", dataDefinition.getKey());
+                continue;
+            }
             String valueColumn = dataDefinitionValue.getValueColumn();
-            Object value = dataDefinitionValue.getNotNullValue();
+            Object value = dataDefinitionValue.getValue(dataDefinition.getDataTypeEnum());
             StringBuilder execSql = new StringBuilder();
             execSql.append("insert into ").append(Constant.DATA_DEFINITION_VALUE).append("(prm_id,dd_ref_id,emp_name,").append(valueColumn).append(")")
                     .append("values").append("(?,?,?,?) on duplicate key update ").append(valueColumn).append("=?, emp_name=?, status=0");
