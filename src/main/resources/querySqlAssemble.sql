@@ -9,7 +9,7 @@
     ${left_table} a
   <#if left_operation_str ??>
   where
-    ${left_operation_str}
+    ${left_operation_str} and status=0
   </#if>
   limit ${start_index}, ${size}
 <#elseif only_right ??>
@@ -49,7 +49,7 @@
       ${left_table}
     <#if left_operation_str ??>
     where
-      ${left_operation_str}
+      ${left_operation_str} and status=0
     </#if>
   ) a
   JOIN

@@ -68,7 +68,7 @@ public class Tagger implements ITagger {
                     for (Map<String, Object> value : values) {
                         Long prmId = Long.valueOf(value.get("id").toString());
                         Map<String, Object> m = new HashMap<>();
-                        m.put(tagKey, -1);
+                        m.put(tagKey, 1);
                         writer.updateRecord(m, prmId, "system");
                     }
                     if (pair.getValue0() == 0 || values.size() < size) {

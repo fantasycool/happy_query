@@ -98,7 +98,7 @@ public class Query implements IQuery {
                 if(!(dataDefinition instanceof DataDefinitionCacheManager.NullDataDefinition)){
                     if(dataDefinition.getDataTypeEnum() == DataDefinitionDataType.STRING
                             && (entry.getValue() == null || StringUtils.isEmptyOrWhitespaceOnly(entry.getValue().toString()))){
-                        m.remove(entry.getKey());
+                        it.remove();
                     }else if(dataDefinition.getDataTypeEnum() == DataDefinitionDataType.BOOLEAN
                             || dataDefinition.getDataTypeEnum() == DataDefinitionDataType.INT
                             || dataDefinition.getDataTypeEnum() == DataDefinitionDataType.DOUBLE){
