@@ -82,7 +82,7 @@ public class Tagger implements ITagger {
                 LOG.error("tag task execute failed!expression:{}, tagKey:{}", expression, tagKey, e);
                 DataDefinition.updateTaskProgressStatus(DataDefinitionCacheManager.dataSource, tagKey, Constant.TAG_TASK_STATUS_FAILED);
             }catch(Exception e){
-                LOG.error("tag task execute failed!expression:{}, tagKey:{}, unexpected exception.", expression, tagKey);
+                LOG.error("tag task execute failed!expression:{}, tagKey:{}, unexpected exception.", expression, tagKey, e);
                 DataDefinition.updateTaskProgressStatus(DataDefinitionCacheManager.dataSource, tagKey, Constant.TAG_TASK_STATUS_FAILED);
             }
         }
